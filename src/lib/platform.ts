@@ -12,7 +12,8 @@ const noopSubscribe = () => () => {};
 export function useIsMac(): boolean {
   return useSyncExternalStore(
     noopSubscribe,
-    () => /Mac|iPhone|iPad|iPod/.test(navigator.userAgent),
+    // iPad counts — it takes a keyboard with a ⌘ key. A phone does not.
+    () => /Mac|iPad/.test(navigator.userAgent),
     () => false,
   );
 }

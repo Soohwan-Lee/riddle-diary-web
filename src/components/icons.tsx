@@ -55,11 +55,13 @@ export function KeyboardIcon({ className }: IconProps) {
   );
 }
 
+/** Sliders rather than a cog — a cog at 16px is indistinguishable from a sun. */
 export function SettingsIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>
-      <circle cx="12" cy="12" r="2.8" />
-      <path d="M12 3.2v2M12 18.8v2M20.8 12h-2M5.2 12h-2M18.2 5.8l-1.4 1.4M7.2 16.8l-1.4 1.4M18.2 18.2l-1.4-1.4M7.2 7.2 5.8 5.8" />
+      <path d="M4 7.5h9M17.5 7.5H20M4 16.5h3.5M12 16.5h8" />
+      <circle cx="15" cy="7.5" r="2.2" />
+      <circle cx="9.5" cy="16.5" r="2.2" />
     </svg>
   );
 }

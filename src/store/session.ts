@@ -152,10 +152,19 @@ export const useSession = create<SessionState>()((set) => ({
       };
     }),
 
+  // If the stream died partway, the words already on the paper stay there —
+  // rewriting `raw` would make characters someone watched being written
+  // change under them.
   failReply: (id, message) =>
     set((state) => ({
       turns: state.turns.map((turn) =>
-        turn.id === id ? { ...turn, raw: message, streaming: false } : turn,
+        turn.id === id
+          ? {
+              ...turn,
+              raw: turn.raw ? `${turn.raw.trimEnd()}\n${message}` : message,
+              streaming: false,
+            }
+          : turn,
       ),
       status: "writing",
       error: message,

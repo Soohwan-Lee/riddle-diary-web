@@ -71,7 +71,9 @@ export function Composer({
       />
 
       <div className="mt-2 flex items-center justify-between gap-4">
-        <p className="text-[0.68rem] text-muted">
+        {/* A soft keyboard has no Ctrl key; on a phone the button is the
+            whole affordance. */}
+        <p className="hidden text-[0.7rem] text-muted sm:block">
           {isMac ? t.composer.hintMac : t.composer.hint}
         </p>
         <button

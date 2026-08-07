@@ -22,8 +22,12 @@ export function Header({ actions }: { actions?: React.ReactNode }) {
         className="flex flex-wrap items-center justify-end gap-2"
       >
         <ModeToggle />
-        <ThemeToggle />
-        <LocaleToggle />
+        {/* On a phone these two would take a third of the screen before a
+            single word is written, so they live in the settings sheet there. */}
+        <div className="hidden items-center gap-2 sm:flex">
+          <ThemeToggle />
+          <LocaleToggle />
+        </div>
         {actions}
       </nav>
     </header>

@@ -17,14 +17,16 @@ const IDLE_POLL_MS = 120;
  */
 export function useInkReveal(
   graphemes: readonly InkGrapheme[],
-  options: { instant: boolean },
+  options: { instant: boolean; streaming: boolean },
 ): number {
   const [revealed, setRevealed] = useState(0);
   const latest = useRef<readonly InkGrapheme[]>(graphemes);
+  const streaming = useRef(options.streaming);
   const cursor = useRef(0);
 
   useEffect(() => {
     latest.current = graphemes;
+    streaming.current = options.streaming;
   });
 
   useEffect(() => {
@@ -40,8 +42,9 @@ export function useInkReveal(
       const index = cursor.current;
 
       if (index >= queue.length) {
-        // Caught up with the stream. Check back shortly.
-        handle = setTimeout(step, IDLE_POLL_MS);
+        // Caught up. Poll only while more text may still arrive — otherwise
+        // every finished node on the page would keep a timer alive forever.
+        if (streaming.current) handle = setTimeout(step, IDLE_POLL_MS);
         return;
       }
 

@@ -12,7 +12,8 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  // The dev server's hot-reload socket needs an explicit allowance.
+  `connect-src 'self'${process.env.NODE_ENV === "development" ? " ws:" : ""}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

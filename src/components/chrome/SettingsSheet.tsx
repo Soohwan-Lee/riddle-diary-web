@@ -12,6 +12,7 @@ import {
   type WriteSpeed,
 } from "@/lib/prefs/config";
 import { usePrefs } from "@/lib/prefs/provider";
+import { LocaleToggle, ThemeToggle } from "./Controls";
 import { SegmentedControl, type Segment } from "./SegmentedControl";
 
 export function SettingsSheet({
@@ -102,6 +103,14 @@ export function SettingsSheet({
         </div>
 
         <div className="space-y-8 text-[0.8rem]">
+          <Field label={t.chrome.themeLabel}>
+            <ThemeToggle />
+          </Field>
+
+          <Field label={t.chrome.localeLabel}>
+            <LocaleToggle />
+          </Field>
+
           <Field label={t.settings.paceLabel} hint={describePace(dwell, t.settings.paceHint)}>
             <SegmentedControl
               label={t.settings.paceLabel}

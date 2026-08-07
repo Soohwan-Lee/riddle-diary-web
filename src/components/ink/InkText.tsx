@@ -65,7 +65,7 @@ export function InkText({
     [parsed.text, cpm, locale, seed],
   );
 
-  const revealed = useInkReveal(layout.graphemes, { instant });
+  const revealed = useInkReveal(layout.graphemes, { instant, streaming });
   const written = !streaming && revealed >= layout.graphemes.length;
 
   const marks = useMemo<ResolvedMark[]>(() => {
