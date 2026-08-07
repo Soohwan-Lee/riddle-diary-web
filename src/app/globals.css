@@ -1,0 +1,193 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Inkling design tokens
+
+   Themes switch on `data-theme` on <html>, written server-side from a cookie
+   so there is never a flash of the wrong theme. `system` resolves in pure CSS.
+   ========================================================================== */
+
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* surface */
+  --paper: #f7f3ea;
+  --paper-edge: #efe8d9;
+  --paper-shadow: 22 20 16;
+  --grain-opacity: 0.035;
+  --rule: #1b243014;
+
+  /* ink */
+  --ink-user: #1b2430;
+  --ink-user-wet: #0d1622;
+  --ink-ai: #2f5d57;
+  --ink-ai-wet: #1d443f;
+  --ink-ai-glow: transparent;
+  --ink-mark: #b4553f;
+  --highlight: #f2d06b;
+  --highlight-alpha: 0.42;
+  --highlight-blend: multiply;
+
+  /* chrome */
+  --muted: #6c665a;
+  --muted-strong: #45403a;
+  --hairline: #1b243019;
+  --hairline-strong: #1b243033;
+  --focus: #2f5d57;
+  --danger: #a8402c;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #0e1013;
+  --paper-edge: #141719;
+  --paper-shadow: 0 0 0;
+  --grain-opacity: 0.05;
+  --rule: #ede8dc12;
+
+  --ink-user: #ede8dc;
+  --ink-user-wet: #ffffff;
+  --ink-ai: #8fd9c4;
+  --ink-ai-wet: #b9f0e0;
+  --ink-ai-glow: #8fd9c43d;
+  --ink-mark: #e0876b;
+  --highlight: #f2d06b;
+  --highlight-alpha: 0.2;
+  --highlight-blend: screen;
+
+  --muted: #8b8b85;
+  --muted-strong: #b6b5ac;
+  --hairline: #ede8dc1f;
+  --hairline-strong: #ede8dc3d;
+  --focus: #8fd9c4;
+  --danger: #ef8a77;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="system"] {
+    color-scheme: dark;
+
+    --paper: #0e1013;
+    --paper-edge: #141719;
+    --paper-shadow: 0 0 0;
+    --grain-opacity: 0.05;
+    --rule: #ede8dc12;
+
+    --ink-user: #ede8dc;
+    --ink-user-wet: #ffffff;
+    --ink-ai: #8fd9c4;
+    --ink-ai-wet: #b9f0e0;
+    --ink-ai-glow: #8fd9c43d;
+    --ink-mark: #e0876b;
+    --highlight: #f2d06b;
+    --highlight-alpha: 0.2;
+    --highlight-blend: screen;
+
+    --muted: #8b8b85;
+    --muted-strong: #b6b5ac;
+    --hairline: #ede8dc1f;
+    --hairline-strong: #ede8dc3d;
+    --focus: #8fd9c4;
+    --danger: #ef8a77;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-edge: var(--paper-edge);
+  --color-rule: var(--rule);
+  --color-ink-user: var(--ink-user);
+  --color-ink-ai: var(--ink-ai);
+  --color-ink-mark: var(--ink-mark);
+  --color-highlight: var(--highlight);
+  --color-muted: var(--muted);
+  --color-muted-strong: var(--muted-strong);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-focus: var(--focus);
+  --color-danger: var(--danger);
+
+  --font-ui: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-hand-user: var(--font-caveat), var(--font-gaegu), cursive;
+  --font-hand-ai: var(--font-shadows), var(--font-nanum-pen), cursive;
+
+  /* Slow-technology motion. No springs, no bounce. */
+  --ease-ink: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-settle: cubic-bezier(0.33, 0, 0.15, 1);
+  --duration-chrome: 240ms;
+  --duration-ink: 900ms;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background-color: var(--paper);
+  color: var(--ink-user);
+  font-family: var(--font-ui);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background-color var(--duration-chrome) var(--ease-settle),
+    color var(--duration-chrome) var(--ease-settle);
+}
+
+/* Fibrous paper grain. Static, cheap, and does not repaint. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--ink-ai) 24%, transparent);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Visually hidden but available to assistive technology. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
