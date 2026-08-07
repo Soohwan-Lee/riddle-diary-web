@@ -48,6 +48,8 @@ const ko = {
     fingerHint: "손가락으로도 쓸 수 있어요",
     penOnlyHint: "스타일러스로 써주세요",
     reading: "글씨를 읽는 중",
+    pointerOnly:
+      "손글씨는 마우스나 펜이 필요합니다. 키보드로 적으시려면 상단에서 타이핑 모드로 바꿔주세요.",
   },
 
   settings: {
@@ -151,6 +153,8 @@ const en: Translation<Dictionary> = {
     fingerHint: "You can write with your finger too",
     penOnlyHint: "Please write with a stylus",
     reading: "Reading your handwriting",
+    pointerOnly:
+      "Handwriting needs a mouse or a pen. To write with a keyboard, switch to typing mode at the top of the page.",
   },
 
   settings: {

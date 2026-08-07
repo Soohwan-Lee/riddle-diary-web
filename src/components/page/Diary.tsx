@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Header } from "@/components/chrome/Header";
+import { SettingsSheet } from "@/components/chrome/SettingsSheet";
+import { SettingsIcon } from "@/components/icons";
 import { InkStrokes } from "@/components/ink/InkStrokes";
 import { InkText } from "@/components/ink/InkText";
 import type { Stroke } from "@/lib/ink/strokes";
@@ -32,6 +34,7 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   const hidden = useDocumentHidden();
   const { composing, touch } = useComposingPause();
   const [held, setHeld] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   // Time only runs when someone is looking and nobody is mid-sentence.
   const paused = hidden || composing || held;
@@ -114,16 +117,37 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
 
   return (
     <div className="relative z-10 flex min-h-dvh flex-col">
-      <a
-        href="#composer"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:bg-paper focus:px-4 focus:py-2"
-      >
-        {t.a11y.skipToComposer}
-      </a>
+      {/* A landmark of its own, so the link is not content stranded outside
+          every region — and it targets the entry area rather than the
+          textarea, which does not exist in handwriting mode. */}
+      <nav aria-label={t.a11y.skipToComposer}>
+        <a
+          href="#entry"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:bg-paper focus:px-4 focus:py-2"
+        >
+          {t.a11y.skipToComposer}
+        </a>
+      </nav>
 
-      <Header />
+      <Header
+        actions={
+          <button
+            type="button"
+            onClick={() => setSettingsOpen(true)}
+            aria-label={t.chrome.settings}
+            title={t.chrome.settings}
+            className="inline-flex size-8 items-center justify-center rounded-full border border-hairline text-muted transition-colors hover:border-hairline-strong hover:text-ink-user"
+          >
+            <SettingsIcon className="size-4" />
+          </button>
+        }
+      />
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-6 pt-10 pb-16 sm:px-8">
+        <h1 className="sr-only">
+          {t.app.name} — {t.app.tagline}
+        </h1>
+
         <div
           className="ink-surface flex-1 space-y-7"
           data-paused={paused ? "true" : "false"}
@@ -172,26 +196,39 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
             ),
           )}
 
-          {mode === "type" ? (
-            <Composer
-              disabled={busy}
-              onSend={(text) => void send({ text })}
-              onActivity={touch}
-            />
-          ) : (
-            <InkCanvas
-              disabled={busy}
-              allowFinger={allowFinger}
-              onSend={(payload) => void send(payload)}
-              onActivity={touch}
-            />
-          )}
+          <div id="entry" tabIndex={-1} className="outline-none">
+            {mode === "type" ? (
+              <Composer
+                disabled={busy}
+                onSend={(text) => void send({ text })}
+                onActivity={touch}
+              />
+            ) : (
+              <InkCanvas
+                disabled={busy}
+                allowFinger={allowFinger}
+                onSend={(payload) => void send(payload)}
+                onActivity={touch}
+              />
+            )}
+          </div>
         </div>
 
-        <p className="mt-10 text-[0.68rem] text-muted/80">{t.page.notice}</p>
+        {/* Full-strength `--muted`: at this size an alpha modifier drops the
+            contrast below AA, and this line is the app's one honest warning. */}
+        <p className="mt-10 text-[0.72rem] leading-relaxed text-muted">
+          {t.page.notice}
+          <span className="ml-2">· {t.a11y.holdToKeep}</span>
+        </p>
       </main>
 
       <Transcript history={history} />
+
+      <SettingsSheet
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        onClearPage={() => useSession.getState().clearAll()}
+      />
     </div>
   );
 }

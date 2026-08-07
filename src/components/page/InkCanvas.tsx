@@ -150,9 +150,15 @@ export function InkCanvas({
 
   return (
     <div>
+      {/* Handwriting is inherently pointer-driven. Rather than dress the
+          canvas in `role="application"` and trap a screen reader in a surface
+          with no keyboard affordances, say so plainly and point at the mode
+          that does work. */}
+      <p className="sr-only">{t.hand.pointerOnly}</p>
+
       <div
         ref={surfaceRef}
-        role="application"
+        role="group"
         aria-label={t.hand.canvasLabel}
         aria-disabled={disabled}
         onPointerDown={handleDown}

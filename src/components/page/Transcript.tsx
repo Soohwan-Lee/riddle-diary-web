@@ -14,7 +14,9 @@ export function Transcript({ history }: { history: readonly ChatMessage[] }) {
   const { t } = useI18n();
 
   return (
-    <div className="sr-only">
+    // A named `section` is a landmark, which keeps the transcript reachable
+    // by region navigation instead of stranded outside every landmark.
+    <section className="sr-only" aria-label={t.a11y.transcript}>
       <h2>{t.a11y.transcript}</h2>
       <p>{t.a11y.transcriptHint}</p>
       <div role="log" aria-live="polite" aria-relevant="additions">
@@ -27,6 +29,6 @@ export function Transcript({ history }: { history: readonly ChatMessage[] }) {
           </p>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
