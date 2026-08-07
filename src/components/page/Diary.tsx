@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Header } from "@/components/chrome/Header";
 import { InkText } from "@/components/ink/InkText";
-import { localMockTransport, type Transport } from "@/lib/ai/transport";
+import {
+  ConverseFailure,
+  sseTransport,
+  type ConverseError,
+  type Transport,
+} from "@/lib/ai/transport";
 import { LOCALE_TAG } from "@/lib/i18n/config";
 import { useI18n } from "@/lib/i18n/provider";
 import { useComposingPause, useDocumentHidden } from "@/lib/ink/usePageClock";
@@ -13,7 +18,7 @@ import { useSession } from "@/store/session";
 import { Composer } from "./Composer";
 import { Transcript } from "./Transcript";
 
-export function Diary({ transport = localMockTransport }: { transport?: Transport }) {
+export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   const { t, locale } = useI18n();
   const { mode, writeSpeed, fadePace, reducedMotion } = usePrefs();
 
@@ -46,25 +51,49 @@ export function Diary({ transport = localMockTransport }: { transport?: Transpor
     finishReply(id);
   }, [t.page.firstLine]);
 
+  const errorText = useCallback(
+    (code: ConverseError["code"]) => {
+      if (code === "rate_limited") return t.errors.rateLimited;
+      if (code === "too_long") return t.errors.tooLong;
+      if (code === "unreadable") return t.errors.unreadable;
+      if (code === "offline") return t.errors.offline;
+      return t.errors.generic;
+    },
+    [t.errors],
+  );
+
   const send = useCallback(
-    async (text: string) => {
+    async ({ text, image }: { text?: string; image?: string }) => {
       const session = useSession.getState();
-      session.addUserTurn({ raw: text });
-      const outgoing = useSession.getState().history;
+      // The history sent upstream is prior turns only; the current entry
+      // travels beside it, since handwriting arrives as an image.
+      const priorHistory = session.history;
+      const userId = session.addUserTurn({ raw: image ? "" : (text ?? "") });
       const replyId = session.beginReply();
 
       try {
         await transport(
-          { mode: "text", text, history: outgoing, locale },
-          { onDelta: (delta) => useSession.getState().appendReply(replyId, delta) },
+          {
+            mode: image ? "ink" : "text",
+            text,
+            image,
+            history: priorHistory,
+            locale,
+          },
+          {
+            onTranscript: (reading) =>
+              useSession.getState().setUserTranscript(userId, reading),
+            onDelta: (delta) => useSession.getState().appendReply(replyId, delta),
+          },
         );
         useSession.getState().finishReply(replyId);
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") return;
-        useSession.getState().failReply(replyId, t.errors.generic);
+        const code = error instanceof ConverseFailure ? error.code : "upstream";
+        useSession.getState().failReply(replyId, errorText(code));
       }
     },
-    [transport, locale, t.errors.generic],
+    [transport, locale, errorText],
   );
 
   const busy = status !== "idle";
@@ -116,7 +145,11 @@ export function Diary({ transport = localMockTransport }: { transport?: Transpor
           ))}
 
           {mode === "type" && (
-            <Composer disabled={busy} onSend={send} onActivity={touch} />
+            <Composer
+              disabled={busy}
+              onSend={(text) => void send({ text })}
+              onActivity={touch}
+            />
           )}
         </div>
 
