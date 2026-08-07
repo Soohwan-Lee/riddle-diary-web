@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Header } from "@/components/chrome/Header";
+import { InkStrokes } from "@/components/ink/InkStrokes";
 import { InkText } from "@/components/ink/InkText";
+import type { Stroke } from "@/lib/ink/strokes";
 import {
   ConverseFailure,
   sseTransport,
@@ -16,11 +18,12 @@ import { DWELL_MS, FADE_MS, WRITE_CPM } from "@/lib/prefs/config";
 import { usePrefs } from "@/lib/prefs/provider";
 import { useSession } from "@/store/session";
 import { Composer } from "./Composer";
+import { InkCanvas } from "./InkCanvas";
 import { Transcript } from "./Transcript";
 
 export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   const { t, locale } = useI18n();
-  const { mode, writeSpeed, fadePace, reducedMotion } = usePrefs();
+  const { mode, writeSpeed, fadePace, reducedMotion, allowFinger } = usePrefs();
 
   const turns = useSession((state) => state.turns);
   const history = useSession((state) => state.history);
@@ -63,12 +66,23 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   );
 
   const send = useCallback(
-    async ({ text, image }: { text?: string; image?: string }) => {
+    async ({
+      text,
+      image,
+      strokes,
+    }: {
+      text?: string;
+      image?: string;
+      strokes?: Stroke[];
+    }) => {
       const session = useSession.getState();
       // The history sent upstream is prior turns only; the current entry
       // travels beside it, since handwriting arrives as an image.
       const priorHistory = session.history;
-      const userId = session.addUserTurn({ raw: image ? "" : (text ?? "") });
+      const userId = session.addUserTurn({
+        raw: image ? "" : (text ?? ""),
+        strokes,
+      });
       const replyId = session.beginReply();
 
       try {
@@ -123,31 +137,52 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
           onPointerCancel={() => setHeld(false)}
           onPointerLeave={() => setHeld(false)}
         >
-          {turns.map((turn) => (
-            <InkText
-              key={turn.id}
-              id={turn.id}
-              voice={turn.voice}
-              raw={turn.raw}
-              streaming={turn.streaming}
-              phase={turn.phase}
-              cpm={cpm}
-              locale={LOCALE_TAG[locale]}
-              dwellMs={dwellMs}
-              fadeMs={fadeMs}
-              instant={turn.voice === "user" || reducedMotion}
-              onWritten={
-                turn.voice === "ai" ? () => useSession.getState().restAll() : undefined
-              }
-              onFaded={() => useSession.getState().removeTurn(turn.id)}
-              className="text-2xl leading-[1.85] sm:text-[1.7rem]"
-            />
-          ))}
+          {turns.map((turn) =>
+            turn.strokes ? (
+              <InkStrokes
+                key={turn.id}
+                strokes={turn.strokes}
+                style={{ size: 4.4, simulatePressure: true }}
+                phase={turn.phase}
+                dwellMs={dwellMs}
+                fadeMs={fadeMs}
+                onFaded={() => useSession.getState().removeTurn(turn.id)}
+              />
+            ) : (
+              <InkText
+                key={turn.id}
+                id={turn.id}
+                voice={turn.voice}
+                raw={turn.raw}
+                streaming={turn.streaming}
+                phase={turn.phase}
+                cpm={cpm}
+                locale={LOCALE_TAG[locale]}
+                dwellMs={dwellMs}
+                fadeMs={fadeMs}
+                instant={turn.voice === "user" || reducedMotion}
+                onWritten={
+                  turn.voice === "ai"
+                    ? () => useSession.getState().restAll()
+                    : undefined
+                }
+                onFaded={() => useSession.getState().removeTurn(turn.id)}
+                className="text-2xl leading-[1.85] sm:text-[1.7rem]"
+              />
+            ),
+          )}
 
-          {mode === "type" && (
+          {mode === "type" ? (
             <Composer
               disabled={busy}
               onSend={(text) => void send({ text })}
+              onActivity={touch}
+            />
+          ) : (
+            <InkCanvas
+              disabled={busy}
+              allowFinger={allowFinger}
+              onSend={(payload) => void send(payload)}
               onActivity={touch}
             />
           )}

@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { parseInkScript } from "@/lib/ink/inkscript";
+import type { Stroke } from "@/lib/ink/strokes";
 
 export type Voice = "user" | "ai";
 export type TurnPhase = "fresh" | "resting";
@@ -12,7 +13,7 @@ export type Turn = {
   /** InkScript for the page's replies, plain text for the reader's. */
   raw: string;
   /** Strokes captured in handwriting mode, drawn instead of text. */
-  strokes?: readonly (readonly number[][])[];
+  strokes?: readonly Stroke[];
   streaming: boolean;
   phase: TurnPhase;
   createdAt: number;
