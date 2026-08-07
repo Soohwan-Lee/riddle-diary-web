@@ -42,11 +42,16 @@ export const WRITE_SPEEDS = ["slow", "normal", "brisk"] as const;
 export type WriteSpeed = (typeof WRITE_SPEEDS)[number];
 export const DEFAULT_WRITE_SPEED: WriteSpeed = "normal";
 
-/** Characters per minute. */
+/**
+ * Characters per minute, script-independent — the layout normalises its
+ * per-character weights so Korean and English take the same total time.
+ * A two-sentence reply lands around fifteen seconds at `normal`: long enough
+ * to feel written, short enough that nobody walks away.
+ */
 export const WRITE_CPM: Record<WriteSpeed, number> = {
-  slow: 46,
-  normal: 72,
-  brisk: 104,
+  slow: 120,
+  normal: 190,
+  brisk: 280,
 };
 
 export type LocalPrefs = {

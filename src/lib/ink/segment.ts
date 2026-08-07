@@ -1,0 +1,190 @@
+import { noiseAt } from "./random";
+
+/**
+ * Turns a string into a writing schedule: one entry per grapheme, each with
+ * how long the hand spends on it and how long it rests afterwards. Hangul
+ * syllables take longer than Latin letters because they are three or four
+ * strokes stacked into one square; punctuation buys thinking time.
+ */
+
+export type InkGrapheme = {
+  char: string;
+  /** Absolute index across the whole text, marks stripped. */
+  index: number;
+  durationMs: number;
+  pauseAfterMs: number;
+  /** Whitespace is scheduled but drawn as a plain text node. */
+  whitespace: boolean;
+};
+
+export type InkWord = {
+  key: string;
+  /** Position across the whole text — drives the staggered fade. */
+  order: number;
+  indices: number[];
+  /** Whitespace that follows the word, rendered verbatim. */
+  trailing: string;
+};
+
+export type InkLine = {
+  key: string;
+  words: InkWord[];
+};
+
+export type InkLayout = {
+  graphemes: InkGrapheme[];
+  lines: InkLine[];
+  totalMs: number;
+};
+
+const HANGUL_SYLLABLE = /[가-힣]/;
+const HANGUL_JAMO = /[ᄀ-ᇿ㄰-㆏ꥠ-꥿]/;
+const CJK = /[㐀-䶿一-鿿豈-﫿]/;
+const KANA = /[぀-ヿ]/;
+const DIGIT = /[0-9]/;
+const LETTER = /\p{L}/u;
+
+/** Multiplier on the base per-character duration. */
+export function strokeWeight(char: string): number {
+  if (/\s/.test(char)) return 0.34;
+  if (HANGUL_SYLLABLE.test(char)) return 1.5;
+  if (HANGUL_JAMO.test(char)) return 1.1;
+  if (CJK.test(char)) return 1.7;
+  if (KANA.test(char)) return 1.15;
+  if (DIGIT.test(char)) return 0.9;
+  if (LETTER.test(char)) return 1;
+  return 0.65;
+}
+
+/** Extra rest after a character — the pen lifting, or the mind catching up. */
+export function pauseAfter(char: string): number {
+  if (char === "\n") return 420;
+  if (/[.!?。！？…]/.test(char)) return 320;
+  if (/[,、·;:]/.test(char)) return 140;
+  if (/\s/.test(char)) return 60;
+  return 0;
+}
+
+function splitGraphemes(text: string, locale: string): string[] {
+  if (typeof Intl !== "undefined" && "Segmenter" in Intl) {
+    const segmenter = new Intl.Segmenter(locale, { granularity: "grapheme" });
+    return Array.from(segmenter.segment(text), (entry) => entry.segment);
+  }
+  return Array.from(text);
+}
+
+export type LayoutOptions = {
+  /** Characters per minute the hand writes at. */
+  cpm: number;
+  locale: string;
+  /** Stable seed so jitter survives re-renders. */
+  seed: number;
+};
+
+export function layoutText(text: string, options: LayoutOptions): InkLayout {
+  const { cpm, locale, seed } = options;
+  const baseMs = 60_000 / Math.max(1, cpm);
+
+  const graphemes: InkGrapheme[] = [];
+  const lines: InkLine[] = [];
+
+  let index = 0;
+  let order = 0;
+  let totalMs = 0;
+
+  // A trailing "\n" would otherwise be dropped by split, and an empty line is
+  // meaningful in a diary.
+  const rawLines = text.split("\n");
+
+  rawLines.forEach((rawLine, lineNumber) => {
+    const words: InkWord[] = [];
+    // Keep the separators so spacing survives the round trip.
+    const tokens = rawLine.split(/(\s+)/).filter((token) => token.length > 0);
+
+    let pendingWord: InkWord | null = null;
+
+    for (const token of tokens) {
+      const isSpace = /^\s+$/.test(token);
+
+      if (isSpace) {
+        for (const char of splitGraphemes(token, locale)) {
+          const duration = baseMs * strokeWeight(char);
+          graphemes.push({
+            char,
+            index,
+            durationMs: duration,
+            pauseAfterMs: pauseAfter(char),
+            whitespace: true,
+          });
+          totalMs += duration + pauseAfter(char);
+          index += 1;
+        }
+        if (pendingWord) pendingWord.trailing += token;
+        continue;
+      }
+
+      const word: InkWord = { key: `w${index}`, order, indices: [], trailing: "" };
+      order += 1;
+      for (const char of splitGraphemes(token, locale)) {
+        // ±18% so no two neighbouring characters take exactly as long.
+        const jitter = 1 + noiseAt(seed, index) * 0.18;
+        const duration = baseMs * strokeWeight(char) * jitter;
+        const rest = pauseAfter(char);
+        graphemes.push({
+          char,
+          index,
+          durationMs: duration,
+          pauseAfterMs: rest,
+          whitespace: false,
+        });
+        word.indices.push(index);
+        totalMs += duration + rest;
+        index += 1;
+      }
+      words.push(word);
+      pendingWord = word;
+    }
+
+    if (lineNumber < rawLines.length - 1) {
+      const duration = baseMs * 0.2;
+      graphemes.push({
+        char: "\n",
+        index,
+        durationMs: duration,
+        pauseAfterMs: pauseAfter("\n"),
+        whitespace: true,
+      });
+      totalMs += duration + pauseAfter("\n");
+      index += 1;
+    }
+
+    lines.push({ key: `l${lineNumber}`, words });
+  });
+
+  // Weights shape the rhythm, they should not change the tempo: a Hangul
+  // syllable still takes longer than an `a`, but a Korean sentence and an
+  // English one of the same length finish together. Without this, `cpm` would
+  // mean something different in every script.
+  if (graphemes.length > 0) {
+    const target = graphemes.length * baseMs;
+    const written = graphemes.reduce((sum, g) => sum + g.durationMs, 0);
+    if (written > 0) {
+      const scale = target / written;
+      totalMs = 0;
+      for (const grapheme of graphemes) {
+        grapheme.durationMs *= scale;
+        totalMs += grapheme.durationMs + grapheme.pauseAfterMs;
+      }
+    }
+  }
+
+  return { graphemes, lines, totalMs };
+}
+
+/**
+ * Index of the last grapheme belonging to a word, used to decide when a
+ * word's trailing space should appear.
+ */
+export function wordEnd(word: InkWord): number {
+  return word.indices.length > 0 ? word.indices[word.indices.length - 1] : -1;
+}

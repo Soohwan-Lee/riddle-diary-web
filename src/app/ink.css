@@ -1,0 +1,249 @@
+/* ==========================================================================
+   The ink layer
+
+   Two backends, one clock:
+     - text  reveals per grapheme with clip-path
+     - marks draw along a real path with stroke-dashoffset
+
+   Everything animates on the compositor. Fading is a CSS animation whose play
+   state is driven by the inherited `--fade-state` custom property, so pausing
+   the whole page (tab hidden, someone is writing, hold-to-keep) is a single
+   variable write rather than a JavaScript loop.
+
+   Phases: `fresh` means the ink is still wet and time has not started;
+   `resting` means the dwell is counting down and the fade will follow.
+   ========================================================================== */
+
+.ink-surface {
+  --fade-state: running;
+  position: relative;
+}
+
+.ink-surface[data-paused="true"] {
+  --fade-state: paused;
+}
+
+.ink-node {
+  position: relative;
+  z-index: 1;
+}
+
+.ink-node[data-held="true"] {
+  --fade-state: paused;
+}
+
+.ink-node[data-voice="user"] {
+  --ink-rest: var(--ink-user);
+  --ink-wet: var(--ink-user-wet);
+  font-family: var(--font-hand-user);
+  color: var(--ink-rest);
+}
+
+.ink-node[data-voice="ai"] {
+  --ink-rest: var(--ink-ai);
+  --ink-wet: var(--ink-ai-wet);
+  font-family: var(--font-hand-ai);
+  color: var(--ink-rest);
+  text-shadow: 0 0 12px var(--ink-ai-glow);
+}
+
+.ink-line {
+  display: block;
+  white-space: pre-wrap;
+  min-height: 1em;
+}
+
+/* Words wrap; the characters inside them do not, so `everything` never
+   breaks after `every`. */
+.ink-word {
+  display: inline;
+  white-space: nowrap;
+}
+
+.ink-char {
+  display: inline-block;
+  position: relative;
+  /* Percentages, not em: mixing units inside an interpolated clip-path is
+     asking for trouble, and each box is about one character wide anyway. */
+  clip-path: inset(-45% -15% -35% -15%);
+  animation:
+    ink-write var(--ink-d, 90ms) var(--ease-ink) both,
+    ink-dry 1200ms linear both;
+}
+
+@keyframes ink-write {
+  from {
+    clip-path: inset(-45% 100% -35% -15%);
+  }
+  to {
+    clip-path: inset(-45% -15% -35% -15%);
+  }
+}
+
+/* Ink leaves the nib dark and wet, then settles as it soaks in. */
+@keyframes ink-dry {
+  from {
+    color: var(--ink-wet);
+  }
+  to {
+    color: var(--ink-rest);
+  }
+}
+
+/* The nib: a sliver riding the edge of the reveal. It is a pseudo-element on
+   every character rather than one tracked element, which buys the effect for
+   no rAF loop and no layout reads. */
+.ink-node[data-voice="ai"] .ink-char::after {
+  content: "";
+  position: absolute;
+  top: 8%;
+  bottom: 14%;
+  width: 0.075em;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  animation: ink-nib var(--ink-d, 90ms) linear both;
+}
+
+@keyframes ink-nib {
+  0% {
+    left: -0.04em;
+    opacity: 0.8;
+  }
+  88% {
+    opacity: 0.55;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+/* ---- marks ------------------------------------------------------------- */
+
+.ink-marks {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ink-marks[data-layer="under"] {
+  z-index: 0;
+}
+
+.ink-marks[data-layer="over"] {
+  z-index: 2;
+}
+
+.ink-mark-path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: mark-draw var(--mark-d, 520ms) var(--ease-ink) var(--mark-t, 0ms)
+    forwards;
+}
+
+/* `stroke-opacity`, not `opacity` — the fade animates `opacity`, and a static
+   value there would be overridden the moment the fade starts, making the
+   highlighter flare to full strength on its way out. */
+.ink-mark-path[data-kind="highlight"] {
+  stroke: var(--highlight);
+  stroke-linecap: round;
+  stroke-opacity: var(--highlight-alpha);
+  mix-blend-mode: var(--highlight-blend);
+}
+
+.ink-mark-path[data-kind="underline"],
+.ink-mark-path[data-kind="circle"] {
+  stroke: var(--ink-mark);
+  stroke-width: 1.7;
+}
+
+@keyframes mark-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---- the reader's own strokes ------------------------------------------ */
+
+.ink-stroke {
+  fill: currentColor;
+}
+
+/* ---- fading ------------------------------------------------------------ */
+
+/*
+ * Words, marks and strokes each thin out on their own delay, in the order
+ * they were written. Marks keep their draw-on animation in slot 0 so the
+ * dash offset does not snap back to hidden.
+ */
+.ink-node[data-phase="resting"] .ink-word,
+.ink-node[data-phase="resting"] .ink-stroke {
+  animation: ink-fade var(--fade-d, 12s) var(--ease-settle) var(--fade-t, 0ms)
+    forwards;
+  animation-play-state: var(--fade-state, running);
+}
+
+.ink-node[data-phase="resting"] .ink-mark-path {
+  animation:
+    mark-draw var(--mark-d, 520ms) var(--ease-ink) var(--mark-t, 0ms) forwards,
+    ink-fade var(--fade-d, 12s) var(--ease-settle) var(--fade-t, 0ms) forwards;
+  animation-play-state: running, var(--fade-state, running);
+}
+
+/* Opacity thins slowly at first — ink going pale — then lets go. */
+@keyframes ink-fade {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  55% {
+    opacity: 0.5;
+    filter: blur(0.15px);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(0.5px);
+  }
+}
+
+/* ---- reduced motion ---------------------------------------------------- */
+
+/*
+ * The writing stops performing, but time still passes: ink still fades,
+ * because that is the idea rather than the decoration. It just does so more
+ * gently, and without blur.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ink-char,
+  .ink-char::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+  }
+
+  /* Marks carry two animations in one shorthand, so shorten the draw through
+     its custom properties and leave the fade alone. */
+  .ink-mark-path {
+    --mark-d: 1ms;
+    --mark-t: 0ms;
+  }
+
+  @keyframes ink-fade {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .ink-node[data-phase="resting"] .ink-word,
+  .ink-node[data-phase="resting"] .ink-stroke {
+    animation-duration: calc(var(--fade-d, 12s) * 2) !important;
+  }
+}

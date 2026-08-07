@@ -40,7 +40,9 @@ export function SegmentedControl<T extends string>({
     <div
       role="radiogroup"
       aria-label={label}
-      className="relative inline-flex items-center rounded-full border border-hairline p-[3px]"
+      // Grid rather than flex so every segment is exactly as wide as the
+      // widest one, which is what lets the thumb be a pure CSS calc.
+      className="relative grid auto-cols-fr grid-flow-col items-center rounded-full border border-hairline p-[3px]"
     >
       <span
         aria-hidden
@@ -64,7 +66,7 @@ export function SegmentedControl<T extends string>({
             onClick={() => onChange(segment.value)}
             className={[
               "relative z-10 inline-flex items-center justify-center gap-1.5 rounded-full",
-              compact ? "size-7" : "h-7 px-3",
+              compact ? "size-7" : "h-7 px-3.5",
               "text-[0.72rem] tracking-[0.02em] whitespace-nowrap",
               "transition-colors duration-[var(--duration-chrome)]",
               selected ? "text-ink-user" : "text-muted hover:text-muted-strong",
