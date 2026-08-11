@@ -15,8 +15,12 @@ type Props<T extends string> = {
   value: T;
   segments: readonly Segment<T>[];
   onChange: (value: T) => void;
-  /** Hides text labels and shows icons only. */
-  compact?: boolean;
+  /**
+   * `true` shows icons only. `"sm"` shows icons only on narrow screens and
+   * labels from the `sm` breakpoint up — "Handwriting / Typing" is short in
+   * Korean and long enough in English to wrap a 390px header.
+   */
+  compact?: boolean | "sm";
 };
 
 /**
@@ -31,6 +35,8 @@ export function SegmentedControl<T extends string>({
   compact = false,
 }: Props<T>) {
   const groupId = useId();
+  const iconOnly = compact === true;
+  const iconOnlyBelowSm = compact === "sm";
   const index = Math.max(
     0,
     segments.findIndex((segment) => segment.value === value),
@@ -66,14 +72,22 @@ export function SegmentedControl<T extends string>({
             onClick={() => onChange(segment.value)}
             className={[
               "relative z-10 inline-flex items-center justify-center gap-1.5 rounded-full",
-              compact ? "size-7" : "h-7 px-3.5",
+              iconOnly
+                ? "size-7"
+                : iconOnlyBelowSm
+                  ? "size-7 sm:h-7 sm:w-auto sm:px-3.5"
+                  : "h-7 px-3.5",
               "text-[0.72rem] tracking-[0.02em] whitespace-nowrap",
               "transition-colors duration-[var(--duration-chrome)]",
               selected ? "text-ink-user" : "text-muted hover:text-muted-strong",
             ].join(" ")}
           >
             {segment.icon}
-            {!compact && <span>{segment.label}</span>}
+            {!iconOnly && (
+              <span className={iconOnlyBelowSm ? "hidden sm:inline" : undefined}>
+                {segment.label}
+              </span>
+            )}
           </button>
         );
       })}

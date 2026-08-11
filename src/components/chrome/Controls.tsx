@@ -22,6 +22,7 @@ export function ModeToggle() {
 
   return (
     <SegmentedControl
+      compact="sm"
       label={t.chrome.modeLabel}
       value={mode}
       segments={segments}
