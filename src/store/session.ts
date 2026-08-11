@@ -57,6 +57,11 @@ type SessionState = {
     strokes?: Turn["strokes"];
     clearPage?: boolean;
   }) => string;
+  /**
+   * The opening line. Not a reply: it never touches `status`, so the surface
+   * accepts writing while the page is still writing its question.
+   */
+  greet: (text: string) => void;
   /** Replaces a handwritten turn's placeholder text once the page reads it. */
   setUserTranscript: (id: string, transcript: string) => void;
   beginReply: (options?: { pinned?: boolean }) => string;
@@ -124,6 +129,25 @@ export const useSession = create<SessionState>()((set) => ({
     }));
     return id;
   },
+
+  greet: (text) =>
+    set((state) => {
+      if (state.turns.length > 0) return state;
+      return {
+        turns: [
+          {
+            id: newId(),
+            voice: "ai",
+            raw: text,
+            streaming: false,
+            phase: "fresh",
+            pinned: true,
+            createdAt: Date.now(),
+          },
+        ],
+        history: [{ role: "assistant", content: text }],
+      };
+    }),
 
   // A handwritten turn keeps showing the reader's own strokes; only the
   // remembered history gains the words the page read in them.

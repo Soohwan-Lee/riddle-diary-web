@@ -27,6 +27,7 @@ import { usePrefs } from "@/lib/prefs/provider";
 import { useSession, type Turn } from "@/store/session";
 import { Composer } from "./Composer";
 import { InkCanvas } from "./InkCanvas";
+import { IntroNote } from "./IntroNote";
 import { Transcript } from "./Transcript";
 
 export function Diary({ transport = sseTransport }: { transport?: Transport }) {
@@ -39,6 +40,8 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
     reducedMotion,
     allowFinger,
     autoHandoff,
+    introSeen,
+    setLocalPrefs,
   } = usePrefs();
 
   const turns = useSession((state) => state.turns);
@@ -85,14 +88,10 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   useEffect(() => {
     if (greeted.current) return;
     greeted.current = true;
-    const { turns: existing, beginReply, appendReply, finishReply } =
-      useSession.getState();
-    if (existing.length > 0) return;
-    // The page speaks first. Its opening line is pinned: it waits on the paper
-    // until there is something to answer, and then leaves like everything else.
-    const id = beginReply({ pinned: true });
-    appendReply(id, t.page.firstLine);
-    finishReply(id);
+    // The page speaks first. Its opening line is pinned — it waits on the
+    // paper until there is something to answer — and it is not a turn, so it
+    // does not lock the surface while it is being written.
+    useSession.getState().greet(t.page.firstLine);
   }, [t.page.firstLine]);
 
   const errorText = useCallback(
@@ -186,6 +185,10 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
         <h1 className="sr-only">
           {t.app.name} — {t.app.tagline}
         </h1>
+
+        {!introSeen && (
+          <IntroNote onDismiss={() => setLocalPrefs({ introSeen: true })} />
+        )}
 
         <div
           className="ink-surface flex-1 space-y-7"
