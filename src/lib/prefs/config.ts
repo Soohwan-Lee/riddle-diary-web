@@ -15,6 +15,23 @@ export const DEFAULT_INPUT_MODE: InputMode = "type";
 export const MODE_COOKIE = "inkling.mode";
 
 /**
+ * The handwriting faces. Each is a Latin face paired with a Hangul one, so a
+ * line that mixes scripts still looks like one person wrote it. Which hand is
+ * in use is visible in the very first paint, so it travels in a cookie
+ * alongside the theme rather than in localStorage.
+ */
+export const HANDS = ["pen", "quill", "brush", "print"] as const;
+export type Hand = (typeof HANDS)[number];
+export const DEFAULT_HAND_USER: Hand = "pen";
+export const DEFAULT_HAND_AI: Hand = "quill";
+export const HAND_USER_COOKIE = "inkling.hand.user";
+export const HAND_AI_COOKIE = "inkling.hand.ai";
+
+export function isHand(value: unknown): value is Hand {
+  return typeof value === "string" && (HANDS as readonly string[]).includes(value);
+}
+
+/**
  * What the paper does between turns.
  *
  *   `blank` — the film's behaviour. What you hand over sinks into the page at

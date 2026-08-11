@@ -227,7 +227,7 @@ export function InkCanvas({
         </svg>
 
         {strokes.length === 0 && !live && (
-          <p className="pointer-events-none absolute top-1 left-0 font-hand-user text-2xl text-muted/45 select-none sm:text-[1.7rem]">
+          <p className="ink-entry pointer-events-none absolute top-1 left-0 text-muted/45 select-none">
             {t.composer.placeholder}
           </p>
         )}

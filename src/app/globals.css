@@ -95,6 +95,89 @@
   }
 }
 
+/* ==========================================================================
+   Handwriting
+
+   Four hands, each a Latin face plus a Hangul one. `--hand-user` and
+   `--hand-ai` are what the ink actually resolves to; the attributes are
+   written server-side from a cookie, so a chosen hand is on the page from the
+   first paint rather than swapping in after hydration.
+
+   `--hand-*-scale` exists because these faces do not agree about x-height:
+   Nanum Pen Script set at the same pixel size as Caveat reads noticeably
+   smaller. The factor brings them to the same apparent size.
+   ========================================================================== */
+
+:root {
+  --hand-pen: var(--font-caveat), var(--font-gaegu), cursive;
+  --hand-pen-scale: 1;
+  --hand-quill: var(--font-shadows), var(--font-nanum-pen), cursive;
+  --hand-quill-scale: 1;
+  --hand-brush: var(--font-kalam), var(--font-nanum-brush), cursive;
+  --hand-brush-scale: 0.94;
+  --hand-print: var(--font-patrick), var(--font-hi-melody), cursive;
+  --hand-print-scale: 0.96;
+
+  /* Defaults, for the first visit and for anything rendered outside <html>. */
+  --hand-user: var(--hand-pen);
+  --hand-user-scale: var(--hand-pen-scale);
+  --hand-ai: var(--hand-quill);
+  --hand-ai-scale: var(--hand-quill-scale);
+}
+
+:root[data-hand-user="pen"] {
+  --hand-user: var(--hand-pen);
+  --hand-user-scale: var(--hand-pen-scale);
+}
+:root[data-hand-user="quill"] {
+  --hand-user: var(--hand-quill);
+  --hand-user-scale: var(--hand-quill-scale);
+}
+:root[data-hand-user="brush"] {
+  --hand-user: var(--hand-brush);
+  --hand-user-scale: var(--hand-brush-scale);
+}
+:root[data-hand-user="print"] {
+  --hand-user: var(--hand-print);
+  --hand-user-scale: var(--hand-print-scale);
+}
+
+:root[data-hand-ai="pen"] {
+  --hand-ai: var(--hand-pen);
+  --hand-ai-scale: var(--hand-pen-scale);
+}
+:root[data-hand-ai="quill"] {
+  --hand-ai: var(--hand-quill);
+  --hand-ai-scale: var(--hand-quill-scale);
+}
+:root[data-hand-ai="brush"] {
+  --hand-ai: var(--hand-brush);
+  --hand-ai-scale: var(--hand-brush-scale);
+}
+:root[data-hand-ai="print"] {
+  --hand-ai: var(--hand-print);
+  --hand-ai-scale: var(--hand-print-scale);
+}
+
+/* A hand has to be chosen by looking at it, so every option in the settings
+   sheet writes the same line in its own face. */
+.hand-sample[data-hand="pen"] {
+  font-family: var(--hand-pen);
+  font-size: calc(1.3rem * var(--hand-pen-scale));
+}
+.hand-sample[data-hand="quill"] {
+  font-family: var(--hand-quill);
+  font-size: calc(1.3rem * var(--hand-quill-scale));
+}
+.hand-sample[data-hand="brush"] {
+  font-family: var(--hand-brush);
+  font-size: calc(1.3rem * var(--hand-brush-scale));
+}
+.hand-sample[data-hand="print"] {
+  font-family: var(--hand-print);
+  font-size: calc(1.3rem * var(--hand-print-scale));
+}
+
 @theme inline {
   --color-paper: var(--paper);
   --color-paper-edge: var(--paper-edge);
@@ -111,8 +194,8 @@
   --color-danger: var(--danger);
 
   --font-ui: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
-  --font-hand-user: var(--font-caveat), var(--font-gaegu), cursive;
-  --font-hand-ai: var(--font-shadows), var(--font-nanum-pen), cursive;
+  --font-hand-user: var(--hand-user);
+  --font-hand-ai: var(--hand-ai);
 
   /* Slow-technology motion. No springs, no bounce. */
   --ease-ink: cubic-bezier(0.22, 0.61, 0.36, 1);

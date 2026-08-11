@@ -67,7 +67,7 @@ export function Composer({
           event.preventDefault();
           submit();
         }}
-        className="font-hand-user placeholder:text-muted/45 w-full resize-none overflow-hidden border-none bg-transparent text-2xl leading-[1.85] text-ink-user caret-ink-user outline-none disabled:opacity-40 sm:text-[1.7rem]"
+        className="ink-entry placeholder:text-muted/45 w-full resize-none overflow-hidden border-none bg-transparent text-ink-user caret-ink-user outline-none disabled:opacity-40"
       />
 
       <div className="mt-2 flex items-center justify-between gap-4">

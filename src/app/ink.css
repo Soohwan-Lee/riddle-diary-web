@@ -35,6 +35,7 @@
 .ink-node[data-voice="user"] {
   --ink-rest: var(--ink-user);
   --ink-wet: var(--ink-user-wet);
+  --hand-scale: var(--hand-user-scale, 1);
   font-family: var(--font-hand-user);
   color: var(--ink-rest);
 }
@@ -42,6 +43,7 @@
 .ink-node[data-voice="ai"] {
   --ink-rest: var(--ink-ai);
   --ink-wet: var(--ink-ai-wet);
+  --hand-scale: var(--hand-ai-scale, 1);
   font-family: var(--font-hand-ai);
   color: var(--ink-rest);
   text-shadow: 0 0 12px var(--ink-ai-glow);
@@ -51,6 +53,27 @@
   display: block;
   white-space: pre-wrap;
   min-height: 1em;
+  /* The size lives one level down from the node so `1em` still resolves to
+     the size the node was given, letting each hand correct for its own
+     x-height without the caller knowing which hand is in play. */
+  font-size: calc(1em * var(--hand-scale, 1));
+}
+
+/*
+ * Where the reader writes: the composer's textarea and the placeholder over
+ * the canvas. Same hand, same correction, stated absolutely because a
+ * textarea sets its own size and `1em` would resolve against its parent.
+ */
+.ink-entry {
+  font-family: var(--font-hand-user);
+  font-size: calc(1.5rem * var(--hand-user-scale, 1));
+  line-height: 1.85;
+}
+
+@media (width >= 40rem) {
+  .ink-entry {
+    font-size: calc(1.7rem * var(--hand-user-scale, 1));
+  }
 }
 
 /* Words wrap; the characters inside them do not, so `everything` never

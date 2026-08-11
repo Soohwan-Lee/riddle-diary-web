@@ -38,12 +38,23 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { theme, mode, locale } = await readServerPrefs();
+  const { theme, mode, locale, handUser, handAi } = await readServerPrefs();
 
   return (
-    <html lang={LOCALE_TAG[locale]} data-theme={theme} className={fontVariables}>
+    <html
+      lang={LOCALE_TAG[locale]}
+      data-theme={theme}
+      data-hand-user={handUser}
+      data-hand-ai={handAi}
+      className={fontVariables}
+    >
       <body>
-        <PrefsProvider initialTheme={theme} initialMode={mode}>
+        <PrefsProvider
+          initialTheme={theme}
+          initialMode={mode}
+          initialHandUser={handUser}
+          initialHandAi={handAi}
+        >
           <I18nProvider initialLocale={locale}>{children}</I18nProvider>
         </PrefsProvider>
       </body>
