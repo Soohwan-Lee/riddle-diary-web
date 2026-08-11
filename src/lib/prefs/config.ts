@@ -75,13 +75,15 @@ export const DEFAULT_WRITE_SPEED: WriteSpeed = "normal";
 /**
  * Characters per minute, script-independent — the layout normalises its
  * per-character weights so Korean and English take the same total time.
- * A two-sentence reply lands around thirteen seconds at `normal`: long enough
- * to feel written, short enough that nobody walks away.
+ * A two-sentence reply lands around fifteen seconds at `normal`: long enough
+ * to feel written, short enough that nobody walks away. Faster than a real
+ * hand, deliberately — the point is the sense of being written to, and past a
+ * certain slowness that reads as waiting rather than as writing.
  */
 export const WRITE_CPM: Record<WriteSpeed, number> = {
-  slow: 135,
-  normal: 215,
-  brisk: 310,
+  slow: 175,
+  normal: 280,
+  brisk: 400,
 };
 
 /**

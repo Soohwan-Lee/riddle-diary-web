@@ -113,35 +113,12 @@
   }
 }
 
-/* The nib: a sliver riding the edge of the reveal. It is a pseudo-element on
-   every character rather than one tracked element, which buys the effect for
-   no rAF loop and no layout reads. */
-.ink-node[data-voice="ai"] .ink-char::after {
-  content: "";
-  position: absolute;
-  top: 8%;
-  bottom: 14%;
-  width: 0.075em;
-  border-radius: 999px;
-  background: currentColor;
-  opacity: 0;
-  pointer-events: none;
-  animation: ink-nib var(--ink-d, 90ms) linear both;
-}
-
-@keyframes ink-nib {
-  0% {
-    left: -0.04em;
-    opacity: 0.8;
-  }
-  88% {
-    opacity: 0.55;
-  }
-  100% {
-    left: 100%;
-    opacity: 0;
-  }
-}
+/*
+ * There used to be a nib here: a sliver riding the edge of the reveal. At
+ * text sizes it read as a text caret blinking along a line — the one thing
+ * this page must never look like. Handwriting appearing on paper has nothing
+ * in front of it. The reveal itself is the pen.
+ */
 
 /* ---- marks ------------------------------------------------------------- */
 
@@ -368,8 +345,7 @@
  * gently, and without blur.
  */
 @media (prefers-reduced-motion: reduce) {
-  .ink-char,
-  .ink-char::after {
+  .ink-char {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
   }

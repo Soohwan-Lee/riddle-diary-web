@@ -48,8 +48,8 @@ export const BLANK_FADE_MS: Record<FadePace, number> = {
  * What you hand over is taken almost at once — long enough to see it happen,
  * short enough that it reads as the page absorbing it rather than as a fade.
  */
-export const ABSORB_DWELL_MS = 900;
-export const ABSORB_FADE_MS = 1_800;
+export const ABSORB_DWELL_MS = 600;
+export const ABSORB_FADE_MS = 1_200;
 
 /** Strips InkScript markers, which are instructions rather than words. */
 function plain(text: string): string {
