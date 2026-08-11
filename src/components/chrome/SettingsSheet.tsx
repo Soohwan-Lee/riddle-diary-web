@@ -15,6 +15,7 @@ import {
 } from "@/lib/prefs/config";
 import { usePrefs } from "@/lib/prefs/provider";
 import { LocaleToggle, ThemeToggle } from "./Controls";
+import { HandPicker } from "./HandPicker";
 import { SegmentedControl, type Segment } from "./SegmentedControl";
 
 export function SettingsSheet({
@@ -33,7 +34,10 @@ export function SettingsSheet({
     writeSpeed,
     allowFinger,
     autoHandoff,
+    handUser,
+    handAi,
     reducedMotion,
+    setHand,
     setLocalPrefs,
   } = usePrefs();
   const panel = useRef<HTMLDivElement>(null);
@@ -156,6 +160,28 @@ export function SettingsSheet({
               onChange={(value) => setLocalPrefs({ fadePace: value })}
             />
           </Field>
+
+          <section className="space-y-4 border-t border-hairline pt-6">
+            <h3 className="text-[0.72rem] font-medium tracking-[0.08em] text-muted-strong uppercase">
+              {t.settings.handTitle}
+            </h3>
+            <Field label={t.settings.handUserLabel}>
+              <HandPicker
+                label={t.settings.handUserLabel}
+                value={handUser}
+                tone="user"
+                onChange={(hand) => setHand("user", hand)}
+              />
+            </Field>
+            <Field label={t.settings.handAiLabel}>
+              <HandPicker
+                label={t.settings.handAiLabel}
+                value={handAi}
+                tone="ai"
+                onChange={(hand) => setHand("ai", hand)}
+              />
+            </Field>
+          </section>
 
           <Field
             label={t.settings.writingSpeedLabel}
