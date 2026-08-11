@@ -6,7 +6,19 @@ import { PrefsProvider } from "@/lib/prefs/provider";
 import { readServerPrefs } from "@/lib/server-prefs";
 import "./globals.css";
 
+/**
+ * Vercel sets `VERCEL_PROJECT_PRODUCTION_URL` for us; without it the icons and
+ * social card still resolve, just against localhost. Set `NEXT_PUBLIC_SITE_URL`
+ * when deploying anywhere else.
+ */
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Inkling — a page that writes back",
     template: "%s · Inkling",

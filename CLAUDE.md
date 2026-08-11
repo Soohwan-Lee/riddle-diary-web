@@ -37,10 +37,27 @@ src/lib/i18n/     ko/en dictionaries + provider
 src/store/        zustand stores (ink nodes, session, settings)
 ```
 
+## How the page turns
+
+`pageMode` is `blank` (default) or `keep`.
+
+- **blank** — handing something over rests it immediately and marks everything
+  already on the paper `absorbing`; those sink at `ABSORB_*` speed. A reply
+  rests for `readDwellMs()` — a script-weighted reading estimate, not a fixed
+  number. The result is that you always write on an empty sheet.
+- **keep** — one dwell for everything, as before.
+- `fadePace: "never"` overrides both. In `blank` the pace control is a
+  multiplier on reading time instead of a dwell.
+
+The opening line is `pinned`: `restAll()` skips it until an entry unpins it.
+It is written by `greet()`, which never touches `status`, so the surface
+accepts writing while the page is still asking its question.
+
 ## Non-negotiable rules
 
 1. **Nothing is persisted.** No database, no server logs of user content, no
-   localStorage of conversation. Only settings (theme, locale, mode, pace) are
+   localStorage of conversation. Only settings (theme, locale, mode, page mode,
+   handwriting faces, pace, speed, whether the opening note was dismissed) are
    stored locally. History lives in memory and dies with the tab.
 2. **Two ink backends, one clock.** Text reveals via per-grapheme `clip-path`;
    marks draw via SVG `stroke-dashoffset`. Both schedule through `InkClock`.
@@ -48,7 +65,9 @@ src/store/        zustand stores (ink nodes, session, settings)
 3. **Animate only** `opacity`, `transform`, `clip-path`, `stroke-dashoffset`.
    Fades run as CSS animations, never a JS rAF loop.
 4. **Never make it fast.** Minimum durations are deliberate. Do not add a
-   "skip animation" affordance; do add accessibility escapes (§5).
+   "skip animation" affordance; do add accessibility escapes (§5). The one
+   thing exempt from reduced-motion shortening is the hand-over countdown
+   ring: it reports when your writing leaves, so it must run its real length.
 5. **Accessibility is not optional.** Full text always reaches an `aria-live`
    region, `prefers-reduced-motion` is honored, and hold-to-keep must work.
 6. **Safety.** Crisis resources stay reachable; the app never claims to be
@@ -59,6 +78,10 @@ src/store/        zustand stores (ink nodes, session, settings)
 
 - Server components by default; `"use client"` only where interaction needs it.
 - Colors come from CSS variables in `globals.css` — never hardcode hex in TSX.
+- Handwriting faces are four Latin+Hangul pairs defined in `globals.css` as
+  `--hand-<name>`. Anything visible in the first paint (theme, locale, input
+  mode, both hands) travels in a cookie and is read by `readServerPrefs`;
+  everything else is localStorage.
 - User-facing strings live in `src/lib/i18n/dictionaries`, never inline.
 - Pure engine logic (segmentation, timing, geometry, parsing) is unit-tested;
   animation itself is verified by hand against `/lab`.
