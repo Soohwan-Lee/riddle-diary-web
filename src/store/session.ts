@@ -68,8 +68,13 @@ type SessionState = {
   appendReply: (id: string, delta: string) => void;
   finishReply: (id: string) => void;
   failReply: (id: string, message: string) => void;
-  /** Called when a reply has finished being written out. */
-  restAll: () => void;
+  /**
+   * Called when a reply has finished being written out: it and everything
+   * older settles. Anything *newer* is left alone — the opening line can
+   * finish writing after an entry has already been handed over, and it must
+   * not put a reply that is still being written to rest.
+   */
+  restFrom: (id: string) => void;
   removeTurn: (id: string) => void;
   setError: (message: string | null) => void;
   clearAll: () => void;
@@ -197,6 +202,21 @@ export const useSession = create<SessionState>()((set) => ({
       const turn = state.turns.find((entry) => entry.id === id);
       // The model sees plain prose; the marks are a rendering instruction.
       const content = turn ? parseInkScript(turn.raw).text : "";
+
+      // A reply with no words in it would sit on the paper forever: there is
+      // nothing to run a fade animation, so nothing ever reports finishing and
+      // the turn is never removed. Drop it, settle the rest, hand the page back.
+      if (!content.trim()) {
+        return {
+          turns: state.turns
+            .filter((entry) => entry.id !== id)
+            .map((entry) =>
+              entry.pinned ? entry : { ...entry, phase: "resting" as const },
+            ),
+          status: "idle" as const,
+        };
+      }
+
       return {
         turns: state.turns.map((entry) =>
           entry.id === id ? { ...entry, streaming: false } : entry,
@@ -225,15 +245,25 @@ export const useSession = create<SessionState>()((set) => ({
       error: message,
     })),
 
-  restAll: () =>
-    set((state) => ({
-      turns: state.turns.map((turn) =>
-        turn.phase === "resting" || turn.pinned
-          ? turn
-          : { ...turn, phase: "resting" },
-      ),
-      status: "idle",
-    })),
+  restFrom: (id) =>
+    set((state) => {
+      const index = state.turns.findIndex((turn) => turn.id === id);
+      if (index === -1) return state;
+      // A reply that arrived after this one is still in flight; the page is
+      // not free yet, whatever this node has just finished doing.
+      const newerReply = state.turns
+        .slice(index + 1)
+        .some((turn) => turn.voice === "ai");
+
+      return {
+        turns: state.turns.map((turn, position) =>
+          position <= index && !turn.pinned && turn.phase !== "resting"
+            ? { ...turn, phase: "resting" as const }
+            : turn,
+        ),
+        status: newerReply ? state.status : "idle",
+      };
+    }),
 
   removeTurn: (id) =>
     set((state) => ({ turns: state.turns.filter((turn) => turn.id !== id) })),
