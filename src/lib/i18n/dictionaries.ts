@@ -47,6 +47,9 @@ const ko = {
     canvasLabel: "손글씨 영역",
     fingerHint: "손가락으로도 쓸 수 있어요",
     penOnlyHint: "스타일러스로 써주세요",
+    autoHint: "손을 멈추면 곧 건네집니다",
+    manualHint: "다 썼으면 오른쪽 버튼으로 건네주세요",
+    notYet: "아직요",
     reading: "글씨를 읽는 중",
     pointerOnly:
       "손글씨는 마우스나 펜이 필요합니다. 키보드로 적으시려면 상단에서 타이핑 모드로 바꿔주세요.",
@@ -66,6 +69,8 @@ const ko = {
     speedBrisk: "조금 빠르게",
     fingerLabel: "손가락 필기 허용",
     fingerHint: "끄면 스타일러스로만 쓸 수 있습니다.",
+    autoHandoffLabel: "멈추면 자동으로 건네기",
+    autoHandoffHint: "손글씨를 쓰다 4초간 멈추면 페이지가 가져갑니다. 끄면 버튼으로만 건네집니다.",
     reducedMotionNote: "동작 줄이기가 켜져 있어 필기 애니메이션은 생략됩니다.",
     clearPage: "페이지 비우기",
     clearPageHint: "지금 남아 있는 글씨와 대화 기억을 모두 지웁니다.",
@@ -152,6 +157,9 @@ const en: Translation<Dictionary> = {
     canvasLabel: "Handwriting area",
     fingerHint: "You can write with your finger too",
     penOnlyHint: "Please write with a stylus",
+    autoHint: "Stop writing and the page takes it",
+    manualHint: "Hand it over with the button when you are done",
+    notYet: "Not yet",
     reading: "Reading your handwriting",
     pointerOnly:
       "Handwriting needs a mouse or a pen. To write with a keyboard, switch to typing mode at the top of the page.",
@@ -171,6 +179,9 @@ const en: Translation<Dictionary> = {
     speedBrisk: "A little faster",
     fingerLabel: "Allow finger drawing",
     fingerHint: "When off, only a stylus can write.",
+    autoHandoffLabel: "Hand over when the pen stops",
+    autoHandoffHint:
+      "Four seconds of stillness and the page takes your handwriting. Turn it off to hand over only with the button.",
     reducedMotionNote:
       "Reduced motion is on, so handwriting appears without animating.",
     clearPage: "Empty the page",

@@ -29,6 +29,7 @@ export function SettingsSheet({
     fadePace,
     writeSpeed,
     allowFinger,
+    autoHandoff,
     reducedMotion,
     setLocalPrefs,
   } = usePrefs();
@@ -137,6 +138,17 @@ export function SettingsSheet({
               label={t.settings.fingerLabel}
               checked={allowFinger}
               onChange={(value) => setLocalPrefs({ allowFinger: value })}
+            />
+          </Field>
+
+          <Field
+            label={t.settings.autoHandoffLabel}
+            hint={t.settings.autoHandoffHint}
+          >
+            <Switch
+              label={t.settings.autoHandoffLabel}
+              checked={autoHandoff}
+              onChange={(value) => setLocalPrefs({ autoHandoff: value })}
             />
           </Field>
 

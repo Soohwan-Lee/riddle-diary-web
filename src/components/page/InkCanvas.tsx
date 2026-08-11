@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   EraserIcon,
   InkDropIcon,
@@ -16,6 +16,7 @@ import {
   type StrokePoint,
   type StrokeStyle,
 } from "@/lib/ink/strokes";
+import { AUTO_HANDOFF_MS } from "@/lib/prefs/config";
 
 /** Beyond this the page is full; the reader is asked to hand it over. */
 const MAX_STROKES = 800;
@@ -29,11 +30,14 @@ type Tool = "pen" | "eraser";
 export function InkCanvas({
   disabled,
   allowFinger,
+  autoHandoff,
   onSend,
   onActivity,
 }: {
   disabled: boolean;
   allowFinger: boolean;
+  /** Take a finished entry once the pen has been still for a moment. */
+  autoHandoff: boolean;
   onSend: (payload: { strokes: Stroke[]; image: string }) => void;
   onActivity: () => void;
 }) {
@@ -43,11 +47,15 @@ export function InkCanvas({
   const [live, setLive] = useState<Stroke | null>(null);
   const [tool, setTool] = useState<Tool>("pen");
   const [pointerKind, setPointerKind] = useState<"pen" | "other">("other");
+  /** Bumped to put the countdown back to zero. */
+  const [arm, setArm] = useState(0);
+  /** "Not yet" — this entry waits for the button, however long it takes. */
+  const [waiting, setWaiting] = useState(false);
 
-  const style: StrokeStyle = {
-    size: 4.4,
-    simulatePressure: pointerKind !== "pen",
-  };
+  const style = useMemo<StrokeStyle>(
+    () => ({ size: 4.4, simulatePressure: pointerKind !== "pen" }),
+    [pointerKind],
+  );
 
   const height = Math.max(
     MIN_HEIGHT,
@@ -71,11 +79,14 @@ export function InkCanvas({
   const accepts = (event: React.PointerEvent) =>
     !disabled && (allowFinger || event.pointerType !== "touch");
 
+  const rearm = useCallback(() => setArm((count) => count + 1), []);
+
   const handleDown = (event: React.PointerEvent) => {
     if (!accepts(event)) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     setPointerKind(event.pointerType === "pen" ? "pen" : "other");
     onActivity();
+    rearm();
 
     const point = pointFrom(event);
     if (!point) return;
@@ -132,20 +143,50 @@ export function InkCanvas({
     setStrokes((current) =>
       current.filter((stroke) => !strokeHitTest(stroke, x, y, ERASER_RADIUS)),
     );
+    rearm();
   };
 
-  const undo = () => setStrokes((current) => current.slice(0, -1));
-  const clear = () => setStrokes([]);
+  const undo = () => {
+    setStrokes((current) => current.slice(0, -1));
+    rearm();
+  };
 
-  const send = () => {
+  const clear = () => {
+    setStrokes([]);
+    setWaiting(false);
+  };
+
+  const send = useCallback(() => {
     if (strokes.length === 0 || disabled) return;
     const image = rasterizeStrokes(strokes, style);
     if (!image) return;
     onSend({ strokes, image });
     setStrokes([]);
-  };
+    setWaiting(false);
+  }, [strokes, disabled, style, onSend]);
 
   const ready = strokes.length > 0 && !disabled;
+  const inking = live !== null;
+  /** The countdown is running: something is written, the pen is down nowhere. */
+  const counting = autoHandoff && !waiting && ready && !inking;
+
+  // The timer is what actually hands the page over; the ring beside the button
+  // is the same duration rendered, so the wait is never a guess. Restarting is
+  // a matter of bumping `arm` — every stroke, erase and undo does.
+  // Held in a ref rather than a dependency: `send` is re-created whenever the
+  // page above re-renders, and a countdown that restarts because a word
+  // somewhere else finished fading would never finish.
+  const sendRef = useRef(send);
+  useEffect(() => {
+    sendRef.current = send;
+  }, [send]);
+
+  useEffect(() => {
+    if (!counting) return;
+    const id = window.setTimeout(() => sendRef.current(), AUTO_HANDOFF_MS);
+    return () => window.clearTimeout(id);
+  }, [counting, arm]);
+
   const drawing = [...strokes, ...(live ? [live] : [])];
 
   return (
@@ -225,26 +266,65 @@ export function InkCanvas({
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
-          <p className="text-[0.68rem] text-muted">
-            {allowFinger ? t.hand.fingerHint : t.hand.penOnlyHint}
+        <div className="flex items-center gap-2.5">
+          {/* One line that always says what will happen next: what the surface
+              accepts when it is empty, that the page is about to take the
+              entry while the countdown runs, and that it is waiting on the
+              button once you have said "not yet". */}
+          <p className="text-right text-[0.68rem] text-muted" aria-live="polite">
+            {!ready
+              ? allowFinger
+                ? t.hand.fingerHint
+                : t.hand.penOnlyHint
+              : counting
+                ? t.hand.autoHint
+                : t.hand.manualHint}
           </p>
-          <button
-            type="button"
-            onClick={send}
-            disabled={!ready}
-            aria-label={t.hand.send}
-            title={t.hand.send}
-            className={[
-              "inline-flex size-9 items-center justify-center rounded-full border",
-              "transition-all duration-[var(--duration-chrome)] ease-[var(--ease-settle)]",
-              ready
-                ? "border-hairline-strong text-ink-ai opacity-100"
-                : "pointer-events-none border-hairline text-muted opacity-0",
-            ].join(" ")}
-          >
-            <InkDropIcon className="size-4" />
-          </button>
+
+          {counting && (
+            <button
+              type="button"
+              onClick={() => setWaiting(true)}
+              className="rounded-full px-2 py-1 text-[0.68rem] text-muted underline decoration-hairline-strong underline-offset-4 transition-colors hover:text-ink-user"
+            >
+              {t.hand.notYet}
+            </button>
+          )}
+
+          <span className="relative inline-flex size-9 shrink-0">
+            {counting && (
+              // Remounting on `arm` is what restarts the animation; the
+              // timeout above is armed by the same value.
+              <svg
+                key={arm}
+                className="handoff-ring pointer-events-none absolute inset-0 size-full"
+                viewBox="0 0 36 36"
+                aria-hidden
+                focusable="false"
+                style={
+                  { "--arm-d": `${AUTO_HANDOFF_MS}ms` } as React.CSSProperties
+                }
+              >
+                <circle cx="18" cy="18" r="17.25" pathLength={1} />
+              </svg>
+            )}
+            <button
+              type="button"
+              onClick={send}
+              disabled={!ready}
+              aria-label={t.hand.send}
+              title={t.hand.send}
+              className={[
+                "inline-flex size-9 items-center justify-center rounded-full border",
+                "transition-colors duration-[var(--duration-chrome)] ease-[var(--ease-settle)]",
+                ready
+                  ? "border-hairline-strong text-ink-ai"
+                  : "border-hairline text-muted/50",
+              ].join(" ")}
+            >
+              <InkDropIcon className="size-4" />
+            </button>
+          </span>
         </div>
       </div>
     </div>

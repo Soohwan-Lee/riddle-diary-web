@@ -25,7 +25,8 @@ import { Transcript } from "./Transcript";
 
 export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   const { t, locale } = useI18n();
-  const { mode, writeSpeed, fadePace, reducedMotion, allowFinger } = usePrefs();
+  const { mode, writeSpeed, fadePace, reducedMotion, allowFinger, autoHandoff } =
+    usePrefs();
 
   const turns = useSession((state) => state.turns);
   const history = useSession((state) => state.history);
@@ -207,6 +208,7 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
               <InkCanvas
                 disabled={busy}
                 allowFinger={allowFinger}
+                autoHandoff={autoHandoff}
                 onSend={(payload) => void send(payload)}
                 onActivity={touch}
               />

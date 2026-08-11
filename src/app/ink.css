@@ -212,6 +212,40 @@
   }
 }
 
+/* ---- hand-over countdown ----------------------------------------------- */
+
+/*
+ * Chrome rather than ink, but it is a stroke being drawn, so it belongs with
+ * the rest of the stroke work. The ring only renders what the timer in
+ * `InkCanvas` is already doing — it exists so the wait is legible instead of
+ * something you have to guess at.
+ *
+ * Deliberately outside the reduced-motion block below: this is a countdown,
+ * and a countdown that finishes instantly is a lie about when the page will
+ * take your writing.
+ */
+.handoff-ring {
+  overflow: visible;
+}
+
+.handoff-ring circle {
+  fill: none;
+  stroke: var(--ink-ai);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  animation: handoff-arm var(--arm-d, 4000ms) linear forwards;
+}
+
+@keyframes handoff-arm {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 /* ---- reduced motion ---------------------------------------------------- */
 
 /*

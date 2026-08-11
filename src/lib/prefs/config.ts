@@ -45,25 +45,35 @@ export const DEFAULT_WRITE_SPEED: WriteSpeed = "normal";
 /**
  * Characters per minute, script-independent — the layout normalises its
  * per-character weights so Korean and English take the same total time.
- * A two-sentence reply lands around fifteen seconds at `normal`: long enough
+ * A two-sentence reply lands around thirteen seconds at `normal`: long enough
  * to feel written, short enough that nobody walks away.
  */
 export const WRITE_CPM: Record<WriteSpeed, number> = {
-  slow: 120,
-  normal: 190,
-  brisk: 280,
+  slow: 135,
+  normal: 215,
+  brisk: 310,
 };
+
+/**
+ * How long a handwriting entry sits still before the page takes it. Short
+ * enough that nobody wonders whether anything is going to happen, long enough
+ * to cross a `t` or start another word. Any new stroke puts it back to zero.
+ */
+export const AUTO_HANDOFF_MS = 4_000;
 
 export type LocalPrefs = {
   fadePace: FadePace;
   writeSpeed: WriteSpeed;
   allowFinger: boolean;
+  /** Hand a finished piece of handwriting over once the pen stops. */
+  autoHandoff: boolean;
 };
 
 export const DEFAULT_LOCAL_PREFS: LocalPrefs = {
   fadePace: DEFAULT_FADE_PACE,
   writeSpeed: DEFAULT_WRITE_SPEED,
   allowFinger: true,
+  autoHandoff: true,
 };
 
 export const LOCAL_PREFS_KEY = "inkling.prefs";
@@ -99,6 +109,10 @@ export function readLocalPrefs(): LocalPrefs {
         typeof parsed.allowFinger === "boolean"
           ? parsed.allowFinger
           : DEFAULT_LOCAL_PREFS.allowFinger,
+      autoHandoff:
+        typeof parsed.autoHandoff === "boolean"
+          ? parsed.autoHandoff
+          : DEFAULT_LOCAL_PREFS.autoHandoff,
     };
   } catch {
     return DEFAULT_LOCAL_PREFS;

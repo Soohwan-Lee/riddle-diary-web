@@ -82,12 +82,15 @@ export function Composer({
           disabled={!ready}
           aria-label={t.composer.send}
           title={t.composer.send}
+          // Visible from the start, dimmed until there is something to hand
+          // over. Hiding it entirely left a first-time reader with no clue
+          // that handing anything over was a thing you could do.
           className={[
             "inline-flex size-9 items-center justify-center rounded-full border",
-            "transition-all duration-[var(--duration-chrome)] ease-[var(--ease-settle)]",
+            "transition-colors duration-[var(--duration-chrome)] ease-[var(--ease-settle)]",
             ready
-              ? "border-hairline-strong text-ink-ai opacity-100"
-              : "pointer-events-none border-hairline text-muted opacity-0",
+              ? "border-hairline-strong text-ink-ai"
+              : "border-hairline text-muted/50",
           ].join(" ")}
         >
           <InkDropIcon className="size-4" />
