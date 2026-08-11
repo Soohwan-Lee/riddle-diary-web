@@ -31,6 +31,15 @@ const ko = {
     thinking: "페이지가 읽는 중",
   },
 
+  intro: {
+    title: "처음이신가요",
+    write: "오늘 있었던 일을 적어 건네면, 페이지가 손글씨로 답합니다.",
+    fade: "주고받은 글은 저장되지 않고, 다 읽을 즈음 종이에서 사라집니다.",
+    hold: "사라지는 걸 멈추고 싶으면 종이를 누르고 계세요.",
+    dismiss: "알겠어요",
+    again: "설정에서 다시 볼 수 있어요",
+  },
+
   composer: {
     placeholder: "여기에 오늘을 적어보세요",
     hint: "Enter 줄바꿈 · Ctrl+Enter 로 건네기",
@@ -91,6 +100,9 @@ const ko = {
     autoHandoffLabel: "멈추면 자동으로 건네기",
     autoHandoffHint: "손글씨를 쓰다 4초간 멈추면 페이지가 가져갑니다. 끄면 버튼으로만 건네집니다.",
     reducedMotionNote: "동작 줄이기가 켜져 있어 필기 애니메이션은 생략됩니다.",
+    introLabel: "처음 안내",
+    introHint: "여기가 어떤 곳인지 알려주는 세 줄을 다시 띄웁니다.",
+    introShow: "다시 보기",
     clearPage: "페이지 비우기",
     clearPageHint: "지금 남아 있는 글씨와 대화 기억을 모두 지웁니다.",
     helpTitle: "도움이 필요할 때",
@@ -160,6 +172,15 @@ const en: Translation<Dictionary> = {
     thinking: "The page is reading",
   },
 
+  intro: {
+    title: "First time here",
+    write: "Write down your day and hand it over. The page answers by hand.",
+    fade: "Nothing is saved. Both of you leave the paper about the time you finish reading.",
+    hold: "Press and hold the paper to stop anything from fading.",
+    dismiss: "Got it",
+    again: "You can read this again from settings",
+  },
+
   composer: {
     placeholder: "Write today here",
     hint: "Enter for a new line · Ctrl+Enter to hand it over",
@@ -222,6 +243,9 @@ const en: Translation<Dictionary> = {
       "Four seconds of stillness and the page takes your handwriting. Turn it off to hand over only with the button.",
     reducedMotionNote:
       "Reduced motion is on, so handwriting appears without animating.",
+    introLabel: "The opening note",
+    introShow: "Show it again",
+    introHint: "Brings back the three lines about what this place is.",
     clearPage: "Empty the page",
     clearPageHint: "Erases the remaining ink and everything the page remembers.",
     helpTitle: "If you need support",

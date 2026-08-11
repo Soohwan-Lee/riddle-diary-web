@@ -214,6 +214,19 @@ export function SettingsSheet({
             />
           </Field>
 
+          <Field label={t.settings.introLabel} hint={t.settings.introHint}>
+            <button
+              type="button"
+              onClick={() => {
+                setLocalPrefs({ introSeen: false });
+                onClose();
+              }}
+              className="rounded-full border border-hairline px-3.5 py-1.5 text-[0.72rem] transition-colors hover:border-hairline-strong"
+            >
+              {t.settings.introShow}
+            </button>
+          </Field>
+
           <Field label={t.settings.clearPage} hint={t.settings.clearPageHint}>
             <button
               type="button"

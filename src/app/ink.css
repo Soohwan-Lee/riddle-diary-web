@@ -235,6 +235,33 @@
   }
 }
 
+/* ---- the first-visit note ----------------------------------------------- */
+
+/*
+ * Arrives after hydration, because whether it should appear at all lives in
+ * localStorage. Easing it in stops that from reading as a layout bug.
+ */
+.ink-intro {
+  animation: ink-intro-in 520ms var(--ease-settle) both;
+}
+
+@keyframes ink-intro-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ink-intro {
+    animation: none;
+  }
+}
+
 /* ---- the page is thinking ----------------------------------------------- */
 
 /*

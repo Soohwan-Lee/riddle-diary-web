@@ -98,14 +98,23 @@ export type LocalPrefs = {
   allowFinger: boolean;
   /** Hand a finished piece of handwriting over once the pen stops. */
   autoHandoff: boolean;
+  /** The three lines a first visit needs. Dismissed once, or from settings. */
+  introSeen: boolean;
 };
 
+/**
+ * Also the server snapshot, which is why `introSeen` starts *true*: rendering
+ * the note during SSR and then hiding it a beat later would flash it at every
+ * returning reader. `readLocalPrefs` turns it off when there are no stored
+ * preferences at all, which is exactly the first visit.
+ */
 export const DEFAULT_LOCAL_PREFS: LocalPrefs = {
   pageMode: DEFAULT_PAGE_MODE,
   fadePace: DEFAULT_FADE_PACE,
   writeSpeed: DEFAULT_WRITE_SPEED,
   allowFinger: true,
   autoHandoff: true,
+  introSeen: true,
 };
 
 export const LOCAL_PREFS_KEY = "inkling.prefs";
@@ -128,7 +137,7 @@ export function readLocalPrefs(): LocalPrefs {
   if (typeof window === "undefined") return DEFAULT_LOCAL_PREFS;
   try {
     const raw = window.localStorage.getItem(LOCAL_PREFS_KEY);
-    if (!raw) return DEFAULT_LOCAL_PREFS;
+    if (!raw) return { ...DEFAULT_LOCAL_PREFS, introSeen: false };
     const parsed = JSON.parse(raw) as Partial<LocalPrefs>;
     return {
       pageMode: (PAGE_MODES as readonly string[]).includes(parsed.pageMode ?? "")
@@ -148,6 +157,8 @@ export function readLocalPrefs(): LocalPrefs {
         typeof parsed.autoHandoff === "boolean"
           ? parsed.autoHandoff
           : DEFAULT_LOCAL_PREFS.autoHandoff,
+      // Anyone whose stored preferences predate the note has not seen it.
+      introSeen: parsed.introSeen === true,
     };
   } catch {
     return DEFAULT_LOCAL_PREFS;
