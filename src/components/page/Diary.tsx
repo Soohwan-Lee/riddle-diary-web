@@ -153,6 +153,27 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
 
   const busy = status !== "idle";
 
+  /**
+   * In blank-page mode the paper belongs to one hand at a time. The entry area
+   * exists only when it is yours: it leaves the moment you hand something over
+   * and comes back when the last of the reply has gone.
+   *
+   * This is a layout fix as much as a conceptual one. The entry sits below the
+   * ink in normal flow, so a reply growing line by line used to drag the caret
+   * down with it and snap it back up when the ink went — all during the window
+   * where nothing could be typed anyway. Now nothing moves, and from the second
+   * turn on the caret returns to exactly the same place: the top of an empty
+   * sheet.
+   */
+  const inkOnPaper = turns.some(
+    (turn) => !turn.pinned && (turn.strokes?.length || turn.raw.trim().length > 0),
+  );
+  const yourTurn = !blankPage || (!busy && !inkOnPaper);
+
+  // Give the caret back when the paper does, but not on the first visit —
+  // arriving at a page that grabs focus is a different, worse thing.
+  const hasWritten = history.some((message) => message.role === "user");
+
   return (
     <div className="relative z-10 flex min-h-dvh flex-col">
       {/* A landmark of its own, so the link is not content stranded outside
@@ -230,7 +251,7 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
                 instant={turn.voice === "user" || reducedMotion}
                 onWritten={
                   turn.voice === "ai"
-                    ? () => useSession.getState().restAll()
+                    ? () => useSession.getState().restFrom(turn.id)
                     : undefined
                 }
                 onFaded={() => useSession.getState().removeTurn(turn.id)}
@@ -251,22 +272,28 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
             {status === "thinking" ? t.page.thinking : ""}
           </span>
 
+          {/* The wrapper always stays: the skip link needs somewhere to land
+              even on a turn that is not yours. */}
           <div id="entry" tabIndex={-1} className="outline-none">
-            {mode === "type" ? (
-              <Composer
-                disabled={busy}
-                onSend={(text) => void send({ text })}
-                onActivity={touch}
-              />
-            ) : (
-              <InkCanvas
-                disabled={busy}
-                allowFinger={allowFinger}
-                autoHandoff={autoHandoff}
-                onSend={(payload) => void send(payload)}
-                onActivity={touch}
-              />
-            )}
+            {yourTurn &&
+              (mode === "type" ? (
+                <Composer
+                  disabled={busy}
+                  returning={blankPage && hasWritten}
+                  onSend={(text) => void send({ text })}
+                  onActivity={touch}
+                />
+              ) : (
+                <div className={blankPage && hasWritten ? "ink-entry-return" : undefined}>
+                  <InkCanvas
+                    disabled={busy}
+                    allowFinger={allowFinger}
+                    autoHandoff={autoHandoff}
+                    onSend={(payload) => void send(payload)}
+                    onActivity={touch}
+                  />
+                </div>
+              ))}
           </div>
         </div>
 

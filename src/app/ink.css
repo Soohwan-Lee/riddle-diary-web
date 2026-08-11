@@ -235,6 +235,35 @@
   }
 }
 
+/* ---- the paper coming back to you --------------------------------------- */
+
+/*
+ * In blank-page mode the entry area is only mounted on your turn, so it needs
+ * a way in. It never needs a way out: it leaves at the moment you hand
+ * something over, with your own ink still on the paper above it and nothing
+ * below it to move.
+ */
+.ink-entry-return {
+  animation: ink-entry-in 640ms var(--ease-settle) both;
+}
+
+@keyframes ink-entry-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ink-entry-return {
+    animation: none;
+  }
+}
+
 /* ---- the first-visit note ----------------------------------------------- */
 
 /*

@@ -12,10 +12,17 @@ import { useIsMac } from "@/lib/platform";
  */
 export function Composer({
   disabled,
+  returning = false,
   onSend,
   onActivity,
 }: {
   disabled: boolean;
+  /**
+   * The paper has just come back to you after a turn. Ease in rather than
+   * appear, and take the caret with you — the point of the whole arrangement
+   * is that the cursor waits its turn instead of being dragged around.
+   */
+  returning?: boolean;
   onSend: (text: string) => void;
   onActivity: () => void;
 }) {
@@ -42,7 +49,7 @@ export function Composer({
   }, [value, disabled, onSend, grow]);
 
   return (
-    <div className="relative">
+    <div className={["relative", returning ? "ink-entry-return" : ""].join(" ")}>
       <label htmlFor="composer" className="sr-only">
         {t.composer.placeholder}
       </label>
@@ -52,6 +59,7 @@ export function Composer({
         rows={1}
         value={value}
         disabled={disabled}
+        autoFocus={returning}
         spellCheck={false}
         placeholder={t.composer.placeholder}
         onChange={(event) => {
