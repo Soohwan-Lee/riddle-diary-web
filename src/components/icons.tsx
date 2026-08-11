@@ -11,6 +11,43 @@ const base = {
   focusable: false,
 };
 
+/**
+ * The mark: three written lines, each fainter than the one above it, and a nib
+ * still resting on the first. `docs/media/mark.svg` is the same drawing with
+ * real gradients — at 20px in the header, stepped opacity reads identically and
+ * costs no gradient definitions.
+ */
+export function InklingMark({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 96 96"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      focusable={false}
+      className={className}
+    >
+      <path
+        d="M14 30 C 26 24, 34 36, 46 30 C 56 25, 66 33, 82 28"
+        strokeWidth="5.4"
+      />
+      <path
+        d="M14 50 C 28 44, 38 56, 52 49 C 62 44, 70 51, 82 47"
+        strokeWidth="5"
+        strokeOpacity="0.52"
+      />
+      <path
+        d="M14 70 C 26 65, 36 75, 50 69 C 58 65, 66 70, 78 67"
+        strokeWidth="4.6"
+        strokeOpacity="0.22"
+      />
+      <circle cx="14" cy="30" r="3.4" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 export function SunIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>

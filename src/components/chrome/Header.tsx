@@ -1,5 +1,6 @@
 "use client";
 
+import { InklingMark } from "@/components/icons";
 import { useI18n } from "@/lib/i18n/provider";
 import { LocaleToggle, ModeToggle, ThemeToggle } from "./Controls";
 
@@ -8,13 +9,16 @@ export function Header({ actions }: { actions?: React.ReactNode }) {
 
   return (
     <header className="relative z-20 flex items-start justify-between gap-4 px-5 pt-5 sm:px-8 sm:pt-6">
-      <div className="min-w-0">
-        <p className="font-ui text-[0.82rem] leading-none font-medium tracking-[0.14em] text-ink-user uppercase">
-          {t.app.name}
-        </p>
-        <p className="mt-1.5 hidden text-[0.7rem] leading-none text-muted sm:block">
-          {t.app.tagline}
-        </p>
+      <div className="flex min-w-0 items-start gap-2.5">
+        <InklingMark className="mt-[-0.2rem] size-[1.6rem] shrink-0 text-ink-ai" />
+        <div className="min-w-0">
+          <p className="font-ui text-[0.82rem] leading-none font-medium tracking-[0.14em] text-ink-user uppercase">
+            {t.app.name}
+          </p>
+          <p className="mt-1.5 hidden text-[0.7rem] leading-none text-muted sm:block">
+            {t.app.tagline}
+          </p>
+        </div>
       </div>
 
       <nav

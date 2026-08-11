@@ -22,6 +22,9 @@ const csp = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // `next dev` otherwise appends its own block to CLAUDE.md on every run.
+  // That file is authored here and kept short on purpose.
+  agentRules: false,
   // Pin the workspace root so Turbopack ignores stray lockfiles further up
   // the filesystem.
   turbopack: { root: import.meta.dirname },
