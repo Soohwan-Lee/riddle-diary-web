@@ -16,6 +16,18 @@ export type Turn = {
   strokes?: readonly Stroke[];
   streaming: boolean;
   phase: TurnPhase;
+  /**
+   * Holds the opening line on the page until there is something to answer.
+   * An empty sheet is the resting state of this app, but it is a poor
+   * first impression.
+   */
+  pinned?: boolean;
+  /**
+   * Set when handing something over cleared the page under it. Such a turn
+   * has already been read, so it sinks at the speed of the entry that
+   * displaced it rather than at reading speed.
+   */
+  absorbing?: boolean;
   createdAt: number;
 };
 
@@ -36,10 +48,18 @@ type SessionState = {
   status: SessionStatus;
   error: string | null;
 
-  addUserTurn: (input: { raw: string; strokes?: Turn["strokes"] }) => string;
+  /**
+   * `clearPage` is blank-page mode: handing something over takes it, and
+   * everything already on the paper, straight into its fade.
+   */
+  addUserTurn: (input: {
+    raw: string;
+    strokes?: Turn["strokes"];
+    clearPage?: boolean;
+  }) => string;
   /** Replaces a handwritten turn's placeholder text once the page reads it. */
   setUserTranscript: (id: string, transcript: string) => void;
-  beginReply: () => string;
+  beginReply: (options?: { pinned?: boolean }) => string;
   appendReply: (id: string, delta: string) => void;
   finishReply: (id: string) => void;
   failReply: (id: string, message: string) => void;
@@ -72,18 +92,26 @@ export const useSession = create<SessionState>()((set) => ({
   status: "idle",
   error: null,
 
-  addUserTurn: ({ raw, strokes }) => {
+  addUserTurn: ({ raw, strokes, clearPage }) => {
     const id = newId();
     set((state) => ({
       turns: [
-        ...state.turns,
+        // Whatever was on the paper is no longer waiting for anything: the
+        // opening line has been answered, and in blank-page mode the answer
+        // before this one has been read.
+        ...state.turns.map((turn) => ({
+          ...turn,
+          pinned: false,
+          absorbing: clearPage || turn.absorbing,
+          phase: clearPage ? ("resting" as const) : turn.phase,
+        })),
         {
           id,
           voice: "user",
           raw,
           strokes,
           streaming: false,
-          phase: "fresh",
+          phase: clearPage ? ("resting" as const) : ("fresh" as const),
           createdAt: Date.now(),
         },
       ],
@@ -111,7 +139,7 @@ export const useSession = create<SessionState>()((set) => ({
       };
     }),
 
-  beginReply: () => {
+  beginReply: (options) => {
     const id = newId();
     set((state) => ({
       turns: [
@@ -122,19 +150,22 @@ export const useSession = create<SessionState>()((set) => ({
           raw: "",
           streaming: true,
           phase: "fresh",
+          pinned: options?.pinned,
           createdAt: Date.now(),
         },
       ],
-      status: "writing",
+      status: "thinking",
     }));
     return id;
   },
 
+  // The first delta is the moment the page stops thinking and starts writing.
   appendReply: (id, delta) =>
     set((state) => ({
       turns: state.turns.map((turn) =>
         turn.id === id ? { ...turn, raw: turn.raw + delta } : turn,
       ),
+      status: "writing",
     })),
 
   finishReply: (id) =>
@@ -173,7 +204,9 @@ export const useSession = create<SessionState>()((set) => ({
   restAll: () =>
     set((state) => ({
       turns: state.turns.map((turn) =>
-        turn.phase === "resting" ? turn : { ...turn, phase: "resting" },
+        turn.phase === "resting" || turn.pinned
+          ? turn
+          : { ...turn, phase: "resting" },
       ),
       status: "idle",
     })),

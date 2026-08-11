@@ -7,8 +7,10 @@ import { useI18n } from "@/lib/i18n/provider";
 import {
   DWELL_MS,
   FADE_PACES,
+  PAGE_MODES,
   WRITE_SPEEDS,
   type FadePace,
+  type PageMode,
   type WriteSpeed,
 } from "@/lib/prefs/config";
 import { usePrefs } from "@/lib/prefs/provider";
@@ -26,6 +28,7 @@ export function SettingsSheet({
 }) {
   const { t } = useI18n();
   const {
+    pageMode,
     fadePace,
     writeSpeed,
     allowFinger,
@@ -70,7 +73,31 @@ export function SettingsSheet({
     label: speedLabels[value],
   }));
 
+  const pageModeLabels: Record<PageMode, string> = {
+    blank: t.settings.pageModeBlank,
+    keep: t.settings.pageModeKeep,
+  };
+
+  const pageModeSegments: Segment<PageMode>[] = PAGE_MODES.map((value) => ({
+    value,
+    label: pageModeLabels[value],
+  }));
+
   const dwell = DWELL_MS[fadePace];
+  const neverFades = fadePace === "never";
+
+  // The two controls talk to each other, so each says what the other is
+  // currently doing to it rather than describing itself in isolation.
+  const pageModeHint = neverFades
+    ? t.settings.pageModeNeverNote
+    : pageMode === "blank"
+      ? t.settings.pageModeBlankHint
+      : t.settings.pageModeKeepHint;
+
+  const paceHint =
+    pageMode === "blank" && !neverFades
+      ? t.settings.paceHintBlank
+      : describePace(dwell, t.settings.paceHint);
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -112,7 +139,16 @@ export function SettingsSheet({
             <LocaleToggle />
           </Field>
 
-          <Field label={t.settings.paceLabel} hint={describePace(dwell, t.settings.paceHint)}>
+          <Field label={t.settings.pageModeLabel} hint={pageModeHint}>
+            <SegmentedControl
+              label={t.settings.pageModeLabel}
+              value={pageMode}
+              segments={pageModeSegments}
+              onChange={(value) => setLocalPrefs({ pageMode: value })}
+            />
+          </Field>
+
+          <Field label={t.settings.paceLabel} hint={paceHint}>
             <SegmentedControl
               label={t.settings.paceLabel}
               value={fadePace}

@@ -14,6 +14,19 @@ export type InputMode = (typeof INPUT_MODES)[number];
 export const DEFAULT_INPUT_MODE: InputMode = "type";
 export const MODE_COOKIE = "inkling.mode";
 
+/**
+ * What the paper does between turns.
+ *
+ *   `blank` — the film's behaviour. What you hand over sinks into the page at
+ *             once; the answer stays as long as it takes to read, then goes.
+ *             You are always writing on an empty sheet.
+ *   `keep`  — the exchange stays together and leaves together, after the
+ *             dwell set below.
+ */
+export const PAGE_MODES = ["blank", "keep"] as const;
+export type PageMode = (typeof PAGE_MODES)[number];
+export const DEFAULT_PAGE_MODE: PageMode = "blank";
+
 /** How long ink rests after it is written, before it starts thinning out. */
 export const FADE_PACES = ["short", "normal", "long", "never"] as const;
 export type FadePace = (typeof FADE_PACES)[number];
@@ -62,6 +75,7 @@ export const WRITE_CPM: Record<WriteSpeed, number> = {
 export const AUTO_HANDOFF_MS = 4_000;
 
 export type LocalPrefs = {
+  pageMode: PageMode;
   fadePace: FadePace;
   writeSpeed: WriteSpeed;
   allowFinger: boolean;
@@ -70,6 +84,7 @@ export type LocalPrefs = {
 };
 
 export const DEFAULT_LOCAL_PREFS: LocalPrefs = {
+  pageMode: DEFAULT_PAGE_MODE,
   fadePace: DEFAULT_FADE_PACE,
   writeSpeed: DEFAULT_WRITE_SPEED,
   allowFinger: true,
@@ -99,6 +114,9 @@ export function readLocalPrefs(): LocalPrefs {
     if (!raw) return DEFAULT_LOCAL_PREFS;
     const parsed = JSON.parse(raw) as Partial<LocalPrefs>;
     return {
+      pageMode: (PAGE_MODES as readonly string[]).includes(parsed.pageMode ?? "")
+        ? (parsed.pageMode as PageMode)
+        : DEFAULT_PAGE_MODE,
       fadePace: (FADE_PACES as readonly string[]).includes(parsed.fadePace ?? "")
         ? (parsed.fadePace as FadePace)
         : DEFAULT_FADE_PACE,

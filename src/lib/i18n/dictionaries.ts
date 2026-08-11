@@ -28,6 +28,7 @@ const ko = {
     firstLine: "오늘, 어땠어요?",
     notice: "여기 적은 것은 저장되지 않고, 곧 사라집니다.",
     writing: "쓰는 중",
+    thinking: "페이지가 읽는 중",
   },
 
   composer: {
@@ -57,12 +58,22 @@ const ko = {
 
   settings: {
     title: "설정",
+    pageModeLabel: "페이지가 넘어가는 방식",
+    pageModeBlank: "빈 페이지",
+    pageModeKeep: "쌓아두기",
+    pageModeBlankHint:
+      "건넨 글은 바로 종이에 스며들고, 답장은 다 읽을 즈음 사라집니다. 늘 빈 페이지에서 씁니다.",
+    pageModeKeepHint:
+      "주고받은 글이 함께 머물다가, 아래에서 정한 시간이 지나면 함께 사라집니다.",
+    pageModeNeverNote:
+      "‘사라지지 않게’가 켜져 있어 지금은 두 방식 모두 쌓아두기로 동작합니다.",
     paceLabel: "사라지는 속도",
     paceShort: "짧게",
     paceNormal: "기본",
     paceLong: "길게",
     paceNever: "사라지지 않게",
     paceHint: "다 쓰고 나서 이만큼 머문 뒤 옅어집니다.",
+    paceHintBlank: "빈 페이지 모드에서는 답장을 읽을 시간의 배율이 됩니다.",
     writingSpeedLabel: "AI가 쓰는 속도",
     speedSlow: "느리게",
     speedNormal: "기본",
@@ -138,6 +149,7 @@ const en: Translation<Dictionary> = {
     firstLine: "How was today?",
     notice: "Nothing here is saved. It will fade shortly.",
     writing: "Writing",
+    thinking: "The page is reading",
   },
 
   composer: {
@@ -167,12 +179,22 @@ const en: Translation<Dictionary> = {
 
   settings: {
     title: "Settings",
+    pageModeLabel: "How the page turns",
+    pageModeBlank: "Blank page",
+    pageModeKeep: "Keep the exchange",
+    pageModeBlankHint:
+      "What you hand over sinks in at once, and the reply goes about the time you finish reading it. You always write on an empty sheet.",
+    pageModeKeepHint:
+      "The exchange stays together, and leaves together once the dwell below is up.",
+    pageModeNeverNote:
+      "“Never fade” is on, so both settings currently keep the exchange.",
     paceLabel: "How quickly it fades",
     paceShort: "Short",
     paceNormal: "Default",
     paceLong: "Long",
     paceNever: "Never fade",
     paceHint: "Ink rests this long after it is written, then thins out.",
+    paceHintBlank: "In blank-page mode this scales how long you get to read.",
     writingSpeedLabel: "How fast the page writes",
     speedSlow: "Slower",
     speedNormal: "Default",

@@ -15,18 +15,31 @@ import {
 } from "@/lib/ai/transport";
 import { LOCALE_TAG } from "@/lib/i18n/config";
 import { useI18n } from "@/lib/i18n/provider";
+import {
+  ABSORB_DWELL_MS,
+  ABSORB_FADE_MS,
+  BLANK_FADE_MS,
+  readDwellMs,
+} from "@/lib/ink/dwell";
 import { useComposingPause, useDocumentHidden } from "@/lib/ink/usePageClock";
 import { DWELL_MS, FADE_MS, WRITE_CPM } from "@/lib/prefs/config";
 import { usePrefs } from "@/lib/prefs/provider";
-import { useSession } from "@/store/session";
+import { useSession, type Turn } from "@/store/session";
 import { Composer } from "./Composer";
 import { InkCanvas } from "./InkCanvas";
 import { Transcript } from "./Transcript";
 
 export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   const { t, locale } = useI18n();
-  const { mode, writeSpeed, fadePace, reducedMotion, allowFinger, autoHandoff } =
-    usePrefs();
+  const {
+    mode,
+    pageMode,
+    writeSpeed,
+    fadePace,
+    reducedMotion,
+    allowFinger,
+    autoHandoff,
+  } = usePrefs();
 
   const turns = useSession((state) => state.turns);
   const history = useSession((state) => state.history);
@@ -45,6 +58,29 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   const dwellMs = Number.isFinite(dwell) ? dwell : 0;
   const fadeMs = fadePace === "never" ? 0 : FADE_MS[fadePace];
 
+  // "Never fade" wins over blank-page mode: someone who asked for nothing to
+  // disappear did not ask for the page to clear itself between turns.
+  const blankPage = pageMode === "blank" && fadePace !== "never";
+
+  /**
+   * In blank-page mode the two voices keep different time. What you hand over
+   * is absorbed almost at once; what the page writes stays for as long as it
+   * takes to read. Everywhere else both rest together on the dwell setting.
+   */
+  const timingFor = useCallback(
+    (turn: Turn) => {
+      if (!blankPage) return { dwellMs, fadeMs };
+      if (turn.voice === "user" || turn.absorbing) {
+        return { dwellMs: ABSORB_DWELL_MS, fadeMs: ABSORB_FADE_MS };
+      }
+      return {
+        dwellMs: readDwellMs(turn.raw, fadePace),
+        fadeMs: BLANK_FADE_MS[fadePace],
+      };
+    },
+    [blankPage, dwellMs, fadeMs, fadePace],
+  );
+
   const greeted = useRef(false);
   useEffect(() => {
     if (greeted.current) return;
@@ -52,8 +88,9 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
     const { turns: existing, beginReply, appendReply, finishReply } =
       useSession.getState();
     if (existing.length > 0) return;
-    // The page speaks first, and its opening line fades like everything else.
-    const id = beginReply();
+    // The page speaks first. Its opening line is pinned: it waits on the paper
+    // until there is something to answer, and then leaves like everything else.
+    const id = beginReply({ pinned: true });
     appendReply(id, t.page.firstLine);
     finishReply(id);
   }, [t.page.firstLine]);
@@ -86,6 +123,7 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
       const userId = session.addUserTurn({
         raw: image ? "" : (text ?? ""),
         strokes,
+        clearPage: blankPage,
       });
       const replyId = session.beginReply();
 
@@ -111,7 +149,7 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
         useSession.getState().failReply(replyId, errorText(code));
       }
     },
-    [transport, locale, errorText],
+    [transport, locale, errorText, blankPage],
   );
 
   const busy = status !== "idle";
@@ -162,15 +200,16 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
           onPointerCancel={() => setHeld(false)}
           onPointerLeave={() => setHeld(false)}
         >
-          {turns.map((turn) =>
-            turn.strokes ? (
+          {turns.map((turn) => {
+            const timing = timingFor(turn);
+            return turn.strokes ? (
               <InkStrokes
                 key={turn.id}
                 strokes={turn.strokes}
                 style={{ size: 4.4, simulatePressure: true }}
                 phase={turn.phase}
-                dwellMs={dwellMs}
-                fadeMs={fadeMs}
+                dwellMs={timing.dwellMs}
+                fadeMs={timing.fadeMs}
                 onFaded={() => useSession.getState().removeTurn(turn.id)}
               />
             ) : (
@@ -183,8 +222,8 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
                 phase={turn.phase}
                 cpm={cpm}
                 locale={LOCALE_TAG[locale]}
-                dwellMs={dwellMs}
-                fadeMs={fadeMs}
+                dwellMs={timing.dwellMs}
+                fadeMs={timing.fadeMs}
                 instant={turn.voice === "user" || reducedMotion}
                 onWritten={
                   turn.voice === "ai"
@@ -194,8 +233,20 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
                 onFaded={() => useSession.getState().removeTurn(turn.id)}
                 className="text-2xl leading-[1.85] sm:text-[1.7rem]"
               />
-            ),
+            );
+          })}
+
+          {/* Between handing something over and the first character coming
+              back there is nothing on the paper at all in blank-page mode.
+              A nib resting on the page is the whole indicator. */}
+          {status === "thinking" && (
+            <p className="flex items-center gap-2" aria-hidden>
+              <span className="ink-thinking" />
+            </p>
           )}
+          <span role="status" className="sr-only">
+            {status === "thinking" ? t.page.thinking : ""}
+          </span>
 
           <div id="entry" tabIndex={-1} className="outline-none">
             {mode === "type" ? (

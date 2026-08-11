@@ -212,6 +212,41 @@
   }
 }
 
+/* ---- the page is thinking ----------------------------------------------- */
+
+/*
+ * A nib touched to the paper, waiting. In blank-page mode this is the only
+ * thing on screen between handing something over and the reply starting, so
+ * it has to read as "something is coming" rather than as a loading spinner.
+ */
+.ink-thinking {
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 9999px;
+  background: var(--ink-ai);
+  animation: ink-think 2000ms var(--ease-settle) infinite;
+}
+
+@keyframes ink-think {
+  0%,
+  100% {
+    opacity: 0.16;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ink-thinking {
+    animation: none;
+    opacity: 0.55;
+  }
+}
+
 /* ---- hand-over countdown ----------------------------------------------- */
 
 /*
