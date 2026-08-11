@@ -32,10 +32,11 @@ Then both of you fade off the paper, and nothing is kept.
 Every conversational AI keeps everything. That is useful, and it is also not the only
 possible shape.
 
-Inkling is the other one. You write — by hand or by keyboard — and a page writes back.
-It writes the way a person writes: character by character, pausing at commas, pressing
-harder at the start of a stroke. Then, after a while, the ink thins and goes, taking
-your words with it. Nothing is saved to a server. Nothing survives closing the tab.
+Inkling is the other one. You write — by hand or by keyboard — and **Riddle** writes
+back. Riddle writes the way a person writes: character by character, pausing at commas,
+pressing harder at the start of a stroke. Then, after a while, the ink thins and goes,
+taking your words with it. Nothing is saved to a server. Nothing survives closing the
+tab.
 
 The hypothesis it exists to test: **a guarantee of disappearance lowers the threshold
 for saying the thing.**
@@ -49,15 +50,32 @@ words sink in, the answer surfaces, and by the time you have read it the sheet i
 empty again.
 
 <div align="center">
-<img src="docs/media/blank.gif" width="820" alt="An entry is handed over and sinks into the page, the page thinks, then writes its reply on an empty sheet — which itself fades once it has been read." />
+<img src="docs/media/blank.gif" width="820" alt="An entry is handed over and sinks into the page, Riddle reads it, then writes a reply on an empty sheet — which itself fades once it has been read, and the caret returns to the top." />
 <br/>
-<sub><i>Hand it over · it sinks · the page reads · it answers · you read · gone.</i></sub>
+<sub><i>Hand it over · it sinks · Riddle reads · Riddle answers · you read · gone · your turn.</i></sub>
 </div>
 
 The reply's dwell is not a fixed number — it is a **reading estimate**, weighted by
 script so that Korean and English of equivalent content get equal time on the page.
 If you would rather the exchange stayed together, **Keep the exchange** in settings
 restores the older behaviour, and **Never fade** turns the whole thing off.
+
+### One hand at a time
+
+The entry area used to sit below the ink in normal flow, which meant a reply growing
+line by line dragged the caret down with it and snapped it back up when the ink went —
+all during the window where nothing could be typed anyway. The caret spent the whole
+turn moving for no reason.
+
+So in blank-page mode **the entry exists only on your turn.** It leaves when you hand
+something over and returns when the last of the reply has gone, easing in and taking
+the caret with it. From the second turn on it comes back to exactly the same place, the
+top of an empty sheet — measured at a stable 100px across three consecutive turns.
+
+There is also **no caret while Riddle writes.** There was once a nib riding the edge of
+the reveal; at text sizes it read as a cursor blinking along a line, which is the one
+thing this page must never look like. Handwriting appearing on paper has nothing in
+front of it. The reveal itself is the pen.
 
 ---
 
@@ -66,8 +84,9 @@ restores the older behaviour, and **Never fade** turns the whole thing off.
 |   | |
 |---|---|
 | 📖 | **Blank-page mode.** What you hand over sinks in at once; the reply leaves about the time you finish reading it |
+| 🤝 | **One hand at a time.** The entry area — and the caret — waits its turn instead of being dragged around by growing ink |
 | ✍️ | **Two hands, one page.** Write with a stylus, a finger, or a keyboard — toggle at any time |
-| 🪶 | **Real handwriting animation.** Per-grapheme reveal in Korean and English, with a nib riding the stroke |
+| 🪶 | **Real handwriting animation.** Per-grapheme reveal in Korean and English, and no cursor in front of it |
 | 🖋️ | **Four handwriting faces**, each a Latin face paired with a Hangul one, chosen separately for you and for the page |
 | ✏️ | **Hand-drawn marks.** Underlines that flick, circles that overshoot their own start, a highlighter pass |
 | ⏱️ | **Hand-over you can see coming.** Stop writing and a ring fills; any new stroke puts it back to zero |
@@ -146,10 +165,9 @@ What sells the illusion is the timing, not the technique:
   must never make the line twitch.
 - **Pen lifts** after spaces, longer rests at commas and full stops. The page appears to
   think mid-sentence.
-- **A nib** riding the edge of the reveal. It is a pseudo-element animation on every
-  character rather than one tracked node, which buys the effect for zero rAF loops and
-  zero layout reads.
 - **Wet ink** that dries to its resting tone over the following second.
+- **Nothing in front of the reveal.** No nib, no caret, no leading marker of any kind —
+  see [One hand at a time](#one-hand-at-a-time).
 
 Marks are drawn *after* the sentence is finished, the way a person marks. A hand-drawn
 circle's giveaway is that it passes its own starting point instead of meeting it, so it
@@ -226,12 +244,15 @@ The parser has one hard requirement — **the plain text it emits must be a stab
 A character already written can never move or disappear. An unclosed opener is therefore
 treated as a mark that is still growing, not as literal text.
 
-### Who answers
+### Riddle
 
-Not a coach, not a therapist, not an assistant. It listens, it does not advise, and it
-usually copies out one exact fragment of what you wrote so you can see it from outside.
-Replies are one to three sentences — **not to save tokens, but because something writing
-by hand cannot write much.** The constraint is the product.
+The one who answers has a name, and it is not "the assistant". **Riddle** listens, does
+not advise, and usually copies out one exact fragment of what you wrote so you can see
+it from outside. Replies are one to three sentences — **not to save tokens, but because
+something writing by hand cannot write much.** The constraint is the product.
+
+Named, not disguised: asked directly whether it is a program, Riddle says so in one
+sentence and goes back to you.
 
 The system prompt is in [`src/lib/ai/prompt.ts`](src/lib/ai/prompt.ts) and is worth
 reading; it is more of the design than the CSS is.
@@ -306,10 +327,13 @@ diverged from it and why.
 
 ## 🗺️ Roadmap
 
-- [ ] **Diagrams.** The model emits a node/edge spec; the same `stroke-dashoffset` engine
-      draws it. The `{ kind: 'path' }` case already exists
+- [ ] **Riddle draws.** Not only writes — a small sketch in the margin, an arrow between
+      two things you said, a shape. Riddle emits a spec and the same `stroke-dashoffset`
+      engine draws it stroke by stroke, exactly as it already draws circles and
+      underlines. The `{ kind: 'path' }` case is in the type and waiting
+- [ ] Diagrams proper: a node/edge spec on top of the same engine
 - [ ] A single-stroke font backend for Latin text, promoting it to the true stroke engine
-- [ ] Page turns, paper textures, an optional nib sound
+- [ ] Page turns, paper textures, an optional pen sound
 - [ ] An end-of-session ritual: keep one sentence, burn the rest
 - [ ] Writing rhythm — speed, pressure, pauses — as an affective signal, **only** behind a
       designed research-consent flow
