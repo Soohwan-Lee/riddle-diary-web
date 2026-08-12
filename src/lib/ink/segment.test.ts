@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { GLYPH_PLACEHOLDER } from "./inkscript";
 import { layoutText, pauseAfter, strokeWeight } from "./segment";
 
 const options = { cpm: 72, locale: "ko-KR", seed: 12345 };
@@ -96,6 +97,32 @@ describe("layoutText", () => {
     const slow = layoutText("한 줄만 적어요", { ...options, cpm: 40 });
     const fast = layoutText("한 줄만 적어요", { ...options, cpm: 120 });
     expect(slow.totalMs).toBeGreaterThan(fast.totalMs * 2);
+  });
+
+  it("gives a drawing its own time, and does not slow the words for it", () => {
+    const words = layoutText("한 줄만 적어요", { ...options, cpm: 600 });
+    const drawn = layoutText(`한 줄만 적어요${GLYPH_PLACEHOLDER}`, {
+      ...options,
+      cpm: 600,
+    });
+
+    const letters = (layout: ReturnType<typeof layoutText>) =>
+      layout.graphemes
+        .filter((g) => g.char !== GLYPH_PLACEHOLDER)
+        .reduce((sum, g) => sum + g.durationMs, 0);
+
+    // Folded into the tempo normalisation, a drawing would be squeezed into a
+    // character's worth of time and every letter beside it would stretch.
+    expect(letters(drawn)).toBeCloseTo(letters(words), 5);
+
+    const glyph = drawn.graphemes.at(-1);
+    expect(glyph?.durationMs).toBeGreaterThan(1_000);
+  });
+
+  it("draws faster when the hand is faster", () => {
+    const glyphAt = (cpm: number) =>
+      layoutText(GLYPH_PLACEHOLDER, { ...options, cpm }).graphemes[0].durationMs;
+    expect(glyphAt(300) / glyphAt(600)).toBeCloseTo(2, 5);
   });
 
   it("handles an empty string", () => {

@@ -1,3 +1,4 @@
+import { GLYPH_PLACEHOLDER } from "./inkscript";
 import { noiseAt } from "./random";
 
 /**
@@ -91,6 +92,16 @@ export type LayoutOptions = {
 /** Per-character time at `WRITE_CPM.normal`, which the rests are written for. */
 const PAUSE_REFERENCE_MS = 100;
 
+/**
+ * A drawing takes one character's room in the line but nothing like one
+ * character's time. Both figures are written for the default hand and scale
+ * with it, like the rests.
+ */
+const GLYPH_MS = 1_300;
+const GLYPH_REST_MS = 260;
+
+const isDrawing = (char: string) => char === GLYPH_PLACEHOLDER;
+
 export function layoutText(text: string, options: LayoutOptions): InkLayout {
   const { cpm, locale, seed } = options;
   const baseMs = 60_000 / Math.max(1, cpm);
@@ -141,8 +152,12 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
       for (const char of splitGraphemes(token, locale)) {
         // ±18% so no two neighbouring characters take exactly as long.
         const jitter = 1 + noiseAt(seed, index) * 0.18;
-        const duration = baseMs * strokeWeight(char) * jitter;
-        const rest = restAfter(char);
+        const duration = isDrawing(char)
+          ? GLYPH_MS * pauseScale
+          : baseMs * strokeWeight(char) * jitter;
+        const rest = isDrawing(char)
+          ? Math.round(GLYPH_REST_MS * pauseScale)
+          : restAfter(char);
         graphemes.push({
           char,
           index,
@@ -178,14 +193,20 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
   // syllable still takes longer than an `a`, but a Korean sentence and an
   // English one of the same length finish together. Without this, `cpm` would
   // mean something different in every script.
-  if (graphemes.length > 0) {
-    const target = graphemes.length * baseMs;
-    const written = graphemes.reduce((sum, g) => sum + g.durationMs, 0);
+  //
+  // Drawings sit outside it entirely. This normalisation exists to hold two
+  // scripts to one tempo, and a drawing is neither script — folded in, it
+  // would be squeezed to a character's worth of time and every letter beside
+  // it would slow down to make room.
+  const lettered = graphemes.filter((grapheme) => !isDrawing(grapheme.char));
+  if (lettered.length > 0) {
+    const target = lettered.length * baseMs;
+    const written = lettered.reduce((sum, g) => sum + g.durationMs, 0);
     if (written > 0) {
       const scale = target / written;
       totalMs = 0;
       for (const grapheme of graphemes) {
-        grapheme.durationMs *= scale;
+        if (!isDrawing(grapheme.char)) grapheme.durationMs *= scale;
         totalMs += grapheme.durationMs + grapheme.pauseAfterMs;
       }
     }

@@ -1,9 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { parseInkScript, toGraphemeRange } from "@/lib/ink/inkscript";
+import {
+  GLYPH_PLACEHOLDER,
+  parseInkScript,
+  toGraphemeRange,
+  type InkGlyphRef,
+} from "@/lib/ink/inkscript";
 import { hashSeed, noiseAt } from "@/lib/ink/random";
 import { layoutText, wordEnd } from "@/lib/ink/segment";
+import { InkGlyph } from "./InkGlyph";
 import { MarkLayer, type ResolvedMark } from "./MarkLayer";
 import { useInkReveal } from "./useInkReveal";
 
@@ -78,6 +84,22 @@ export function InkText({
     // `layout` already changes whenever the text does.
   }, [id, parsed.marks, layout]);
 
+  /**
+   * Which grapheme slots hold a drawing. Both lists are in document order, so
+   * the nth placeholder in the layout is the nth drawing in the parse.
+   */
+  const drawings = useMemo(() => {
+    const found = new Map<number, InkGlyphRef>();
+    let seen = 0;
+    layout.graphemes.forEach((grapheme, index) => {
+      if (grapheme.char !== GLYPH_PLACEHOLDER) return;
+      const glyph = parsed.glyphs[seen];
+      seen += 1;
+      if (glyph) found.set(index, glyph);
+    });
+    return found;
+  }, [layout.graphemes, parsed.glyphs]);
+
   const writtenRef = useRef(false);
   useEffect(() => {
     if (written && !writtenRef.current) {
@@ -141,6 +163,27 @@ export function InkText({
                     // line never twitches on a re-render.
                     const lift = noiseAt(seed, index * 3) * 0.45;
                     const tilt = noiseAt(seed, index * 3 + 1) * 0.4;
+
+                    const drawing = drawings.get(index);
+                    if (drawing) {
+                      return (
+                        <span
+                          key={index}
+                          className="ink-glyph"
+                          // Marks measure by this, so a drawing can be
+                          // circled like anything else on the line.
+                          data-i={index}
+                          style={{ transform: `translateY(${lift.toFixed(2)}px)` }}
+                        >
+                          <InkGlyph
+                            id={`${id}:${drawing.id}`}
+                            name={drawing.name}
+                            durationMs={grapheme.durationMs}
+                          />
+                        </span>
+                      );
+                    }
+
                     return (
                       <span
                         key={index}

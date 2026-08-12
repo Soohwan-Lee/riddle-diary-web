@@ -169,6 +169,46 @@
   }
 }
 
+/* ---- drawings ----------------------------------------------------------- */
+
+/*
+ * Not a third backend: a drawing is the marks backend given a character's slot
+ * in the line. It takes room in the flow, so text wraps around it, and it
+ * carries `data-i` so a mark can be measured against it like any letter.
+ */
+.ink-glyph {
+  display: inline-block;
+  position: relative;
+  width: 1.3em;
+  height: 1.3em;
+  vertical-align: -0.26em;
+  margin-inline: 0.08em;
+  /* Same wet-to-dry as the letters beside it; the strokes take the colour
+     through `currentColor`. */
+  animation: ink-dry 1200ms linear both;
+}
+
+.ink-glyph svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ink-glyph path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  /* The same keyframes the marks use — one stroke after another, in the order
+     a hand would make them. */
+  animation: mark-draw var(--glyph-d, 400ms) var(--ease-ink) var(--glyph-t, 0ms)
+    forwards;
+}
+
 /* ---- the reader's own strokes ------------------------------------------ */
 
 .ink-stroke {
@@ -355,6 +395,15 @@
   .ink-mark-path {
     --mark-d: 1ms;
     --mark-t: 0ms;
+  }
+
+  .ink-glyph path {
+    --glyph-d: 1ms;
+    --glyph-t: 0ms;
+  }
+
+  .ink-glyph {
+    animation-duration: 1ms !important;
   }
 
   @keyframes ink-fade {
