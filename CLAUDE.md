@@ -71,12 +71,42 @@ a name looked up in a table cannot carry markup into the renderer.
 - New glyphs go in `glyph.ts` and need a label in `dictionaries.glyphs`, or a
   screen reader hears nothing.
 
+## Someday: memory, not transcript
+
+Not built. Recorded here so nobody builds half of it by accident, and so
+nobody reads rule 1 and concludes the idea is off the table.
+
+In the film, the writing vanishes and the two of them still remember. What
+they carry forward is not a log of the words — the words are gone — but the
+fact of having talked. That distinction is the whole feature.
+
+The direction: **people log in, and Riddle keeps a memory of them.** What is
+kept is a memory, never a transcript. The conversation itself never comes
+back, and no affordance may ever exist for reading it again.
+
+- **Within a session this already works** — `history` in `src/store/session.ts`
+  (last `MAX_HISTORY_TURNS` messages) is what goes upstream. It lives in the
+  tab and dies with it, which is why reloading is a clean slate today.
+- **The next step is across sessions**: log out, come back, and Riddle picks up
+  where you left off.
+
+If it is ever built, these hold or it is not this product any more:
+
+- A memory is written *about* an exchange, not *from* it. Storing the messages
+  and calling it memory is the failure mode, not a shortcut to the feature.
+- Opt-in per account, visible, editable, and deletable in one action.
+- The page still clears. Nothing kept ever comes back onto the paper.
+- Rule 1 gets rewritten before a single row is stored, not after — and
+  `/about` and the README say plainly what is kept and what is not.
+
 ## Non-negotiable rules
 
 1. **Nothing is persisted.** No database, no server logs of user content, no
    localStorage of conversation. Only settings (theme, locale, mode, page mode,
    handwriting faces, pace, speed, whether the opening note was dismissed) are
-   stored locally. History lives in memory and dies with the tab.
+   stored locally. History lives in memory and dies with the tab. There is a
+   direction that would change this — see "Someday: memory, not transcript" —
+   but it is not built, and until it is, this rule holds without exception.
 2. **Two ink backends, one clock.** Text reveals via per-grapheme `clip-path`;
    marks *and drawings* draw via SVG `stroke-dashoffset`. Both schedule through
    `InkClock`. Do not add a third timing mechanism.
