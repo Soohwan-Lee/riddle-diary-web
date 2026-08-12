@@ -17,7 +17,7 @@ Then both of you fade off the paper, and nothing is kept.
 [![axe: 0 violations](https://img.shields.io/badge/axe-0%20violations-3f8378)](#-accessibility-is-the-hard-part)
 [![License: MIT](https://img.shields.io/badge/License-MIT-8a8578)](LICENSE)
 
-<img src="docs/media/writing.gif" width="820" alt="The page writes a reply by hand, one character at a time, then circles a phrase." />
+<img src="docs/media/writing.gif" width="820" alt="Riddle writes a reply by hand, one character at a time, draws a small wave mid-sentence, then circles a phrase." />
 
 </div>
 
@@ -34,9 +34,9 @@ possible shape.
 
 Inkling is the other one. You write — by hand or by keyboard — and **Riddle** writes
 back. Riddle writes the way a person writes: character by character, pausing at commas,
-pressing harder at the start of a stroke. Then, after a while, the ink thins and goes,
-taking your words with it. Nothing is saved to a server. Nothing survives closing the
-tab.
+pressing harder at the start of a stroke, and once in a while drawing something small
+instead of saying it. Then, after a while, the ink thins and goes, taking your words
+with it. Nothing is saved to a server. Nothing survives closing the tab.
 
 The hypothesis it exists to test: **a guarantee of disappearance lowers the threshold
 for saying the thing.**
@@ -50,7 +50,7 @@ words sink in, the answer surfaces, and by the time you have read it the sheet i
 empty again.
 
 <div align="center">
-<img src="docs/media/blank.gif" width="820" alt="An entry is handed over and sinks into the page, Riddle reads it, then writes a reply on an empty sheet — which itself fades once it has been read, and the caret returns to the top." />
+<img src="docs/media/blank.gif" width="820" alt="An entry is handed over and sinks into the page, Riddle reads it, then writes a reply with a small drawing on an empty sheet — which itself fades once it has been read, and the caret returns to the top." />
 <br/>
 <sub><i>Hand it over · it sinks · Riddle reads · Riddle answers · you read · gone · your turn.</i></sub>
 </div>
@@ -89,12 +89,13 @@ front of it. The reveal itself is the pen.
 | 🪶 | **Real handwriting animation.** Per-grapheme reveal in Korean and English, and no cursor in front of it |
 | 🖋️ | **Four handwriting faces**, each a Latin face paired with a Hangul one, chosen separately for you and for the page |
 | ✏️ | **Hand-drawn marks.** Underlines that flick, circles that overshoot their own start, a highlighter pass |
+| 🌤️ | **Riddle draws.** Nine small things — weather, a leaf, a spiral, an arrow — drawn stroke by stroke in the same hand, inline where a word would go |
 | ⏱️ | **Hand-over you can see coming.** Stop writing and a ring fills; any new stroke puts it back to zero |
 | ⏸️ | **Time that waits for you.** The clock stops while you write, while the tab is hidden, and while you hold the paper |
 | 🌗 | **Light · dark · system**, resolved server-side so nothing flashes |
 | 🌏 | **한국어 / English**, including the page's own handwriting |
 | 🔒 | **No database, no logs, no history.** Context lives in the tab and dies with it |
-| ♿ | **Zero axe violations** across six page, theme and mode combinations |
+| ♿ | **Zero axe violations** across thirteen page, theme and mode combinations |
 
 ---
 
@@ -154,7 +155,7 @@ So Inkling runs **two backends on one clock**:
 | What | Technique | Why |
 |---|---|---|
 | **Text** | Per-grapheme animated `clip-path` over a real handwriting face | Works identically in Korean and English, at any font size, for any string |
-| **Marks** | `stroke-dashoffset` along a generated path | These *have* real paths, so the pen genuinely moves |
+| **Marks and drawings** | `stroke-dashoffset` along a generated path | These *have* real paths, so the pen genuinely moves |
 
 What sells the illusion is the timing, not the technique:
 
@@ -164,14 +165,56 @@ What sells the illusion is the timing, not the technique:
 - **±18% jitter** from a seeded hash. Irregular, but frozen per character — a re-render
   must never make the line twitch.
 - **Pen lifts** after spaces, longer rests at commas and full stops. The page appears to
-  think mid-sentence.
+  think mid-sentence. These are written against the default hand and scale with it, so
+  a faster setting is faster all the way through rather than a fast hand with the same
+  fixed gaps: left absolute, the rests would have been a fifth of a quick reply.
 - **Wet ink** that dries to its resting tone over the following second.
 - **Nothing in front of the reveal.** No nib, no caret, no leading marker of any kind —
   see [One hand at a time](#one-hand-at-a-time).
 
+At `normal` a character takes 100ms and a two-sentence reply lands in around seven
+seconds. Well past what a real hand can do, deliberately: what has to survive is the
+sense of being written to, and that lives in the per-character rhythm rather than in
+the total. Slower than this and it stops reading as writing and starts reading as
+waiting.
+
 Marks are drawn *after* the sentence is finished, the way a person marks. A hand-drawn
 circle's giveaway is that it passes its own starting point instead of meeting it, so it
 sweeps 1.08 turns.
+
+### Riddle draws
+
+Not only writes. Riddle asks for a drawing by name — `[[cloud]]`, `[[spiral]]`,
+`[[arrow]]` — and the same `stroke-dashoffset` engine that draws the circles draws it,
+stroke by stroke, in the order a hand would make them.
+
+A fixed vocabulary of nine rather than free-form SVG, for two reasons. **Reliability:**
+paths a model invents come out broken or ugly and there is no way to know which until
+it is on the paper. **Safety:** a name is looked up in a table, so nothing the model
+writes can reach the renderer as markup.
+
+<div align="center">
+<img src="docs/media/glyphs.png" width="820" alt="Nine hand-drawn glyphs, each shown with two different seeds: star, heart, sun, moon, cloud, leaf, wave, spiral, arrow." />
+<br/>
+<sub><i>Each drawn twice, from two seeds — the same wobble the marks use, so a drawing and a circle around a word look like one person's hand.</i></sub>
+</div>
+
+A drawing takes **one character's room in the line** but nothing like one character's
+time. It sits outside the script normalisation — that exists to hold Korean and English
+to the same tempo, and a drawing is neither script; folded in, it would be squeezed into
+a letter's worth of time while every letter beside it stretched to make room. So it gets
+a fixed 1.3s that scales with the hand, and strokes share it by weight: a sun's disc
+takes longer than one of its rays.
+
+Because it occupies a real slot in the line, text wraps around it and a mark can be
+measured against it — **Riddle can circle its own drawing.**
+
+Two shapes took several passes to stop lying about what they were. A crescent needs its
+inner edge to bite *left* into the disc, not bulge right, or it is a lens. A cloud
+cannot be three arcs one after another — each begins at its own left edge, which sends
+the pen back across the puff before it — nor bell curves, which make peaks and turn it
+into a mountain range. It is the tallest of three overlapping circles at each x, with
+the outer two sitting on the base so the outline comes back down.
 
 ### Streaming into a hand
 
@@ -232,17 +275,25 @@ both just work. The model reads it and replies in one call, emitting a single le
 becomes conversational context, but it is **never drawn**, so what stays on the page is
 your hand, not a machine's rendering of it.
 
-Marks travel as inline markup inside the stream, so they can be parsed incrementally:
+Marks and drawings travel as inline markup inside the stream, so they can be parsed
+incrementally:
 
 ```
 __text__     underline
 ((text))     circle it
 ==text==     highlighter
+[[star]]     draw one of the nine
 ```
 
 The parser has one hard requirement — **the plain text it emits must be a stable prefix**.
 A character already written can never move or disappear. An unclosed opener is therefore
 treated as a mark that is still growing, not as literal text.
+
+A drawing cannot do that: half a name is not half a drawing. An unclosed `[[` truncates
+the text until its `]]` arrives, and once the stream is over it is nothing special, just
+characters. The lone `[` at the end of a chunk cannot be trimmed off the tail the way a
+half-marker is, either — that would eat the second bracket of a `[[` and leave the first
+looking ordinary.
 
 ### Riddle
 
@@ -267,6 +318,8 @@ it:
 - The **full conversation stays in a live region** that never fades. A screen reader user
   is never asked to race an animation. This matters more in blank-page mode than it did
   before, and it was already the answer.
+- **A drawing becomes words there** — `[[moon]]` is read out as "a drawing of the moon".
+  The placeholder the renderer counts positions with never leaves the renderer.
 - A first visit gets **three sentences** saying what this is, that it disappears, and how
   to hold it. Not a modal — someone who ignores it and starts writing has understood it.
 - `prefers-reduced-motion` drops the writing animation. Ink still fades — that is the
@@ -278,8 +331,9 @@ it:
   and points at typing mode, rather than trapping a screen reader in a `role="application"`
   surface with nothing to do.
 
-Audited with axe (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `best-practice`) across home
-light/dark/handwriting, `/about` light/dark, and the settings sheet: **0 violations**.
+Audited with axe (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `best-practice`) across
+thirteen states — home light/dark/handwriting, a first visit, a countdown running, a
+reply carrying drawings, `/about` light/dark, and the settings sheet: **0 violations**.
 
 ---
 
@@ -314,7 +368,7 @@ This began as a design-research question rather than a product idea, and
 
 - **Slow Technology** (Hallnäs & Redström, 2001) — technology not aimed at efficiency,
   where producing time for reflection is the function. There is no skip button. In the
-  fifteen seconds a reply takes, you re-read the sentence you just wrote.
+  seconds a reply takes to arrive, you re-read the sentence you just wrote.
 - **Critical Design** (Dunne & Raby) — a counter-proposal to accumulation as the default.
 - **Expressive writing** (Pennebaker) — the clinical effect of putting an event into words.
 - **Materiality** — typing is uniform; handwriting keeps hesitation as a wobble and feeling
@@ -327,10 +381,10 @@ diverged from it and why.
 
 ## 🗺️ Roadmap
 
-- [ ] **Riddle draws.** Not only writes — a small sketch in the margin, an arrow between
-      two things you said, a shape. Riddle emits a spec and the same `stroke-dashoffset`
-      engine draws it stroke by stroke, exactly as it already draws circles and
-      underlines. The `{ kind: 'path' }` case is in the type and waiting
+- [x] **Riddle draws** — [nine of them](#riddle-draws), through the same engine that
+      draws the circles
+- [ ] More of them, and drawings that know where they are: a shape sized to the phrase
+      it sits beside, an arrow that actually reaches between two things you said
 - [ ] Diagrams proper: a node/edge spec on top of the same engine
 - [ ] A single-stroke font backend for Latin text, promoting it to the true stroke engine
 - [ ] Page turns, paper textures, an optional pen sound
@@ -352,11 +406,11 @@ src/
 │  ├─ ink.css         the animation layer
 │  └─ globals.css     design tokens, themes, the four hands
 ├─ components/
-│  ├─ ink/            InkText, InkStrokes, MarkLayer, the reveal scheduler
+│  ├─ ink/            InkText, InkStrokes, MarkLayer, InkGlyph, the reveal scheduler
 │  ├─ page/           Diary, Composer, InkCanvas, IntroNote, Transcript
 │  └─ chrome/         header, toggles, hand picker, settings sheet
 ├─ lib/
-│  ├─ ink/            segmentation, timing, dwell, mark geometry, strokes
+│  ├─ ink/            segmentation, timing, dwell, mark and glyph geometry, strokes
 │  ├─ ai/             prompt, InkScript parser, reading splitter, transport
 │  ├─ i18n/           ko/en dictionaries
 │  └─ prefs/          cookie + localStorage preferences

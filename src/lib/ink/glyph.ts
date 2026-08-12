@@ -193,7 +193,9 @@ function leaf(seed: number): GlyphStroke[] {
 
 /** Water: a crest and a half, gentle rather than jagged. */
 function wave(seed: number): GlyphStroke[] {
-  const points = sample(30, (t) => [2.2 + 19.6 * t, C - Math.sin(TAU * 1.5 * t) * 4]);
+  // Few samples on purpose: the drift is per point, so a long smooth stroke
+  // described by many of them comes out as high-frequency chatter.
+  const points = sample(20, (t) => [2.2 + 19.6 * t, C - Math.sin(TAU * 1.5 * t) * 4]);
   return [stroke(points, seed, 1, 0.5)];
 }
 
@@ -211,12 +213,12 @@ function spiral(seed: number): GlyphStroke[] {
 /** A shaft, then the head as one V — the way a hand does it. */
 function arrow(seed: number): GlyphStroke[] {
   const tip: Point = [20.4, 7.4];
-  const shaft = sample(10, (t) => [
+  const shaft = sample(6, (t) => [
     3.4 + (tip[0] - 3.4) * t,
     17.6 + (tip[1] - 17.6) * t - Math.sin(Math.PI * t) * 1.3,
   ]);
   const head: Point[] = [[13.6, 6.2], tip, [18.4, 13.4]];
-  return [stroke(shaft, seed, 2.6, 0.55), stroke(head, seed + 733, 1.2, 0.5)];
+  return [stroke(shaft, seed, 2.6, 0.4), stroke(head, seed + 733, 1.2, 0.4)];
 }
 
 const BUILDERS: Record<GlyphName, (seed: number) => GlyphStroke[]> = {

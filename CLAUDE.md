@@ -31,7 +31,7 @@ npm run build      # production build
 ```
 src/app/          routes; api/converse is the only server endpoint
 src/components/   UI; ink/ holds the rendering primitives
-src/lib/ink/      the ink engine (timing, segmentation, mark geometry)
+src/lib/ink/      the ink engine (timing, segmentation, mark and glyph geometry)
 src/lib/ai/       prompt, InkScript parser, OpenAI client
 src/lib/i18n/     ko/en dictionaries + provider
 src/store/        zustand stores (ink nodes, session, settings)
@@ -53,6 +53,24 @@ The opening line is `pinned`: `restAll()` skips it until an entry unpins it.
 It is written by `greet()`, which never touches `status`, so the surface
 accepts writing while the page is still asking its question.
 
+## What Riddle draws
+
+`[[name]]` in InkScript asks for one of the nine glyphs in `lib/ink/glyph.ts`.
+A fixed vocabulary, not free-form SVG: model-invented paths are unreliable, and
+a name looked up in a table cannot carry markup into the renderer.
+
+- `parseInkScript` returns `text` (U+FFFC per drawing, so mark ranges and
+  grapheme indices still line up) and `source` (the tokens kept, the mark
+  delimiters gone). `source` is what history, the model and the transcript get;
+  the placeholder never leaves the renderer.
+- Streaming: an unclosed `[[` truncates the text until `]]` arrives. Half a name
+  is not half a drawing, and text may only ever grow.
+- A drawing occupies one grapheme slot, so text wraps around it and a mark can
+  enclose it. It is excluded from the script-tempo normalisation and gets a
+  fixed duration that scales with `writeSpeed`.
+- New glyphs go in `glyph.ts` and need a label in `dictionaries.glyphs`, or a
+  screen reader hears nothing.
+
 ## Non-negotiable rules
 
 1. **Nothing is persisted.** No database, no server logs of user content, no
@@ -60,14 +78,19 @@ accepts writing while the page is still asking its question.
    handwriting faces, pace, speed, whether the opening note was dismissed) are
    stored locally. History lives in memory and dies with the tab.
 2. **Two ink backends, one clock.** Text reveals via per-grapheme `clip-path`;
-   marks draw via SVG `stroke-dashoffset`. Both schedule through `InkClock`.
-   Do not add a third timing mechanism.
+   marks *and drawings* draw via SVG `stroke-dashoffset`. Both schedule through
+   `InkClock`. Do not add a third timing mechanism.
 3. **Animate only** `opacity`, `transform`, `clip-path`, `stroke-dashoffset`.
    Fades run as CSS animations, never a JS rAF loop.
-4. **Never make it fast.** Minimum durations are deliberate. Do not add a
-   "skip animation" affordance; do add accessibility escapes (§5). The one
-   thing exempt from reduced-motion shortening is the hand-over countdown
-   ring: it reports when your writing leaves, so it must run its real length.
+4. **It must read as writing, not as waiting.** What carries that is the
+   per-character rhythm, not the total, so the tempo may be raised — but never
+   to the point where a reply arrives at once. No "skip animation" affordance;
+   accessibility escapes instead (§5). The one thing exempt from
+   reduced-motion shortening is the hand-over countdown ring: it reports when
+   your writing leaves, so it must run its real length.
+   Reduced motion shortens a draw-on by *position in the `animation`
+   shorthand*, never through `--mark-d` / `--glyph-d` — those are set inline on
+   the element, and an inline custom property beats any stylesheet.
 5. **Accessibility is not optional.** Full text always reaches an `aria-live`
    region, `prefers-reduced-motion` is honored, and hold-to-keep must work.
 6. **Safety.** Crisis resources stay reachable; the app never claims to be
