@@ -200,8 +200,10 @@ export const useSession = create<SessionState>()((set) => ({
   finishReply: (id) =>
     set((state) => {
       const turn = state.turns.find((entry) => entry.id === id);
-      // The model sees plain prose; the marks are a rendering instruction.
-      const content = turn ? parseInkScript(turn.raw).text : "";
+      // The model sees plain prose; the marks are a rendering instruction. A
+      // drawing keeps its token — Riddle should be able to see what it drew,
+      // and the transcript turns the token into words for a screen reader.
+      const content = turn ? parseInkScript(turn.raw).source : "";
 
       // A reply with no words in it would sit on the paper forever: there is
       // nothing to run a fade animation, so nothing ever reports finishing and

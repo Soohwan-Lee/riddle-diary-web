@@ -1,4 +1,5 @@
 import type { FadePace } from "@/lib/prefs/config";
+import { GLYPH_PLACEHOLDER, parseInkScript } from "./inkscript";
 
 /**
  * How long ink stays on the page in blank-page mode.
@@ -51,21 +52,25 @@ export const BLANK_FADE_MS: Record<FadePace, number> = {
 export const ABSORB_DWELL_MS = 600;
 export const ABSORB_FADE_MS = 1_200;
 
-/** Strips InkScript markers, which are instructions rather than words. */
-function plain(text: string): string {
-  return text.replace(/__|==|\(\(|\)\)/g, "");
-}
-
 export function readingWeight(char: string): number {
+  if (char === GLYPH_PLACEHOLDER) return GLYPH_READ_UNITS;
   if (/\s/.test(char)) return 0.4;
   if (HANGUL.test(char) || CJK.test(char)) return 2.6;
   if (KANA.test(char)) return 1.8;
   return 1;
 }
 
+/**
+ * A drawing is looked at rather than read, and it is looked at for longer than
+ * the character's worth of room it takes up — roughly two Hangul syllables.
+ */
+const GLYPH_READ_UNITS = 5.5;
+
 /** Reading time for a finished reply, in milliseconds. */
 export function readDwellMs(raw: string, pace: FadePace): number {
-  const text = plain(raw);
+  // The parse drops the markers, which are instructions rather than words, and
+  // leaves one placeholder per drawing.
+  const { text } = parseInkScript(raw);
   let units = 0;
   for (const char of text) units += readingWeight(char);
 
