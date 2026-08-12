@@ -33,11 +33,34 @@ const FIRST_MARK_DELAY_MS = 260;
 const BETWEEN_MARKS_MS = 300;
 
 /**
+ * Two boxes belong to the same visual line if they overlap vertically by more
+ * than half the shorter one. Not a shared top: a drawing is taller than the
+ * letters around it, and keying on the top would put it on a line of its own
+ * and split one circle into two.
+ */
+function sameRow(a: Rect, b: Rect): boolean {
+  const top = Math.max(a.y, b.y);
+  const bottom = Math.min(a.y + a.height, b.y + b.height);
+  return bottom - top > Math.min(a.height, b.height) * 0.5;
+}
+
+function union(a: Rect, b: Rect): Rect {
+  const x = Math.min(a.x, b.x);
+  const y = Math.min(a.y, b.y);
+  return {
+    x,
+    y,
+    width: Math.max(a.x + a.width, b.x + b.width) - x,
+    height: Math.max(a.y + a.height, b.y + b.height) - y,
+  };
+}
+
+/**
  * Unions the boxes of a grapheme range, one box per visual line, so a mark
  * that wraps becomes two strokes rather than one impossible diagonal.
  */
 function measureRange(container: HTMLElement, start: number, end: number): Rect[] {
-  const rows = new Map<number, Rect>();
+  const rows: Rect[] = [];
 
   for (let i = start; i < end; i++) {
     const element = container.querySelector<HTMLElement>(`[data-i="${i}"]`);
@@ -49,23 +72,13 @@ function measureRange(container: HTMLElement, start: number, end: number): Rect[
       width: element.offsetWidth,
       height: element.offsetHeight,
     };
-    // Characters on one line share a top within a pixel or two.
-    const row = Math.round(rect.y / 4);
-    const existing = rows.get(row);
 
-    if (!existing) {
-      rows.set(row, rect);
-      continue;
-    }
-
-    const x0 = Math.min(existing.x, rect.x);
-    const y0 = Math.min(existing.y, rect.y);
-    const x1 = Math.max(existing.x + existing.width, rect.x + rect.width);
-    const y1 = Math.max(existing.y + existing.height, rect.y + rect.height);
-    rows.set(row, { x: x0, y: y0, width: x1 - x0, height: y1 - y0 });
+    const index = rows.findIndex((row) => sameRow(row, rect));
+    if (index === -1) rows.push(rect);
+    else rows[index] = union(rows[index], rect);
   }
 
-  return [...rows.values()].filter((rect) => rect.width > 0);
+  return rows.filter((rect) => rect.width > 0);
 }
 
 export function MarkLayer({

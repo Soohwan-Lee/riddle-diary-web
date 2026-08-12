@@ -27,13 +27,15 @@ export function InkGlyph({
     const drawn = glyphStrokes(name, hashSeed(id));
     const total = drawn.reduce((sum, stroke) => sum + stroke.weight, 0);
 
-    let elapsed = 0;
-    return drawn.map((stroke) => {
-      const share = (stroke.weight / total) * durationMs;
-      const delayMs = elapsed;
-      elapsed += share;
-      return { d: stroke.d, delayMs, durationMs: share };
-    });
+    // Each stroke starts where every stroke before it has finished.
+    return drawn.map((stroke, index) => ({
+      d: stroke.d,
+      durationMs: (stroke.weight / total) * durationMs,
+      delayMs:
+        (drawn.slice(0, index).reduce((sum, earlier) => sum + earlier.weight, 0) /
+          total) *
+        durationMs,
+    }));
   }, [id, name, durationMs]);
 
   return (

@@ -1,7 +1,11 @@
 "use client";
 
+import { isGlyphName } from "@/lib/ink/glyph";
 import { useI18n } from "@/lib/i18n/provider";
 import type { ChatMessage } from "@/store/session";
+
+/** `[[moon]]` is a drawing on the paper; here it has to become words. */
+const GLYPH_TOKEN = /\[\[([a-z]+)\]\]/g;
 
 /**
  * The accessibility counterweight to a disappearing interface.
@@ -12,6 +16,11 @@ import type { ChatMessage } from "@/store/session";
  */
 export function Transcript({ history }: { history: readonly ChatMessage[] }) {
   const { t } = useI18n();
+
+  const spoken = (content: string) =>
+    content.replace(GLYPH_TOKEN, (token, name: string) =>
+      isGlyphName(name) ? t.a11y.drawing.replace("{name}", t.glyphs[name]) : token,
+    );
 
   return (
     // A named `section` is a landmark, which keeps the transcript reachable
@@ -25,7 +34,7 @@ export function Transcript({ history }: { history: readonly ChatMessage[] }) {
             <span>
               {message.role === "user" ? t.a11y.userSaid : t.a11y.aiSaid}:{" "}
             </span>
-            {message.content}
+            {spoken(message.content)}
           </p>
         ))}
       </div>

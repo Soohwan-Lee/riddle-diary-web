@@ -135,6 +135,21 @@ const ko = {
     userSaid: "내가 쓴 글",
     aiSaid: "리들이 쓴 글",
     skipToComposer: "입력 영역으로 건너뛰기",
+    /** `{name}` is filled from `glyphs` below. */
+    drawing: "({name} 그림)",
+  },
+
+  /** What Riddle drew, for the reader who cannot see it. */
+  glyphs: {
+    star: "별",
+    heart: "하트",
+    sun: "해",
+    moon: "달",
+    cloud: "구름",
+    leaf: "나뭇잎",
+    wave: "물결",
+    spiral: "소용돌이",
+    arrow: "화살표",
   },
 } as const;
 
@@ -278,6 +293,19 @@ const en: Translation<Dictionary> = {
     userSaid: "What you wrote",
     aiSaid: "What Riddle wrote",
     skipToComposer: "Skip to the writing area",
+    drawing: "(a drawing of {name})",
+  },
+
+  glyphs: {
+    star: "a star",
+    heart: "a heart",
+    sun: "the sun",
+    moon: "the moon",
+    cloud: "a cloud",
+    leaf: "a leaf",
+    wave: "a wave",
+    spiral: "a spiral",
+    arrow: "an arrow",
   },
 };
 

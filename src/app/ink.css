@@ -390,16 +390,20 @@
     animation-delay: 0ms !important;
   }
 
-  /* Marks carry two animations in one shorthand, so shorten the draw through
-     its custom properties and leave the fade alone. */
+  /* Not through `--mark-d`: the element sets that inline, and an inline custom
+     property beats anything a stylesheet says. Marks carry two animations in
+     one shorthand while resting, so the draw is shortened by position and the
+     fade is handed back its own duration. */
   .ink-mark-path {
-    --mark-d: 1ms;
-    --mark-t: 0ms;
+    animation-duration: 1ms, var(--fade-d, 12s) !important;
+    animation-delay: 0ms, var(--fade-t, 0ms) !important;
   }
 
+  /* A drawing only ever carries the one animation — it fades with the word
+     around it — so there is nothing to preserve in the second slot. */
   .ink-glyph path {
-    --glyph-d: 1ms;
-    --glyph-t: 0ms;
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
   }
 
   .ink-glyph {
