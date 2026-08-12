@@ -56,7 +56,14 @@ export function strokeWeight(char: string): number {
   return 0.65;
 }
 
-/** Extra rest after a character — the pen lifting, or the mind catching up. */
+/**
+ * Extra rest after a character — the pen lifting, or the mind catching up.
+ *
+ * These are written for the default hand (`WRITE_CPM.normal`) and the layout
+ * scales them from there, so a slow hand rests longer between sentences and a
+ * brisk one less. Left absolute, they would be a fixed tax that swallows a
+ * fast hand's gains: at twice the speed they would be a fifth of the reply.
+ */
 export function pauseAfter(char: string): number {
   if (char === "\n") return 420;
   if (/[.!?。！？…]/.test(char)) return 320;
@@ -81,9 +88,15 @@ export type LayoutOptions = {
   seed: number;
 };
 
+/** Per-character time at `WRITE_CPM.normal`, which the rests are written for. */
+const PAUSE_REFERENCE_MS = 100;
+
 export function layoutText(text: string, options: LayoutOptions): InkLayout {
   const { cpm, locale, seed } = options;
   const baseMs = 60_000 / Math.max(1, cpm);
+
+  const pauseScale = baseMs / PAUSE_REFERENCE_MS;
+  const restAfter = (char: string) => Math.round(pauseAfter(char) * pauseScale);
 
   const graphemes: InkGrapheme[] = [];
   const lines: InkLine[] = [];
@@ -113,10 +126,10 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
             char,
             index,
             durationMs: duration,
-            pauseAfterMs: pauseAfter(char),
+            pauseAfterMs: restAfter(char),
             whitespace: true,
           });
-          totalMs += duration + pauseAfter(char);
+          totalMs += duration + restAfter(char);
           index += 1;
         }
         if (pendingWord) pendingWord.trailing += token;
@@ -129,7 +142,7 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
         // ±18% so no two neighbouring characters take exactly as long.
         const jitter = 1 + noiseAt(seed, index) * 0.18;
         const duration = baseMs * strokeWeight(char) * jitter;
-        const rest = pauseAfter(char);
+        const rest = restAfter(char);
         graphemes.push({
           char,
           index,
@@ -151,10 +164,10 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
         char: "\n",
         index,
         durationMs: duration,
-        pauseAfterMs: pauseAfter("\n"),
+        pauseAfterMs: restAfter("\n"),
         whitespace: true,
       });
-      totalMs += duration + pauseAfter("\n");
+      totalMs += duration + restAfter("\n");
       index += 1;
     }
 

@@ -61,11 +61,21 @@ describe("layoutText", () => {
 
   it("holds the requested tempo", () => {
     const text = "오늘은 생각보다 긴 하루였습니다";
-    const layout = layoutText(text, options);
-    const expected = ([...text].length * 60_000) / options.cpm;
+    // At the default hand the rests are exactly as written, so the overshoot
+    // they add is a known quantity.
+    const layout = layoutText(text, { ...options, cpm: 600 });
+    const expected = ([...text].length * 60_000) / 600;
     // Only the pauses may push past the nominal duration.
     expect(layout.totalMs).toBeGreaterThanOrEqual(expected - 1);
     expect(layout.totalMs).toBeLessThan(expected + 1_000);
+  });
+
+  it("rests in proportion to the hand, not in fixed milliseconds", () => {
+    // A fixed rest would be a tax the tempo cannot outrun: halve the time per
+    // character and the pauses would become twice the share of the reply.
+    const slow = layoutText("one. two.\nthree,", { ...options, cpm: 300 });
+    const fast = layoutText("one. two.\nthree,", { ...options, cpm: 600 });
+    expect(slow.totalMs / fast.totalMs).toBeCloseTo(2, 3);
   });
 
   it("takes the same time in Korean as in English for the same length", () => {
