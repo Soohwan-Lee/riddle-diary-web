@@ -45,7 +45,7 @@ export default function LabPage() {
     <div className="relative z-10 flex min-h-dvh flex-col">
       <Header />
 
-      <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
+      <main className="ink-sheet flex-1 py-10">
         <div className="mb-8 flex flex-wrap items-center gap-2 text-[0.72rem]">
           <button
             type="button"
@@ -83,7 +83,7 @@ export default function LabPage() {
         </div>
 
         <div
-          className="ink-surface space-y-8 text-2xl leading-[1.85] sm:text-[1.7rem]"
+          className="ink-surface ink-body space-y-8"
           data-paused={paused ? "true" : "false"}
         >
           <InkText

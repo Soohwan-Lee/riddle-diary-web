@@ -246,7 +246,7 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
         }
       />
 
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-6 pt-10 pb-16 sm:px-8">
+      <main className="ink-sheet flex flex-1 flex-col pt-8 pb-12 sm:pt-10 sm:pb-16 lg:pt-14">
         <h1 className="sr-only">
           {t.app.name} — {t.app.tagline}
         </h1>
@@ -299,7 +299,7 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
                     : undefined
                 }
                 onFaded={() => useSession.getState().removeTurn(turn.id)}
-                className="text-2xl leading-[1.85] sm:text-[1.7rem]"
+                className="ink-body"
               />
             );
           })}

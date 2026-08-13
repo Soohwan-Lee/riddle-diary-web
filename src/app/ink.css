@@ -59,6 +59,46 @@
   font-size: calc(1em * var(--hand-scale, 1));
 }
 
+/* ---- the size of the writing, and the room it gets ---------------------- */
+
+/*
+ * One size for both hands, in one place, because they have to agree: the
+ * caret sits in the same line of text the ink lands on, and a composer half a
+ * step off the ink above it reads as two different pages.
+ *
+ * It grows with the screen. A phone gets a size that fits a sentence across;
+ * a desktop gets writing you could actually have written, rather than a
+ * paperback column stranded in the middle of a monitor.
+ */
+:root {
+  --ink-size: 1.55rem;
+}
+
+@media (width >= 40rem) {
+  :root {
+    --ink-size: 1.7rem;
+  }
+}
+
+@media (width >= 64rem) {
+  :root {
+    --ink-size: 1.8rem;
+  }
+}
+
+@media (width >= 80rem) {
+  :root {
+    --ink-size: 1.9rem;
+  }
+}
+
+/* What the page writes at. The node holds the unscaled size; `.ink-line`
+   applies each hand's own correction one level down. */
+.ink-body {
+  font-size: var(--ink-size);
+  line-height: 1.85;
+}
+
 /*
  * Where the reader writes: the composer's textarea and the placeholder over
  * the canvas. Same hand, same correction, stated absolutely because a
@@ -66,13 +106,44 @@
  */
 .ink-entry {
   font-family: var(--font-hand-user);
-  font-size: calc(1.5rem * var(--hand-user-scale, 1));
+  font-size: calc(var(--ink-size) * var(--hand-user-scale, 1));
   line-height: 1.85;
 }
 
+/*
+ * The paper itself. Wide enough to write across without the line turning
+ * over every few words, never so wide that the eye loses its way back to the
+ * left margin — which for handwriting this size is around sixty characters.
+ */
+.ink-sheet {
+  width: 100%;
+  max-width: 42rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
 @media (width >= 40rem) {
-  .ink-entry {
-    font-size: calc(1.7rem * var(--hand-user-scale, 1));
+  .ink-sheet {
+    padding-inline: 2rem;
+  }
+}
+
+@media (width >= 48rem) {
+  .ink-sheet {
+    max-width: 46rem;
+  }
+}
+
+@media (width >= 64rem) {
+  .ink-sheet {
+    max-width: 50rem;
+    padding-inline: 2.5rem;
+  }
+}
+
+@media (width >= 80rem) {
+  .ink-sheet {
+    max-width: 54rem;
   }
 }
 

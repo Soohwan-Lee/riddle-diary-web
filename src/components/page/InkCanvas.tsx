@@ -21,7 +21,15 @@ import { AUTO_HANDOFF_MS } from "@/lib/prefs/config";
 /** Beyond this the page is full; the reader is asked to hand it over. */
 const MAX_STROKES = 800;
 const ERASER_RADIUS = 14;
-const MIN_HEIGHT = 260;
+/**
+ * How much room an empty surface offers. Proportional to its own width rather
+ * than fixed: the same 260px was most of a phone screen and a stamp on a
+ * monitor. Bounded at both ends — a phone in landscape must not hand over the
+ * whole viewport, and a wide desktop does not need half a metre of paper.
+ */
+const MIN_HEIGHT_RATIO = 0.58;
+const MIN_HEIGHT_FLOOR = 230;
+const MIN_HEIGHT_CEILING = 420;
 /** Extra room that appears below the lowest stroke, so writing never boxes in. */
 const HEADROOM = 140;
 
@@ -57,8 +65,26 @@ export function InkCanvas({
     [pointerKind],
   );
 
+  // Measured rather than guessed from the viewport: what matters is how wide
+  // the paper is, and the paper is a column inside the page.
+  const [minHeight, setMinHeight] = useState(MIN_HEIGHT_FLOOR);
+  useEffect(() => {
+    const surface = surfaceRef.current;
+    if (!surface || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      const width = entry.contentRect.width;
+      setMinHeight(
+        Math.round(
+          Math.min(MIN_HEIGHT_CEILING, Math.max(MIN_HEIGHT_FLOOR, width * MIN_HEIGHT_RATIO)),
+        ),
+      );
+    });
+    observer.observe(surface);
+    return () => observer.disconnect();
+  }, []);
+
   const height = Math.max(
-    MIN_HEIGHT,
+    minHeight,
     ...[...strokes, live ?? []].flat().map(([, y]) => y + HEADROOM),
   );
 

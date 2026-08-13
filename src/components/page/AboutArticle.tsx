@@ -14,7 +14,9 @@ export function AboutArticle() {
     <div className="relative z-10 flex min-h-dvh flex-col">
       <Header />
 
-      <main className="mx-auto w-full max-w-2xl flex-1 px-6 pt-14 pb-24 sm:px-8">
+      {/* Prose, not paper: this one keeps a reading measure rather than
+          following `.ink-sheet` out to the wider column. */}
+      <main className="mx-auto w-full max-w-2xl flex-1 px-5 pt-12 pb-24 sm:px-8 sm:pt-14">
         <Link
           href="/"
           className="mb-12 inline-flex items-center gap-1.5 text-[0.72rem] text-muted transition-colors hover:text-ink-user"
