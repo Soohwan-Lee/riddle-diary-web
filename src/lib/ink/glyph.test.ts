@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { systemPrompt } from "@/lib/ai/prompt";
+import { dictionaries } from "@/lib/i18n/dictionaries";
 import { GLYPHS, GLYPH_BOX, glyphStrokes, isGlyphName } from "./glyph";
 
 /** Every coordinate in a path, in order. */
@@ -49,5 +51,23 @@ describe("glyphStrokes", () => {
     const [disc, ...rays] = glyphStrokes("sun", 9);
     expect(rays).toHaveLength(8);
     expect(disc.weight).toBeGreaterThan(rays[0].weight * 2);
+  });
+});
+
+/**
+ * A drawing nobody can name is a drawing a screen reader passes over in
+ * silence, and one the model is never told about is dead code. Both are easy
+ * to forget when adding to the vocabulary, so neither is left to memory.
+ */
+describe("the vocabulary", () => {
+  it.each(["ko", "en"] as const)("has a %s label for every glyph", (locale) => {
+    const labels = dictionaries[locale].glyphs;
+    expect(Object.keys(labels).sort()).toEqual([...GLYPHS].sort());
+    for (const name of GLYPHS) expect(labels[name].trim().length).toBeGreaterThan(0);
+  });
+
+  it("is offered to the model in full", () => {
+    const prompt = systemPrompt("en", "text");
+    for (const name of GLYPHS) expect(prompt).toContain(`[[${name}]]`);
   });
 });
