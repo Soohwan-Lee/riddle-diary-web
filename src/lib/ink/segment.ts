@@ -1,3 +1,4 @@
+import { PAUSE_REFERENCE_CPM } from "@/lib/prefs/config";
 import { GLYPH_PLACEHOLDER } from "./inkscript";
 import { noiseAt } from "./random";
 
@@ -60,10 +61,10 @@ export function strokeWeight(char: string): number {
 /**
  * Extra rest after a character — the pen lifting, or the mind catching up.
  *
- * These are written for the default hand (`WRITE_CPM.normal`) and the layout
- * scales them from there, so a slow hand rests longer between sentences and a
- * brisk one less. Left absolute, they would be a fixed tax that swallows a
- * fast hand's gains: at twice the speed they would be a fifth of the reply.
+ * These are written for `PAUSE_REFERENCE_CPM` and the layout scales them from
+ * there, so a slow hand rests longer between sentences and a brisk one less.
+ * Left absolute, they would be a fixed tax that swallows a fast hand's gains:
+ * at twice the speed they would be a fifth of the reply.
  */
 export function pauseAfter(char: string): number {
   if (char === "\n") return 420;
@@ -89,16 +90,21 @@ export type LayoutOptions = {
   seed: number;
 };
 
-/** Per-character time at `WRITE_CPM.normal`, which the rests are written for. */
-const PAUSE_REFERENCE_MS = 100;
+/** Per-character time at the hand the rests are written for. */
+const PAUSE_REFERENCE_MS = 60_000 / PAUSE_REFERENCE_CPM;
 
 /**
  * A drawing takes one character's room in the line but nothing like one
- * character's time. Both figures are written for the default hand and scale
- * with it, like the rests.
+ * character's time. Both figures are written for the reference hand and scale
+ * with the real one, like the rests.
+ *
+ * Deliberately not proportional to a character: a drawing is the one thing on
+ * the page that is watched rather than read, and a nine-stroke sun that lands
+ * in a third of a second is a flicker, not a hand. At the default it comes out
+ * near a second, which is enough to see it being made.
  */
-const GLYPH_MS = 1_300;
-const GLYPH_REST_MS = 260;
+const GLYPH_MS = 1_900;
+const GLYPH_REST_MS = 400;
 
 const isDrawing = (char: string) => char === GLYPH_PLACEHOLDER;
 

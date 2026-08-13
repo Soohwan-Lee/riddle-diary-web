@@ -78,19 +78,27 @@ export const DEFAULT_WRITE_SPEED: WriteSpeed = "normal";
  *
  * Well past what a real hand can do, deliberately. What has to survive is the
  * sense of being written to, and that turns out to live in the per-character
- * rhythm rather than in the total: at `normal` a character still takes 100ms
- * and a two-sentence reply still takes around seven seconds, which reads as
- * writing. Slower than this and it starts reading as waiting instead.
+ * rhythm rather than in the total: at `normal` a character takes 50ms, which
+ * is still one visible stroke after another, and a two-sentence reply lands in
+ * about three seconds. It reads as a quick hand, not as a paste.
  *
- * `pauseAfter` in the layout scales against `normal`, so raising these numbers
- * shortens the rests between sentences by the same proportion. Change one and
- * you have changed the tempo, not just the letters.
+ * The rests scale with these numbers rather than sitting on top of them (see
+ * `PAUSE_REFERENCE_CPM`), so a hand twice as fast really is twice as fast.
+ * Change one of these and you have changed the tempo, not just the letters.
  */
 export const WRITE_CPM: Record<WriteSpeed, number> = {
-  slow: 360,
-  normal: 600,
-  brisk: 860,
+  slow: 720,
+  normal: 1_200,
+  brisk: 1_720,
 };
+
+/**
+ * The hand the rests in `pauseAfter` were written for. It is a fixed reference
+ * rather than `WRITE_CPM.normal`: the whole point is that the pauses shrink
+ * when the hand speeds up, and pinning them to the default would freeze them
+ * at whatever the default happens to be — a tax the tempo cannot outrun.
+ */
+export const PAUSE_REFERENCE_CPM = 600;
 
 /**
  * How long a handwriting entry sits still before the page takes it. Short

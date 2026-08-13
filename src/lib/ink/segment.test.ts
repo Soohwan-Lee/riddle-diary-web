@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { PAUSE_REFERENCE_CPM } from "@/lib/prefs/config";
 import { GLYPH_PLACEHOLDER } from "./inkscript";
 import { layoutText, pauseAfter, strokeWeight } from "./segment";
 
@@ -77,6 +78,15 @@ describe("layoutText", () => {
     const slow = layoutText("one. two.\nthree,", { ...options, cpm: 300 });
     const fast = layoutText("one. two.\nthree,", { ...options, cpm: 600 });
     expect(slow.totalMs / fast.totalMs).toBeCloseTo(2, 3);
+  });
+
+  it("writes the rests at the reference hand and shrinks them past it", () => {
+    const restAfterStop = (cpm: number) =>
+      layoutText("one.", { ...options, cpm }).graphemes.at(-1)?.pauseAfterMs;
+    expect(restAfterStop(PAUSE_REFERENCE_CPM)).toBe(pauseAfter("."));
+    expect(restAfterStop(PAUSE_REFERENCE_CPM * 2)).toBe(
+      Math.round(pauseAfter(".") / 2),
+    );
   });
 
   it("takes the same time in Korean as in English for the same length", () => {
