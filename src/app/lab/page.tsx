@@ -11,11 +11,11 @@ import { usePrefs } from "@/lib/prefs/provider";
 const SAMPLES: Record<string, { user: string; ai: string }> = {
   ko: {
     user: "오늘은 회의가 세 개나 있었어. 마지막 회의에서는\n한 마디도 못 했고, 집에 오는 길에 그게 계속 걸렸어.",
-    ai: "((한 마디도 못 했고)) — 거기서 걸음이 멈췄네요.\n하고 싶었던 말은 __어떤 말__이었어요?\n오늘은 ==그 말을 고르는 것==까지만 해도 충분해요.",
+    ai: "((한 마디도 못 했고)) — 거기서 걸음이 멈췄네요. [[knot]]\n오늘은 ==그 말을 고르는 것==까지만 해도 충분해요.\n[[candle]]",
   },
   en: {
     user: "Three meetings today. In the last one I did not say\na single word, and it followed me home.",
-    ai: "((did not say a single word)) — that is where you stopped.\nWhat was the __thing you wanted to say__?\nToday, ==choosing the words== is enough on its own.",
+    ai: "((did not say a single word)) — that is where you stopped. [[knot]]\nToday, ==choosing the words== is enough on its own.\n[[candle]]",
   },
 };
 

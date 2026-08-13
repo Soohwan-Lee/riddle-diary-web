@@ -129,6 +129,20 @@ describe("layoutText", () => {
     expect(glyph?.durationMs).toBeGreaterThan(1_000);
   });
 
+  it("gives a drawing alone on its line more room in the clock", () => {
+    const inline = layoutText(`적어요 ${GLYPH_PLACEHOLDER}`, options);
+    const alone = layoutText(`적어요\n${GLYPH_PLACEHOLDER}`, options);
+
+    const glyph = (layout: ReturnType<typeof layoutText>) =>
+      layout.graphemes.find((g) => g.char === GLYPH_PLACEHOLDER)?.durationMs ?? 0;
+
+    expect(alone.lines.map((l) => l.solo)).toEqual([false, true]);
+    expect(inline.lines.every((l) => !l.solo)).toBe(true);
+    // The renderer draws it larger; stretching it there instead would have the
+    // node reporting itself written with a stroke still going.
+    expect(glyph(alone)).toBeGreaterThan(glyph(inline));
+  });
+
   it("draws faster when the hand is faster", () => {
     const glyphAt = (cpm: number) =>
       layoutText(GLYPH_PLACEHOLDER, { ...options, cpm }).graphemes[0].durationMs;

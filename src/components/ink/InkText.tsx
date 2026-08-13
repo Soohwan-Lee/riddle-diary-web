@@ -140,7 +140,13 @@ export function InkText({
       aria-hidden
     >
       {layout.lines.map((line) => (
-        <span key={line.key} className="ink-line">
+        <span
+          key={line.key}
+          className="ink-line"
+          // Nothing but drawings on this line: it is a gesture rather than a
+          // word, and it is given the room to be one.
+          data-solo={line.solo ? "true" : undefined}
+        >
           {line.words.map((word) => {
             const visibleChars = word.indices.filter((index) => index < revealed);
             if (visibleChars.length === 0) return null;

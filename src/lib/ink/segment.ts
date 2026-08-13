@@ -31,6 +31,11 @@ export type InkWord = {
 export type InkLine = {
   key: string;
   words: InkWord[];
+  /**
+   * The line holds drawings and nothing else. Then it is not a word in a
+   * sentence but a gesture on its own, and the renderer gives it room.
+   */
+  solo: boolean;
 };
 
 export type InkLayout = {
@@ -106,7 +111,20 @@ const PAUSE_REFERENCE_MS = 60_000 / PAUSE_REFERENCE_CPM;
 const GLYPH_MS = 1_900;
 const GLYPH_REST_MS = 400;
 
+/**
+ * A drawing alone on its line is drawn larger, so it is also drawn for longer.
+ * The clock has to know: if the renderer stretched it instead, the node would
+ * report itself written while the last stroke was still going.
+ */
+const GLYPH_SOLO_SCALE = 1.6;
+
 const isDrawing = (char: string) => char === GLYPH_PLACEHOLDER;
+
+/** Drawings and nothing else — not even a word beside them. */
+function isSoloLine(rawLine: string): boolean {
+  const marks = [...rawLine].filter((char) => !/\s/.test(char));
+  return marks.length > 0 && marks.every(isDrawing);
+}
 
 export function layoutText(text: string, options: LayoutOptions): InkLayout {
   const { cpm, locale, seed } = options;
@@ -127,6 +145,8 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
   const rawLines = text.split("\n");
 
   rawLines.forEach((rawLine, lineNumber) => {
+    const solo = isSoloLine(rawLine);
+    const glyphMs = GLYPH_MS * (solo ? GLYPH_SOLO_SCALE : 1) * pauseScale;
     const words: InkWord[] = [];
     // Keep the separators so spacing survives the round trip.
     const tokens = rawLine.split(/(\s+)/).filter((token) => token.length > 0);
@@ -159,7 +179,7 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
         // ±18% so no two neighbouring characters take exactly as long.
         const jitter = 1 + noiseAt(seed, index) * 0.18;
         const duration = isDrawing(char)
-          ? GLYPH_MS * pauseScale
+          ? glyphMs
           : baseMs * strokeWeight(char) * jitter;
         const rest = isDrawing(char)
           ? Math.round(GLYPH_REST_MS * pauseScale)
@@ -192,7 +212,7 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
       index += 1;
     }
 
-    lines.push({ key: `l${lineNumber}`, words });
+    lines.push({ key: `l${lineNumber}`, words, solo });
   });
 
   // Weights shape the rhythm, they should not change the tempo: a Hangul

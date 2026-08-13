@@ -188,6 +188,19 @@
   animation: ink-dry 1200ms linear both;
 }
 
+/*
+ * A drawing with no words on its line is not standing in for one. It is the
+ * whole thing being said, and at a character's size it reads as an icon that
+ * lost its sentence. The layout gives it proportionally more time to be drawn,
+ * so the two stay in step.
+ */
+.ink-line[data-solo="true"] .ink-glyph {
+  width: 2.9em;
+  height: 2.9em;
+  vertical-align: -0.68em;
+  margin-inline: 0.14em;
+}
+
 .ink-glyph svg {
   display: block;
   width: 100%;
