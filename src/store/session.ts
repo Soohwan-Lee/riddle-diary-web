@@ -275,3 +275,36 @@ export const useSession = create<SessionState>()((set) => ({
   clearAll: () =>
     set({ turns: [], history: [], status: "idle", error: null }),
 }));
+
+/**
+ * Nothing on the paper at all — no strokes, no words, from either hand. A turn
+ * that exists but has not been written into yet (a reply waiting for its first
+ * character) does not count: it is a slot, not ink.
+ */
+export function paperIsClear(turns: readonly Turn[]): boolean {
+  return turns.every(
+    (turn) => !turn.strokes?.length && turn.raw.trim().length === 0,
+  );
+}
+
+/**
+ * Resolves the moment the paper is empty, now or later. This is what makes
+ * blank-page mode take strict turns: a reply is held here until the entry
+ * above it has finished sinking.
+ *
+ * It reads the store rather than a React value on purpose. The caller is an
+ * async `send` that has just written to the store synchronously, and any
+ * snapshot taken from a render would still be describing the page as it was
+ * before the entry landed — which reports an empty sheet and opens the gate
+ * immediately, exactly when it must not.
+ */
+export function whenPaperClears(): Promise<void> {
+  if (paperIsClear(useSession.getState().turns)) return Promise.resolve();
+  return new Promise((resolve) => {
+    const unsubscribe = useSession.subscribe((state) => {
+      if (!paperIsClear(state.turns)) return;
+      unsubscribe();
+      resolve();
+    });
+  });
+}

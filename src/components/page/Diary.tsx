@@ -24,7 +24,12 @@ import {
 import { useComposingPause, useDocumentHidden } from "@/lib/ink/usePageClock";
 import { DWELL_MS, FADE_MS, WRITE_CPM } from "@/lib/prefs/config";
 import { usePrefs } from "@/lib/prefs/provider";
-import { useSession, type Turn } from "@/store/session";
+import {
+  paperIsClear,
+  useSession,
+  whenPaperClears,
+  type Turn,
+} from "@/store/session";
 import { Composer } from "./Composer";
 import { InkCanvas } from "./InkCanvas";
 import { IntroNote } from "./IntroNote";
@@ -49,7 +54,7 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   const status = useSession((state) => state.status);
 
   const hidden = useDocumentHidden();
-  const { composing, touch } = useComposingPause();
+  const { composing, touch, release } = useComposingPause();
   const [held, setHeld] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -84,6 +89,15 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
     [blankPage, dwellMs, fadeMs, fadePace],
   );
 
+  /**
+   * Nothing on the paper at all — not the reader's ink, not the page's. In
+   * blank-page mode this is the handover: one hand writes, its ink goes, and
+   * only then does the other start. A reply that begins while the entry above
+   * it is still sinking is two hands on one sheet, which is the one thing this
+   * mode exists to prevent.
+   */
+  const paperClear = paperIsClear(turns);
+
   const greeted = useRef(false);
   useEffect(() => {
     if (greeted.current) return;
@@ -116,6 +130,11 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
       strokes?: Stroke[];
     }) => {
       const session = useSession.getState();
+      // Handing something over ends the sentence, whatever the settle timer
+      // still thinks. Left running it would hold the clock for another couple
+      // of seconds — and with the reply now waiting on an empty page, that is
+      // time the reader spends watching nothing happen.
+      release();
       // The history sent upstream is prior turns only; the current entry
       // travels beside it, since handwriting arrives as an image.
       const priorHistory = session.history;
@@ -124,7 +143,26 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
         strokes,
         clearPage: blankPage,
       });
-      const replyId = session.beginReply();
+
+      /**
+       * The request goes out now; the reply waits for an empty page. Asking
+       * upstream only after the paper cleared would spend the absorb doing
+       * nothing and then make the reader wait again for the model — this way
+       * the two happen at once, and whichever finishes last is the one being
+       * waited for. Text that arrives early queues in `pending`, which is also
+       * what keeps `raw` growing monotonically: the node is not mounted until
+       * there is something to write.
+       */
+      let replyId: string | null = null;
+      let pending = "";
+      const opened = (async () => {
+        if (blankPage) await whenPaperClears();
+        replyId = useSession.getState().beginReply();
+        if (pending) {
+          useSession.getState().appendReply(replyId, pending);
+          pending = "";
+        }
+      })();
 
       try {
         await transport(
@@ -138,17 +176,23 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
           {
             onTranscript: (reading) =>
               useSession.getState().setUserTranscript(userId, reading),
-            onDelta: (delta) => useSession.getState().appendReply(replyId, delta),
+            onDelta: (delta) => {
+              if (replyId) useSession.getState().appendReply(replyId, delta);
+              else pending += delta;
+            },
           },
         );
-        useSession.getState().finishReply(replyId);
+        await opened;
+        if (replyId) useSession.getState().finishReply(replyId);
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") return;
         const code = error instanceof ConverseFailure ? error.code : "upstream";
-        useSession.getState().failReply(replyId, errorText(code));
+        // The page still owes an answer, even if the answer is that it failed.
+        await opened;
+        if (replyId) useSession.getState().failReply(replyId, errorText(code));
       }
     },
-    [transport, locale, errorText, blankPage],
+    [transport, locale, errorText, blankPage, release],
   );
 
   const busy = status !== "idle";
@@ -262,8 +306,10 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
 
           {/* Between handing something over and the first character coming
               back there is nothing on the paper at all in blank-page mode.
-              A nib resting on the page is the whole indicator. */}
-          {status === "thinking" && (
+              A nib resting on the page is the whole indicator — and it waits
+              for the sheet to empty too, rather than sitting under ink that
+              is still sinking. */}
+          {status === "thinking" && (!blankPage || paperClear) && (
             <p className="flex items-center gap-2" aria-hidden>
               <span className="ink-thinking" />
             </p>
