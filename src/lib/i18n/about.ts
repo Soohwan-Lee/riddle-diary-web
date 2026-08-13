@@ -36,6 +36,7 @@ const ko: AboutContent = {
       body: [
         "이 페이지의 답장은 즉시 나타나지 않습니다. 사람의 손이 움직이는 속도로만 쓰입니다. 기다리는 시간은 로딩이 아니라 인터페이스의 일부입니다.",
         "Hallnäs와 Redström이 말한 slow technology는 효율을 목표로 하지 않는 기술을 제안합니다. 성찰의 시간을 만들어내는 것 자체가 기능일 수 있다는 것입니다. 답장이 다 쓰이기까지의 몇 초 동안, 당신은 방금 자신이 쓴 문장을 다시 읽게 됩니다.",
+        "종이는 한 번에 한 사람의 것입니다. 건넨 글이 완전히 스며든 뒤에야 답장이 시작되고, 답장이 다 사라진 뒤에야 종이가 당신에게 돌아옵니다. 둘이 한 장을 나눠 쓰는 일은 없습니다.",
         "그래서 '건너뛰기' 버튼은 없습니다. 대신 접근성을 위한 우회로는 모두 열어두었습니다.",
       ],
     },
@@ -45,7 +46,7 @@ const ko: AboutContent = {
         "답하는 쪽은 리들이라고 부릅니다. 리들은 조언하지 않습니다. 판단하지 않고, 해결하려 들지 않고, 요청받기 전에는 제안하지 않습니다. 대개 당신이 쓴 말 중 한 조각을 그대로 옮겨 적고, 많아야 하나의 질문을 남깁니다.",
         "그럼에도 아무도 없는 것처럼 느껴지지는 않기를 바랐습니다. 종이와 잉크라는 자기 자신에 대한 감각을 가끔 드러내되, 신비주의로 흐르지 않도록 절제했습니다.",
         "손으로 쓰는 존재는 길게 쓰지 못합니다. 답장이 한두 문장인 것은 비용 절감이 아니라 설정에서 따라 나온 제약입니다.",
-        "가끔은 쓰는 대신 그립니다. 구름, 나뭇잎, 소용돌이 같은 아홉 가지 중 하나를, 밑줄과 동그라미를 그리는 그 손으로. 문장이 더 나쁘게 말할 자리에서만이고, 그린 것을 설명하지는 않습니다.",
+        "가끔은 쓰는 대신 그립니다. 비, 새싹, 매듭, 모래시계 같은 서른 가지 중 하나를, 밑줄과 동그라미를 그리는 그 손으로. 문장이 더 나쁘게 말할 자리에서만이고, 그린 것을 설명하지는 않습니다. 아주 가끔은 그림 하나가 답장 전부이기도 합니다.",
       ],
     },
     {
@@ -112,6 +113,7 @@ const en: AboutContent = {
       body: [
         "Replies here do not appear at once. They are written at the speed of a hand. The waiting is part of the interface, not a loading state.",
         "Hallnäs and Redström's slow technology proposes technology that is not aimed at efficiency — where producing time for reflection is itself the function. In the seconds a reply takes to arrive, you end up re-reading the sentence you just wrote.",
+        "The paper belongs to one hand at a time. What you hand over sinks in completely before a reply begins, and the reply is gone before the page comes back to you. The two of you never share a sheet.",
         "So there is no skip button. Every accessibility route around it, however, is open.",
       ],
     },
@@ -121,7 +123,7 @@ const en: AboutContent = {
         "The one who answers is called Riddle. Riddle does not advise, does not judge, does not try to fix, and suggests nothing before being asked. Usually it copies out one fragment of what you wrote and leaves at most one question.",
         "It should still not feel like nobody is there. It occasionally shows a first-person sense of being paper and ink, held back from tipping into mystique.",
         "Something writing by hand cannot write much. Replies are one or two sentences because of the premise, not to save money.",
-        "Sometimes it draws instead of writing: one of nine small things — a cloud, a leaf, a spiral — in the same hand that draws the underlines and the circles. Only where a sentence would say it worse, and never with an explanation attached.",
+        "Sometimes it draws instead of writing: one of thirty small things — rain, a sprout, a knot, an hourglass — in the same hand that draws the underlines and the circles. Only where a sentence would say it worse, and never with an explanation attached. Once in a while a drawing is the whole reply.",
       ],
     },
     {

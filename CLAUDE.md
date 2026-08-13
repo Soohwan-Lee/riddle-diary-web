@@ -41,13 +41,24 @@ src/store/        zustand stores (ink nodes, session, settings)
 
 `pageMode` is `blank` (default) or `keep`.
 
-- **blank** — handing something over rests it immediately and marks everything
-  already on the paper `absorbing`; those sink at `ABSORB_*` speed. A reply
-  rests for `readDwellMs()` — a script-weighted reading estimate, not a fixed
-  number. The result is that you always write on an empty sheet.
-- **keep** — one dwell for everything, as before.
+- **blank** — the paper is one hand's at a time. Handing something over rests
+  it immediately and marks everything already on the paper `absorbing`; those
+  sink at `ABSORB_*` speed. The reply is **held until the sheet is empty** —
+  `whenPaperClears()` in the session store — while the request itself goes out
+  at once and the text queues in the meantime. The reply then rests for
+  `readDwellMs()`, a script-weighted reading estimate, and the entry area comes
+  back only when the last of it has gone.
+- **keep** — one dwell for everything, and the reply starts straight away.
 - `fadePace: "never"` overrides both. In `blank` the pace control is a
   multiplier on reading time instead of a dwell.
+
+The gate reads the store, never a render snapshot: a snapshot describes the
+page as it was before the entry landed, which reports an empty sheet at exactly
+the wrong moment. `src/store/session.test.ts` pins that down.
+
+The one thing that shares the paper is the opening line. It is `pinned` and
+waits there until you answer, so your first entry lands beside it; both then
+sink together before the reply starts.
 
 The opening line is `pinned`: `restAll()` skips it until an entry unpins it.
 It is written by `greet()`, which never touches `status`, so the surface
@@ -55,7 +66,7 @@ accepts writing while the page is still asking its question.
 
 ## What Riddle draws
 
-`[[name]]` in InkScript asks for one of the nine glyphs in `lib/ink/glyph.ts`.
+`[[name]]` in InkScript asks for one of the thirty glyphs in `lib/ink/glyph.ts`.
 A fixed vocabulary, not free-form SVG: model-invented paths are unreliable, and
 a name looked up in a table cannot carry markup into the renderer.
 
@@ -68,8 +79,17 @@ a name looked up in a table cannot carry markup into the renderer.
 - A drawing occupies one grapheme slot, so text wraps around it and a mark can
   enclose it. It is excluded from the script-tempo normalisation and gets a
   fixed duration that scales with `writeSpeed`.
-- New glyphs go in `glyph.ts` and need a label in `dictionaries.glyphs`, or a
-  screen reader hears nothing.
+- A line holding drawings and nothing else is `solo`: drawn at 2.9em, and given
+  proportionally more time by the layout. Stretch it in CSS alone and the node
+  reports itself written with a stroke still going.
+- New glyphs go in `glyph.ts`, need a label in `dictionaries.glyphs` and a name
+  in the prompt's DRAWINGS list. `glyph.test.ts` fails if either is missing —
+  without the label a screen reader hears nothing, without the prompt line the
+  drawing is never asked for.
+- Shapes are verified by rendering a contact sheet and looking at it. Four of
+  the thirty were wrong in ways no test can see: a cloud that was a mountain
+  range, a crescent that was a lens, a teardrop that was a gem, an arch that
+  was a hammock.
 
 ## Someday: memory, not transcript
 
@@ -114,7 +134,9 @@ If it is ever built, these hold or it is not this product any more:
    Fades run as CSS animations, never a JS rAF loop.
 4. **It must read as writing, not as waiting.** What carries that is the
    per-character rhythm, not the total, so the tempo may be raised — but never
-   to the point where a reply arrives at once. No "skip animation" affordance;
+   to the point where a reply arrives at once. The rests scale with the hand
+   against `PAUSE_REFERENCE_CPM`, so the tempo is one number rather than
+   letters plus a fixed tax. No "skip animation" affordance;
    accessibility escapes instead (§5). The one thing exempt from
    reduced-motion shortening is the hand-over countdown ring: it reports when
    your writing leaves, so it must run its real length.
@@ -136,5 +158,9 @@ If it is ever built, these hold or it is not this product any more:
   mode, both hands) travels in a cookie and is read by `readServerPrefs`;
   everything else is localStorage.
 - User-facing strings live in `src/lib/i18n/dictionaries`, never inline.
+- The paper's width is `.ink-sheet` and its type size is `--ink-size`, both in
+  `ink.css`. Both hands read the one variable: the caret has to sit in the same
+  line of text the ink lands on, so the composer and the ink can never be given
+  sizes separately.
 - Pure engine logic (segmentation, timing, geometry, parsing) is unit-tested;
   animation itself is verified by hand against `/lab`.

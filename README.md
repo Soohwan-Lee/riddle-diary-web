@@ -17,7 +17,7 @@ Then both of you fade off the paper, and nothing is kept.
 [![axe: 0 violations](https://img.shields.io/badge/axe-0%20violations-3f8378)](#-accessibility-is-the-hard-part)
 [![License: MIT](https://img.shields.io/badge/License-MIT-8a8578)](LICENSE)
 
-<img src="docs/media/writing.gif" width="820" alt="Riddle writes a reply by hand, one character at a time, draws a small wave mid-sentence, then circles a phrase." />
+<img src="docs/media/writing.gif" width="820" alt="Riddle writes a reply by hand, one character at a time, draws a small knot mid-sentence, circles a phrase, and finishes with a candle drawn on a line of its own." />
 
 </div>
 
@@ -50,7 +50,7 @@ words sink in, the answer surfaces, and by the time you have read it the sheet i
 empty again.
 
 <div align="center">
-<img src="docs/media/blank.gif" width="820" alt="An entry is handed over and sinks into the page, Riddle reads it, then writes a reply with a small drawing on an empty sheet — which itself fades once it has been read, and the caret returns to the top." />
+<img src="docs/media/blank.gif" width="820" alt="An entry is handed over and sinks into the page until the sheet is completely empty; only then does Riddle write a reply, with a small drawing of rain in it — and that fades in turn once it has been read, leaving the caret back at the top." />
 <br/>
 <sub><i>Hand it over · it sinks · Riddle reads · Riddle answers · you read · gone · your turn.</i></sub>
 </div>
@@ -62,15 +62,27 @@ restores the older behaviour, and **Never fade** turns the whole thing off.
 
 ### One hand at a time
 
-The entry area used to sit below the ink in normal flow, which meant a reply growing
-line by line dragged the caret down with it and snapped it back up when the ink went —
-all during the window where nothing could be typed anyway. The caret spent the whole
-turn moving for no reason.
+Strictly. **Your ink is completely gone before Riddle writes a word, and Riddle's ink is
+completely gone before the page comes back to you.** The two of you never share a sheet.
 
-So in blank-page mode **the entry exists only on your turn.** It leaves when you hand
-something over and returns when the last of the reply has gone, easing in and taking
-the caret with it. From the second turn on it comes back to exactly the same place, the
-top of an empty sheet — measured at a stable 100px across three consecutive turns.
+Only half of that used to be true. The reply began the moment the request was sent, so
+for a second or two it was writing over an entry that was still sinking. Now the request
+goes out immediately and the *reply* is held until the paper is empty; text that arrives
+early queues up. Nothing is spent waiting that was not going to be spent anyway — the
+model and the absorb run at the same time, and whichever finishes last is the one being
+waited for. Measured: 1.4s from your last word to Riddle's first, and no sample in a
+three-turn recording with both hands' ink on the page.
+
+The gate reads the store rather than a render snapshot. Taken from a snapshot it
+described the page as it was *before* the entry landed — which on the second turn said
+"empty" and opened the gate at once. That one is pinned down by a test.
+
+The entry area follows the same rule: in blank-page mode **it exists only on your turn.**
+It leaves when you hand something over and returns when the last of the reply has gone,
+easing in and taking the caret with it. Before, it sat below the ink in normal flow, so a
+reply growing line by line dragged the caret down and snapped it back up when the ink
+went — all during a window where nothing could be typed anyway. Now, from the second turn
+on, it comes back to exactly the same place: the top of an empty sheet.
 
 There is also **no caret while Riddle writes.** There was once a nib riding the edge of
 the reveal; at text sizes it read as a cursor blinking along a line, which is the one
@@ -84,12 +96,13 @@ front of it. The reveal itself is the pen.
 |   | |
 |---|---|
 | 📖 | **Blank-page mode.** What you hand over sinks in at once; the reply leaves about the time you finish reading it |
-| 🤝 | **One hand at a time.** The entry area — and the caret — waits its turn instead of being dragged around by growing ink |
+| 🤝 | **One hand at a time.** Your ink is gone before Riddle starts, and Riddle's is gone before the page comes back — the entry area and the caret wait their turn |
 | ✍️ | **Two hands, one page.** Write with a stylus, a finger, or a keyboard — toggle at any time |
 | 🪶 | **Real handwriting animation.** Per-grapheme reveal in Korean and English, and no cursor in front of it |
 | 🖋️ | **Four handwriting faces**, each a Latin face paired with a Hangul one, chosen separately for you and for the page |
 | ✏️ | **Hand-drawn marks.** Underlines that flick, circles that overshoot their own start, a highlighter pass |
-| 🌤️ | **Riddle draws.** Nine small things — weather, a leaf, a spiral, an arrow — drawn stroke by stroke in the same hand, inline where a word would go |
+| 🌤️ | **Riddle draws.** Thirty small things — weather, growing things, a cup, a key, a knot — stroke by stroke in the same hand, inline where a word would go, and now and then as the whole reply |
+| 📱 | **A sheet that fits the screen.** The paper and the writing on it grow in four steps from a phone to a wide desktop |
 | ⏱️ | **Hand-over you can see coming.** Stop writing and a ring fills; any new stroke puts it back to zero |
 | ⏸️ | **Time that waits for you.** The clock stops while you write, while the tab is hidden, and while you hold the paper |
 | 🌗 | **Light · dark · system**, resolved server-side so nothing flashes |
@@ -165,18 +178,18 @@ What sells the illusion is the timing, not the technique:
 - **±18% jitter** from a seeded hash. Irregular, but frozen per character — a re-render
   must never make the line twitch.
 - **Pen lifts** after spaces, longer rests at commas and full stops. The page appears to
-  think mid-sentence. These are written against the default hand and scale with it, so
-  a faster setting is faster all the way through rather than a fast hand with the same
-  fixed gaps: left absolute, the rests would have been a fifth of a quick reply.
+  think mid-sentence. These are written against one fixed reference hand and scale from
+  there, so the tempo is a single number rather than letters plus a fixed tax: left
+  absolute, the rests would have been a fifth of a quick reply.
 - **Wet ink** that dries to its resting tone over the following second.
 - **Nothing in front of the reveal.** No nib, no caret, no leading marker of any kind —
   see [One hand at a time](#one-hand-at-a-time).
 
-At `normal` a character takes 100ms and a two-sentence reply lands in around seven
-seconds. Well past what a real hand can do, deliberately: what has to survive is the
-sense of being written to, and that lives in the per-character rhythm rather than in
-the total. Slower than this and it stops reading as writing and starts reading as
-waiting.
+At `normal` a character takes 50ms and a two-sentence Korean reply lands in **2.9s**,
+down from 5.9s — exactly 2.00× at every one of the three settings, because the rests
+moved with the letters. Well past what a real hand can do, deliberately: what has to
+survive is the sense of being written to, and that lives in the per-character rhythm
+rather than in the total. There is still no instant option, and there never will be.
 
 Marks are drawn *after* the sentence is finished, the way a person marks. A hand-drawn
 circle's giveaway is that it passes its own starting point instead of meeting it, so it
@@ -184,37 +197,50 @@ sweeps 1.08 turns.
 
 ### Riddle draws
 
-Not only writes. Riddle asks for a drawing by name — `[[cloud]]`, `[[spiral]]`,
-`[[arrow]]` — and the same `stroke-dashoffset` engine that draws the circles draws it,
-stroke by stroke, in the order a hand would make them.
+Not only writes. Riddle asks for a drawing by name — `[[rain]]`, `[[knot]]`,
+`[[hourglass]]` — and the same `stroke-dashoffset` engine that draws the circles draws
+it, stroke by stroke, in the order a hand would make them.
 
-A fixed vocabulary of nine rather than free-form SVG, for two reasons. **Reliability:**
-paths a model invents come out broken or ugly and there is no way to know which until
-it is on the paper. **Safety:** a name is looked up in a table, so nothing the model
-writes can reach the renderer as markup.
+A fixed vocabulary of thirty rather than free-form SVG, for two reasons.
+**Reliability:** paths a model invents come out broken or ugly and there is no way to
+know which until it is on the paper. **Safety:** a name is looked up in a table, so
+nothing the model writes can reach the renderer as markup.
 
 <div align="center">
-<img src="docs/media/glyphs.png" width="820" alt="Nine hand-drawn glyphs, each shown with two different seeds: star, heart, sun, moon, cloud, leaf, wave, spiral, arrow." />
+<img src="docs/media/glyphs.png" width="820" alt="Thirty hand-drawn glyphs: sun, moon, star, cloud, rain, snow, lightning, rainbow, wind, leaf, sprout, tree, flower, mountain, wave, drop, boat, bird, feather, cup, candle, key, window, bridge, heart, spiral, arrow, knot, clock, hourglass." />
 <br/>
-<sub><i>Each drawn twice, from two seeds — the same wobble the marks use, so a drawing and a circle around a word look like one person's hand.</i></sub>
+<sub><i>The same wobble the marks use, so a drawing and a circle around a word look like one person's hand.</i></sub>
 </div>
+
+Nine of these was a set of icons, not a vocabulary. Someone writing by hand reaches for a
+doodle when a sentence would say it worse, so the list now covers weather in six kinds,
+growing things, a few small objects to point at — and a knot, which is what going over
+the same thing again looks like.
 
 A drawing takes **one character's room in the line** but nothing like one character's
 time. It sits outside the script normalisation — that exists to hold Korean and English
 to the same tempo, and a drawing is neither script; folded in, it would be squeezed into
 a letter's worth of time while every letter beside it stretched to make room. So it gets
-a fixed 1.3s that scales with the hand, and strokes share it by weight: a sun's disc
-takes longer than one of its rays.
+its own duration, which scales with the hand, and strokes share it by weight: a sun's
+disc takes longer than one of its rays.
 
 Because it occupies a real slot in the line, text wraps around it and a mark can be
-measured against it — **Riddle can circle its own drawing.**
+measured against it — **Riddle can circle its own drawing.** And a line holding nothing
+but drawings is drawn at nearly three times the size, because a drawing that *is* the
+reply should not arrive at the size of a letter. The extra time for that comes from the
+layout, not from CSS: stretched in the renderer, the node would report itself finished
+with a stroke still going.
 
-Two shapes took several passes to stop lying about what they were. A crescent needs its
-inner edge to bite *left* into the disc, not bulge right, or it is a lens. A cloud
-cannot be three arcs one after another — each begins at its own left edge, which sends
-the pen back across the puff before it — nor bell curves, which make peaks and turn it
-into a mountain range. It is the tallest of three overlapping circles at each x, with
-the outer two sitting on the base so the outline comes back down.
+**Five of the thirty had to go back for a second pass**, and none of it was catchable by
+a test — every one passed "is inside its box, is real path data" while being the wrong
+picture. A crescent needs its inner edge to bite *left* into the disc, or it is a lens. A
+cloud cannot be three arcs in a row (each begins at its own left edge, sending the pen
+back across the puff before it) nor bell curves (peaks — that is a mountain range); it is
+the tallest of three overlapping circles at each x. A teardrop built from a leaf outline
+comes out a gem, because both sides converge at the far end. A bridge's arch has to rise
+towards the deck or it reads as a hammock. And wind was pure chatter: the wobble is per
+point, so a long smooth line described by many of them is not a hand. The fix for all of
+them was rendering a contact sheet and looking at it.
 
 ### Streaming into a hand
 
@@ -282,7 +308,7 @@ incrementally:
 __text__     underline
 ((text))     circle it
 ==text==     highlighter
-[[star]]     draw one of the nine
+[[star]]     draw one of the thirty
 ```
 
 The parser has one hard requirement — **the plain text it emits must be a stable prefix**.
@@ -332,8 +358,9 @@ it:
   surface with nothing to do.
 
 Audited with axe (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `best-practice`) across
-thirteen states — home light/dark/handwriting, a first visit, a countdown running, a
-reply carrying drawings, `/about` light/dark, and the settings sheet: **0 violations**.
+thirteen states — home light/dark/handwriting, a first visit, phone and tablet widths, a
+reply being written and a reply resting, reduced motion, `/about` light/dark, `/lab`, and
+the settings sheet: **0 violations**.
 
 ---
 
@@ -381,10 +408,10 @@ diverged from it and why.
 
 ## 🗺️ Roadmap
 
-- [x] **Riddle draws** — [nine of them](#riddle-draws), through the same engine that
-      draws the circles
-- [ ] More of them, and drawings that know where they are: a shape sized to the phrase
-      it sits beside, an arrow that actually reaches between two things you said
+- [x] **Riddle draws** — [thirty of them](#riddle-draws), through the same engine that
+      draws the circles, and one on its own line is the whole reply
+- [ ] Drawings that know where they are: a shape sized to the phrase it sits beside, an
+      arrow that actually reaches between two things you said
 - [ ] Diagrams proper: a node/edge spec on top of the same engine
 - [ ] A single-stroke font backend for Latin text, promoting it to the true stroke engine
 - [ ] Page turns, paper textures, an optional pen sound
@@ -414,7 +441,7 @@ src/
 │  ├─ ai/             prompt, InkScript parser, reading splitter, transport
 │  ├─ i18n/           ko/en dictionaries
 │  └─ prefs/          cookie + localStorage preferences
-└─ store/session.ts   turns (fade away) and history (does not)
+└─ store/session.ts   turns (fade away), history (does not), the turn gate
 ```
 
 Every icon in the app — favicon, PWA icon, social card — is rendered from the one drawing

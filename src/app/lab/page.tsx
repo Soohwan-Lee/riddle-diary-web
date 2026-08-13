@@ -46,6 +46,10 @@ export default function LabPage() {
       <Header />
 
       <main className="ink-sheet flex-1 py-10">
+        {/* A harness, but a routed page all the same: it needs a heading like
+            any other, or a screen reader arrives somewhere with no name. */}
+        <h1 className="sr-only">Ink lab</h1>
+
         <div className="mb-8 flex flex-wrap items-center gap-2 text-[0.72rem]">
           <button
             type="button"
