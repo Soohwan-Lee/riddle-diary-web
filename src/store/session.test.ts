@@ -116,4 +116,15 @@ describe("handwritten readings", () => {
       { role: "user", content: "typed" },
     ]);
   });
+
+  it("does not resurrect a reading after the page is cleared", () => {
+    const id = useSession.getState().addUserTurn({
+      raw: "",
+      strokes: [[[1, 2, 0.5]]],
+    });
+    useSession.getState().clearAll();
+    useSession.getState().setUserTranscript(id, "too late");
+
+    expect(useSession.getState().history).toEqual([]);
+  });
 });
