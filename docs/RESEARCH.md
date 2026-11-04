@@ -2,25 +2,23 @@
 
 [← Back to the README](../README.md)
 
-> A working note for a built artifact, not a paper. It separates three things
-> that are easy to blur: what Inkling claims, what the build actually does, and
-> what has been observed. The study in §7 has not been run.
-
-**Status:** deployed artifact, no formal user study. 207 tests pass.
+> A working note about what the artifact argues, what it is likely to do to the
+> people who use it, and what would count as evidence. It is not a technical
+> spec; the build details are in [INK.md](INK.md).
 
 | | |
 |---|---|
 | **Artifact** | A one-page diary that answers in handwriting and then clears |
-| **Constraints** | It forgets · it is written by hand · it is slow |
-| **Evidence** | 207 tests, craft observations, one designer's log |
-| **Study** | 12 participants, four conditions, two weeks — not yet run |
-| **Wager** | A guarantee of disappearance changes what people are willing to write |
+| **Claim** | A guarantee of disappearance changes what people are willing to write |
+| **Design position** | Memory is a choice with a cost, not an invisible default |
+| **Expected outcome** | More disclosure, more rereading, a page read as a listener |
+| **Evidence** | No formal study; the build works as designed |
 
-**Contents:** [The claim](#1-the-claim) · [The instrument](#2-the-artifact-as-an-instrument) · [Rejected alternatives](#3-decisions-and-rejected-alternatives) · [Positioning](#4-where-it-sits) · [Related work](#5-related-work-what-was-borrowed-where-it-departs) · [Evidence](#6-evidence-so-far) · [Study](#7-a-study-that-could-be-run) · [Hypotheses](#8-hypotheses-operationalized) · [Contributions](#9-contributions) · [Limitations](#10-limitations) · [Guardrails](#11-what-would-make-it-a-betrayal) · [References](#12-references-acm-style)
+**Contents:** [The provocation](#1-the-provocation) · [What it does to the exchange](#2-what-the-artifact-does-to-the-exchange) · [Design implications](#3-design-implications) · [Expected outcomes](#4-expected-outcomes) · [A study](#5-a-study-that-could-test-it) · [What the build shows](#6-what-the-build-already-shows) · [Contributions](#7-contributions) · [Limitations](#8-limitations) · [Guardrails](#9-what-would-make-it-a-betrayal) · [References](#10-references-acm-style)
 
 ---
 
-## 1. The claim
+## 1. The provocation
 
 Conversational AI has a default: **keep**. The conversation is stored, searchable,
 summarized into a profile, and carried into the next session. Memory is presented as
@@ -36,7 +34,8 @@ does not keep.**
 > **Research question:** what does a conversational AI become when it answers in
 > handwriting, at a hand's pace, and keeps nothing?
 
-Five sub-questions follow, one per constraint and one for their combination:
+Five questions follow: three for the constraints, one for the ritual that joins them,
+and one for the absence that remains:
 
 - **RQ1 — Forgetting.** Does a guarantee of disappearance change what someone is
   willing to write?
@@ -49,231 +48,193 @@ Five sub-questions follow, one per constraint and one for their combination:
 This is a **design claim, not a clinical one**. It does not claim that forgetting is
 therapeutic, that handwriting is better, or that slowness is virtuous. It claims that
 these are designable conditions, and that their effect on disclosure is an empirical
-question. The artifact is the instrument; the study is how the instrument would be
-read.
+question.
 
 ---
 
-## 2. The artifact as an instrument
+## 2. What the artifact does to the exchange
 
-The three constraints are not themes. They are mechanisms, and each one has a number
-attached to it.
+The constraints are not features. Each one removes something from the exchange and
+makes room for something else.
 
-| Constraint | Mechanism | What the reader meets |
+| Constraint | What it removes | What it makes room for |
 |---|---|---|
-| **It forgets** | No database, no content logs. Error logging keeps the error class only. | Nothing to retrieve after the tab closes. |
-| ↳ | Chat context lives in tab memory; the last 24 messages go upstream. | A reload is a clean slate. |
-| ↳ | The OpenAI Responses request sets `store: false`. | No application-state retention at the provider. |
-| ↳ | The entry is absorbed in 400 ms + 900 ms; the reply leaves after a reading estimate. | The sheet is empty before the reply, and empty again after it. |
-| **It is written by hand** | Hand is the default input; four Latin/Hangul faces; typing is a toggle. | The first screen asks for a hand. |
-| ↳ | Pointer input with pressure where the device reports it; 4 s of stillness hands over. | Hesitation and pressure stay visible. |
-| ↳ | The entry is sent as an image; a `READ:` line becomes the transcript. | The page answers what it can read, not what was typed. |
-| ↳ | The reply is a handwriting face revealed per grapheme at 1,200 cpm; marks and drawings are stroke-drawn. | The reply arrives as writing, not as a block. |
-| **It is slow** | A 650 ms beat after the sheet clears. | A pause that reads as someone taking the pen. |
-| ↳ | The reply is held until the entry has sunk; the composer returns only after the reply has gone. | One hand at a time. |
-| ↳ | No skip control. Reduced motion shortens; hold stops the clock; fade can be disabled. | Waiting is not a loading state with an exit. |
-| ↳ | Reading estimate: 900 weighted units/min + 1.2 s tail, clamped to 4.5–20 s, then scaled by pace. | The reply stays about as long as it takes to read. |
+| **It forgets** | The archive, the future reader, continuity | Candor, present tense, release |
+| **It is handwritten** | Uniform input, copy-paste, speed | Hesitation, pressure, presence |
+| **It is slow** | Instant output, skimming | Rereading, anticipation, attention |
+| **One hand at a time** | Multitasking, interruption | Ritual, turn-taking, a shared sheet |
 
-The reply is **typographic handwriting**: a face revealed by `clip-path`, not
-synthesized strokes. Marks and drawings are SVG strokes. That distinction matters for
-the embodiment claim and is returned to in [§10](#10-limitations).
+### The archive is removed
 
-### One turn, in milliseconds
+The page clears before the reply and again after it. There is no history panel, no
+export, no search. The implication is not privacy in the compliance sense; it is that
+the writer has **no future audience to perform for**. A diary written to be reread is
+a performance for the future self. A diary that clears is written for the present.
 
-These are the client's numbers in blank-page mode. The request is already in flight
-while the entry sinks, so model latency hides inside the ritual rather than adding to
-it.
+The cost is real: no continuity, no building on yesterday, no record to return to. The
+artifact does not argue that this cost is always worth paying. It argues that the cost
+should be **visible**.
 
-| Time | Event |
-|---|---|
-| `0` | Last stroke. 4 s of stillness, or a tap, hands the entry over. The request leaves at once. |
-| `0–1.3 s` | The entry sinks: 400 ms dwell, 900 ms fade. |
-| `~1.3 s` | The sheet is empty. The reply gate opens; the 650 ms beat begins. |
-| `~1.95 s` | First grapheme, if tokens have arrived. Network delay pushes this later, never earlier. |
-| `≈50 ms / weighted character` | The reply writes. Punctuation and line breaks add rests, scaled to the hand. |
-| Reply end | Reading dwell of 4.5–20 s, then a 5 s fade at the default pace. |
-| After the fade | The composer returns. |
+### The body is put back in
 
-### What is deliberately absent
+Handwriting is slower, clumsier, and more revealing than typing. Hesitation is a
+wobble; feeling is pressure. The page can misread you, and that vulnerability is part
+of the exchange. Typing remains as an accommodation, not as the intended mode.
 
-| Absent | Why |
-|---|---|
-| History, export, search | They turn the page into an archive and make the fade a bug. |
-| Cross-session memory | It is the film's mechanism of possession; it would change what the page is. |
-| Avatar, voice, persona | They invite attachment while hiding the program. |
-| Skip | It converts writing back into loading. |
-| Streaks, reminders, notifications | They turn reflection into a habit loop. |
-| Analytics on what people write, or on how often they return | They turn the page into a funnel. |
+The design implication is that handwriting is not a theme applied to a chat app. It
+changes the unit of expression from the message to the stroke, and the tempo of
+thought from **send** to **compose**.
 
----
+### Time is made visible
 
-## 3. Decisions and rejected alternatives
+The reply is not pasted; it is written. The wait is not a loading state with a
+progress bar. It is a gap in which the reader can reread what they wrote, and then a
+reply that stays about as long as it takes to read before it fades.
 
-A provocation is made of refusals, but a refusal is only interesting if the
-alternative was real. These are the decisions where the easier option was available.
+The design implication is that **slowness has to be earned**. If the reply is not
+worth waiting for, the wait is just latency. Brevity is part of the tempo, not a
+separate constraint.
 
-| Decision | Easier alternative | Why rejected | Cost accepted |
-|---|---|---|---|
-| Blank page by default | Keep the exchange on screen | Forgetting should be structural, not a setting | No rereading; an accidental reload loses the exchange |
-| Pen by default | Type by default | The claim is about the hand; a typing default would make it a chat app with a font | First-visit friction; typing is one toggle away |
-| Per-grapheme reveal | Stream tokens as text | Token streaming reads as a chat window; the reveal is the pen | More timing code; no instant option |
-| Fixed glyph vocabulary | Let the model invent SVG | Invented paths are unreliable and can carry markup; a table cannot | Only sixty drawings; expression is bounded |
-| Reading estimate | One fixed dwell | A one-line reply and a three-line reply need different time | Formula tuning; a pace multiplier |
-| No caret | Blinking caret | A caret signals a text field and instant text | Less obvious where writing starts; affordances must carry it |
-| Tab-only memory | `sessionStorage` or `localStorage` | A reload should be a clean slate | A reload loses the conversation |
-| No skip | Skip animation | Skip turns the wait back into loading | Some readers will find it slow; accessibility escapes instead |
+### The sheet belongs to one hand
 
-The right-hand column is the part that makes this a design argument rather than a
-feature list. Every refusal has a price, and the artifact pays it on purpose.
+Your ink goes before Riddle writes. The reply goes before the page comes back. There
+is no shared sheet, no interruption, no multitasking.
+
+The design implication is that conversation can be a **spatial object with one
+occupant**, not a scrolling feed. Turn-taking becomes the unit of interaction. The
+same constraint can read as respect or as control; **Not yet** and hold-to-keep give
+the reader some control over the tempo.
 
 ---
 
-## 4. Where it sits
+## 3. Design implications
 
-Inkling is not the first ephemeral interface, the first handwriting interface, or the
-first slow chat. The contribution is the **combination, held as one constraint set**.
+The artifact is a small machine for making a trade-off visible. These are the
+implications we think travel beyond it.
 
-| Archetype | Keeps | Input | Tempo | Optimizes for |
-|---|---|---|---|---|
-| Memory-first assistant | History, profile, cross-session recall | Keyboard, voice | Instant | Task success, retention |
-| Companion app | Relationship history, persona | Chat | Instant | Attachment, daily return |
-| Journaling app | Entries, archive, export, streaks | Keyboard | Immediate | Habit, archive |
-| Slow-tech artifact | Often little or nothing | Varied | Deliberately slow | Reflection, interpretation |
-| **Inkling** | **No conversation storage** | **Hand first** | **Hand-paced** | **Disclosure, interpretation** |
-
-Read down the columns and each cell is unremarkable. Read across the last row and the
-argument appears: the page is slow because it is handwritten, handwritten because the
-body is part of the exchange, and forgetful because memory is the mechanism the film
-warns about. Remove one constraint and the object becomes a different, more familiar
-thing.
-
----
-
-## 5. Related work: what was borrowed, where it departs
-
-The lineage is not a list of influences. Each row names the idea taken and the point
-where Inkling refuses it.
-
-| Work | Idea used | Where it appears | Where Inkling departs |
-|---|---|---|---|
-| Hallnäs & Redström, 2001 | Slow technology produces time for reflection rather than removing it | No skip, reading dwell, one hand at a time | Slowness is not only an aesthetic; it is a condition on what gets written |
-| Grosse-Hering et al., 2013 | Tempo and ritual make an interaction meaningful | Hand-over ring, **Not yet**, hold-to-keep | No engagement target; the ritual is allowed to be inconvenient |
-| Odom et al., 2014 | Anticipation and re-visitation in a domestic artifact | The page returns, day after day | There is no archive to revisit; the return is to a blank page |
-| Döring et al., 2013 | Ephemeral UI treats decay as a material | Ink absorbs and fades | Ephemerality is conversational, not only material |
-| Bannon 2006 | Forgetting is a feature, not a failure | No history, no export | Extends the argument from ubicomp to conversational AI |
-| Sellen & Whittaker 2010 | Total capture is not the same as memory | No lifelog, no transcript | The alternative to capture is not better retrieval; it is no capture |
-| Park et al., 2023 | Generative agents run on a memory stream, reflection, and retrieval | A negative reference | Removes the memory stream that makes the agent continuous |
-| Bardzell & Bardzell 2013 | Critical design is an argument about values | The three refusals | A working web artifact, not a gallery object |
-| Dunne & Raby 2013 | Speculation proposes a counter-position | The diary that answers and forgets | Meant to be used daily, not only interpreted |
-| DiSalvo 2012 | Adversarial design contests a dominant narrative | Memory-first AI | The adversary is a product default, not an institution |
-| Gaver 2012; Zimmerman et al., 2007 | The artifact is the contribution in research through design | The build, the tests, the contact sheet | Adds technical measurement and autoethnography to the annotated artifact |
-| Boehner et al., 2007 | Probes are read differently by different audiences | Expected misreadings | Names those readings as failure criteria instead of leaving them open |
-| Nass & Moon 2000; Bickmore & Picard 2005 | People respond socially to machines; relational agents are designed for attachment | The page reads as someone | Refuses the durable relationship features: memory, name, avatar, voice |
-| Pennebaker & Beall 1986; Weizenbaum 1966 | Writing a day down; projecting a listener into a machine | The daily entry; the risk of ELIZA | No therapeutic claim; the program is disclosed in one sentence |
-
-The closest neighbour is slow technology, and the most important departure is that
-slowness here is not a lifestyle proposal. It is a constraint on disclosure: if the
-reply is written, the reader has time to reread what they wrote; if the page clears,
-there is nothing to perform for later. The artifact tests whether those conditions
-change the sentence.
-
----
-
-## 6. Evidence so far
-
-The evidence is uneven, and the note says so. Some claims are true by construction;
-some are design observations; the central hypothesis is untested.
-
-| Claim | Status | Basis |
+| Implication | What it means | What it asks of a designer |
 |---|---|---|
-| The page keeps nothing | By construction | No database, no content logs, tab memory, `store: false` |
-| The reply is written at a hand's pace | By construction | 1,200 cpm; timing tests |
-| The page waits for a reading | By construction | Dwell formula and tests |
-| The wait reads as writing | Partial | Designer's observations; no participants |
-| Disappearance lowers the threshold | Untested | Hypothesis |
-| Handwriting changes what is said | Untested | Hypothesis |
-| One hand at a time creates ritual | Untested | Hypothesis |
-| No memory changes what is said | Untested | Hypothesis |
+| **Memory is a choice, not a default.** | A system that remembers has a model of the person and a reason to use it. A system that forgets gives that up. | Say what is kept, why, for how long, and how to remove it. Make the absence visible too. |
+| **Ephemerality needs an accessible layer.** | Disappearing content excludes anyone who reads slowly, looks away, or uses a screen reader. | Keep a persistent text layer outside the visual fade. Honour reduced motion. Let the reader stop the clock. |
+| **Slowness must be earned.** | Waiting is a claim on the person's time. If nothing happens in the gap, it is latency. | Write less. Make the wait legible as writing. Do not offer a skip that turns the ritual back into loading. |
+| **Handwriting is a mode, not a skin.** | A handwriting font over a chat box is a costume. The hand changes what can be expressed and what can go wrong. | Design for strokes, pressure, marks, and misreading. Keep typing as an accommodation. |
+| **The interface should disclose the program.** | A page that answers is read as someone. That is a social response, not a bug. | Do not hide the model behind a persona. One honest sentence is enough. |
+| **Engagement is not the only relationship.** | Retention, streaks, and memory are useful metrics, but they are not the only way to matter. | Measure attention and interpretation as well as return. |
 
-### What the build pins down
+### The trade-offs the artifact accepts
 
-- **207 tests in eight files.** The dwell tests pin the floor (4.5 s), the ceiling
-  (20 s), the tail (1.2 s), and pace scaling. The tempo tests pin script
-  normalization: a Korean reply and an English reply of the same reading weight take
-  the same time.
-- **The parser tests pin streaming behavior.** An unclosed `[[` truncates text until
-  `]]` arrives, and a drawing occupies one grapheme slot so marks and indices still
-  line up.
-- **The glyph tests pin the vocabulary.** All sixty drawings have geometry, a
-  Korean/English label, and a prompt entry. A missing label is silent to a screen
-  reader; a missing prompt entry means the drawing is never asked for.
-- **The session tests pin the one-hand gate to the store, not a render snapshot.**
-  This was a real bug: on the second turn the snapshot said the sheet was empty and
-  the reply started early.
-- **The transcript tests pin a reading to the turn id**, so a handwriting transcript
-  that arrives after the entry has faded is still retained for the next request.
-- **The route sets `store: false`**, and the error path logs only the error class,
-  never the message body.
+| Decision | What it buys | What it costs | The tension left open |
+|---|---|---|---|
+| No history | Candor, release | Continuity, safety | Safety vs. continuity |
+| Hand input | Embodiment, presence | Effort, exclusion | Access vs. effort |
+| Slow reveal | Attention, anticipation | Patience, friction | Reflection vs. friction |
+| One hand at a time | Ritual, turn-taking | Control, interruption | Intimacy vs. autonomy |
+| No persona | Honesty | Warmth, attachment | Presence vs. honesty |
 
-### What the making taught us
+The right-hand columns are the design. A product would try to resolve these tensions.
+A provocation keeps them visible.
 
-These are the design lessons that survived the build. Each one changed the artifact.
-
-- **Generated shapes need looking at.** Five drawings were redrawn after the contact
-  sheet. Four of the first thirty passed every geometry test while being the wrong
-  picture: a cloud that read as a mountain range, a crescent that read as a lens, a
-  teardrop that read as a gem, an arch that read as a hammock. Invariants are not
-  resemblance.
-- **A gate must read the state, not the picture.** The one-hand gate first read a
-  render snapshot. On the second turn it described the page as it was before the
-  entry landed, decided the sheet was empty, and let the reply start early. The fix
-  was to read the store.
-- **Ephemerality makes ordering a first-class problem.** A handwriting reading could
-  arrive after the turn had faded. The fix was to remember the turn by id and fold
-  each reading in once. A disappearing interface has to be more careful about time,
-  not less.
-- **The first mark carries the metaphor.** The first reveal had a leading mark; it
-  read as a cursor. Removing it made the writing feel like a pen. The smallest mark
-  decides whether the page is a text field or a hand.
-- **A privacy promise includes provider defaults.** The Responses API stores
-  responses for 30 days by default. `store: false` is part of the design, not an
-  implementation detail.
-
-### The designer's log
-
-The log is not a dataset. Three observations recurred while building and using the
-page:
-
-- Without the 650 ms beat, the reply began the instant the sheet cleared, and the
-  page read as a text field rather than a hand taking up a pen. The beat was added to
-  make the gap intentional.
-- An early fixed dwell treated a one-line reply and a three-line reply the same. The
-  page either held the short one too long or rushed the long one. Weighting the dwell
-  by script and length made the page feel as if it were waiting for a reader, not
-  running a timer.
-- In blank mode, the entry sinking before the reply was the strongest signal that the
-  page would not keep it. In keep mode, the same exchange felt like a transcript. The
-  difference is not the words; it is whether the sheet is allowed to remember them.
-
-### What this evidence is not
-
-There are no participants, no pre/post measures, no inter-rater reliability, and no
-longitudinal use. The build evidence supports the coherence of the artifact. It does
-not support the central hypothesis. That is what the next section is for.
+The strongest implication is not that every AI should forget. It is that **the cost of
+memory is usually hidden**. A memory-first product shows what it remembers and calls
+that personalization; it rarely shows what the person gave up to be remembered.
+Inkling makes the cost visible by building the opposite, and by letting the reader
+feel what is lost as well as what is gained.
 
 ---
 
-## 7. A study that could be run
+## 4. Expected outcomes
+
+These are predictions, not findings. They are written as signals so that a study can
+confirm or complicate them.
+
+### What we expect the person to do
+
+- Write longer, more specifically, and more in the first person.
+- Reread their own entry while the reply is being written.
+- Test the fade: reload, screenshot, wait, try to catch it.
+- Use **Not yet** or hold-to-keep when the page moves too fast.
+- Choose handwriting at first; whether they stay is the real test.
+
+### What we expect the page to be called
+
+- "It listens," not "it generates."
+- "Someone wrote this," not "a font."
+- "A ritual," not "a bug."
+- "A provocation," not "a trick."
+
+Each of those descriptions is a design outcome. The artifact is trying to produce a
+particular reading, and the reading is part of the evidence.
+
+### What we expect design practice to take
+
+- A **memory audit**: what is kept, why, for whom, and for how long.
+- A **vocabulary for forgetting**: absorb, dwell, clear, hold, hand back.
+- A **pattern for ephemerality with accessibility**, rather than treating the two as
+  opposites.
+- A reason to treat **slowness as a material**, not a delay.
+- A way to talk about **handwriting as a mode**, not a visual theme.
+
+### What we expect research to take
+
+- A counter-case to memory-first AI that is concrete enough to argue with.
+- A set of hypotheses about disclosure, tempo, embodiment, ritual, and memory.
+- A method: build the refusal, measure the interpretation, keep the artifact.
+
+### What success looks like, and what would count against it
+
+| Expected outcome | Why we expect it | If it holds | If it does not |
+|---|---|---|---|
+| **More disclosure** | No record lowers the imagined audience | Longer, more specific, more first-person entries; "I would not have written that otherwise" | Shorter entries; requests for history; the fade makes them anxious |
+| **The wait reads as writing** | The reply is revealed at a hand's pace, and the entry is gone | Readers reread their own sentence; they describe the page as being written to | "Too slow", "loading", "why isn't it instant"; skip requests |
+| **Handwriting feels embodied** | The body is in the input, and the reply carries marks | Handwriting is chosen and stays chosen; marks and drawings are noticed | Readers switch to typing immediately; "it's just text" |
+| **One hand creates ritual** | The sheet has one occupant, and the turn is enforced | **Not yet** and hold-to-keep are used; readers wait for the page | Readers try to interrupt; the rule feels like a bug |
+| **No memory changes what is said** | There is no future audience and no profile | Readers mention the absence; they compare it with assistants that keep everything | Readers ask for memory; the page feels unsafe without it |
+| **The page is read as someone** | Handwriting and tempo cue presence, and the page does not behave like a chat window | Participants describe it as listening, or as a presence | "A chat window with a handwriting font"; "a gimmick" |
+
+### Rival explanations
+
+- **Novelty.** The first sessions may produce longer entries because the page is new,
+  not because it forgets. The two-week design and the free-choice day help; a longer
+  study would help more.
+- **Task demand.** Participants may write more because they are in a study. The
+  no-prompt design reduces this but does not remove it.
+- **Mode novelty.** Handwriting may be chosen because it is unfamiliar, not because it
+  is embodied. Persistence after the first week is the better signal.
+- **The designer in the room.** The page may be called "listening" because the
+  interviewer is also the designer. Independent coding and neutral interview prompts
+  help.
+
+### If the result is negative
+
+A negative result would not make the artifact useless. If blank mode produces *less*
+disclosure, the design question becomes which part of forgetting felt unsafe. The
+response is not to add memory by default. It is to design a ritual around the fear —
+for example, keeping one sentence the reader chooses, rather than a transcript of the
+exchange.
+
+### What would surprise us
+
+- No one asks for memory.
+- The fade feels like relief, not loss.
+- People write less, not more, because the page feels too intimate.
+- The wait feels like care, not slowness.
+- Handwriting is rejected as too effortful, but the slow tempo is kept.
+- The page is described as a game rather than a diary.
+
+Surprise is not failure. Each of these would sharpen the argument rather than end it.
+
+---
+
+## 5. A study that could test it
 
 The app already contains the conditions a study needs: hand/type and blank/keep are
-toggles, and the timing is deterministic. A small within-subject study would be
-enough to learn something without pretending to be a trial.
+toggles. A small within-subject study would be enough to learn something without
+pretending to be a trial.
 
 ### Design
 
 Twelve participants. Over two weeks: eight condition days (four conditions, two days
-each, Latin-square order), one free-choice day, and one exit interview. That is
-roughly ninety-six entries across the sample.
+each, Latin-square order), one free-choice day, and one exit interview.
 
 | Condition | Input | Page | What it isolates |
 |---|---|---|---|
@@ -286,51 +247,45 @@ One entry per day, at the end of the day, about anything. No prompts are supplie
 the question is what participants choose to write, not how they respond to a prompt.
 Skipping a day is data, not a failure.
 
-### Participants
-
-Twelve adults, recruited outside the designer's immediate circle, balanced across
-Korean- and English-speaking participants and across comfort with handwriting. There
-is no mood-based exclusion; this is not a clinical study. Participants are compensated
-for their time.
-
 ### Measures
 
 | Construct | Operationalization | Source |
 |---|---|---|
-| Disclosure | Characters per entry; first-person pronoun rate; comfort after writing (1–7) | Device-computed counts; post-entry survey |
-| Tempo | Perceived duration vs. actual; forced choice "written" or "loaded"; a "too slow" item | Survey |
-| Embodiment | Share of entries in hand mode on the free day; whether marks and drawings were noticed | Mode log; interview |
-| Ritual | Use of **Not yet** and hold-to-keep; gap between reply end and next entry | Device-computed counts |
+| Disclosure | Characters per entry; first-person rate; comfort after writing | Device-computed counts; post-entry survey |
+| Tempo | Perceived duration vs. actual; forced choice "written" or "loaded" | Survey |
+| Embodiment | Hand mode chosen on the free day; marks and drawings noticed | Mode log; interview |
+| Ritual | Use of **Not yet** and hold-to-keep; gap before the next entry | Device-computed counts |
 | Memory | What they remember writing; whether they wanted history or export | Exit interview |
-| Interpretation | How they describe the page: listening, generating, trick, other | Exit interview |
+| Interpretation | Listening, generating, trick, other | Exit interview |
 
 The first-person count is a rough proxy: Korean drops pronouns more readily than
 English, and character counts differ by script. Both are compared within participants,
 not across languages.
 
-### Data handling
+### Expected patterns
+
+- Blank mode should produce more disclosure than keep mode. If it produces less, RQ1
+  is in trouble.
+- Hand mode should be chosen on the free day more often than type. If it is abandoned,
+  the embodiment claim weakens.
+- The wait should be described as writing more often than loading. If it is described
+  as loading, the tempo claim weakens.
+- **Not yet** and hold-to-keep should be used, and described as agency rather than
+  obstruction. If they are described as bugs, the ritual claim weakens.
+
+### Data and ethics
 
 No conversation content leaves the device. A study build adds a local-only panel that
 computes counts and lets the participant export a CSV; nothing is sent to a server.
 The post-entry survey is local. Interviews are recorded with consent, transcribed,
-and pseudonymized. There is no server analytics, and the study does not add one.
-
-That last point matters: a study of a page that forgets must not become the archive
-the page refuses to be. The consent form should say that the researcher will not
-retain the entries either.
-
-### Analysis
-
-Descriptive statistics by condition, paired comparisons with effect sizes rather than
-significance alone, and thematic analysis of interviews (Braun & Clarke, 2006) with
-two coders. Disagreements are resolved by discussion. Survey, counts, and interviews
-are triangulated; a claim that appears in only one channel is reported as weak.
-
-### Ethics
+and pseudonymized.
 
 Informed consent; the provocation is disclosed; participants know the model is a
 program and the researcher is the designer; no deception; the right to withdraw and
 delete data; crisis resources; compensation.
+
+A study of a page that forgets must not become the archive the page refuses to be.
+The consent form should say that the researcher will not retain the entries either.
 
 ### What it can and cannot show
 
@@ -342,35 +297,42 @@ beyond Korean/English web users with a stylus or a finger.
 
 ---
 
-## 8. Hypotheses, operationalized
+## 6. What the build already shows
 
-The thresholds below are illustrative. They would be fixed before data collection,
-not after.
+The build works as designed; the tests establish mechanics, not meaning. Five lessons
+from making it are design knowledge in their own right.
 
-| Hypothesis | Comparison | Signal | Refuted if |
-|---|---|---|---|
-| **H1. Disappearance lowers the threshold** | Blank vs. keep | +20% median characters; higher first-person density; comfort at least as high | Blank entries are shorter, or comfort is lower |
-| **H2. The wait reads as writing** | Hand + blank | At least 60% choose "written" over "loaded"; perceived duration close to actual | Most choose "loaded", or ask for a skip |
-| **H3. Handwriting changes the exchange** | Hand vs. type | Hand is chosen on the free day; marks and drawings are noticed | Hand is abandoned, or described as "just text" |
-| **H4. One hand at a time creates ritual** | Blank | **Not yet** or hold-to-keep is used at least once per participant, and described as agency | It is described as a bug or an interruption |
-| **H5. No memory changes what is said** | All | The absence is described as relief or neutrality, and mentioned without prompting | Participants ask for history or export, or feel unsafe without it |
-
-The numbers above are illustrative targets, not effect sizes. They are the shape of
-the result that would make the claim worth pursuing, written down before the data can
-tempt anyone to move them.
+- **Resemblance is not an invariant.** Five drawings were redrawn after a contact
+  sheet. Four of the first thirty passed every geometry test while being the wrong
+  picture: a cloud that read as a mountain range, a crescent that read as a lens, a
+  teardrop that read as a gem, an arch that read as a hammock. A design can satisfy
+  every formal constraint and still not mean what it intends.
+- **A gate must read the state, not the picture.** The one-hand gate first read a
+  render snapshot. On the second turn it described the page as it was before the
+  entry landed, decided the sheet was empty, and let the reply start early. An
+  interface that hides its history has to be especially careful about what it thinks
+  is true now.
+- **Disappearing interfaces need their own memory of order.** A handwriting reading
+  could arrive after the turn had faded. The fix was to remember the turn by id, not
+  by what was on the page. Ephemerality does not remove the need for memory; it moves
+  the memory out of the content and into the interaction.
+- **The first mark carries the metaphor.** The first reveal had a leading mark; it
+  read as a cursor. Removing it made the writing feel like a pen. The smallest mark
+  decides whether the page is a text field or a hand.
+- **A privacy promise includes provider defaults.** The model provider stores
+  responses by default unless the request opts out. A promise that the page keeps
+  nothing has to include the parts of the system the reader cannot see.
 
 ---
 
-## 9. Contributions
-
-What another designer or researcher can take from this, beyond the demo.
+## 7. Contributions
 
 | For | Contribution |
 |---|---|
-| **Design practice** | A constraint-first method: build the refusal, then look at what it does. The vocabulary below. |
-| **HCI** | Ephemerality and accessibility as a paired pattern: the visual layer disappears, the `aria-live` layer does not. |
-| **AI product design** | Memory as a visible choice with costs; provider defaults as part of the privacy design (`store: false`). |
-| **Interface engineering** | Two ink backends on one clock; a fixed glyph vocabulary with a parser that keeps grapheme indices aligned. |
+| **Design practice** | A constraint-first method: build the refusal, then look at what it does. |
+| **HCI** | Ephemerality and accessibility as a paired pattern, not opposites. |
+| **AI product design** | Memory as a visible choice with costs; the provider's retention default as part of the design. |
+| **Interface design** | A handwriting mode with its own tempo, marks, and failure modes, not a font skin. |
 | **Readers** | A small room with no record. |
 
 ### A vocabulary for designing forgetting
@@ -383,20 +345,19 @@ What another designer or researcher can take from this, beyond the demo.
 | **hold** | Press and hold stops the clock, so reading is not a race. |
 | **hand back** | The composer returns only after the reply has gone. |
 
-These five words are the design vocabulary the artifact offers. Each names a moment
-that can be observed, removed, or varied — which is what makes the vocabulary useful
-to a study rather than only to a critique.
+Each term names a moment that can be observed, removed, or varied. That is what makes
+the vocabulary useful to a study rather than only to a critique.
 
 ---
 
-## 10. Limitations
+## 8. Limitations
 
 1. **No formal study.** The central hypothesis is untested; the autoethnography is one
    designer.
 2. **The reply is typographic, not synthesized.** It is a handwriting face revealed
    per grapheme. Marks and drawings are stroke-drawn, but the letters are not. The
    embodiment claim is weaker than the interface suggests.
-3. **The reading is model-generated.** A `READ:` line can misread handwriting, and an
+3. **The reading is model-generated.** A handwritten entry can be misread, and an
    illegible entry may reach the model as an image with no reliable transcript. The
    page's understanding is not verified.
 4. **Script and language coverage.** Korean and English only; four faces; sixty
@@ -406,27 +367,25 @@ to a study rather than only to a critique.
 6. **Disappearance is not a security guarantee.** The page can be screenshotted,
    recorded, or captured by an extension. It prevents the app from keeping a record;
    it cannot prevent the person or the device from doing so.
-7. **Provider retention is separate.** `store: false` disables application-state
-   retention, not OpenAI's abuse-monitoring retention (up to 30 days unless the
-   organization has Zero Data Retention). The privacy claim is scoped to this server.
+7. **Provider retention is separate.** Opting out of application-state retention does
+   not opt out of the provider's abuse-monitoring retention. The privacy claim is
+   scoped to this server.
 8. **The model is prompt-dependent.** Riddle can fail to listen, give advice, or
    perform a persona. The prompt is a design constraint, not a guarantee.
 9. **Accessibility is designed, not validated.** The full text reaches an `aria-live`
    region, reduced motion is honored, and hold-to-keep works. But no study with
    disabled users has been run, and handwriting input itself may exclude some users;
    typing is the fallback.
-10. **Rate limiting is per instance.** A public deployment needs an account-level
-    spend limit; the app's limiter is not a global guarantee.
-11. **Novelty and designer bias.** A first encounter may be read as a trick; a
-    two-week study may be read as a habit. The designer is also the developer, and
-    the artifact encodes his values.
-12. **The reading can overshoot.** A provocation against memory can be read as a claim
+10. **Novelty and designer bias.** A first encounter may be read as a trick; a
+    two-week study may be read as a habit. The designer is also the developer, and the
+    artifact encodes his values.
+11. **The reading can overshoot.** A provocation against memory can be read as a claim
     that forgetting is always good. The artifact argues for designability, not for a
     universal rule.
 
 ---
 
-## 11. What would make it a betrayal
+## 9. What would make it a betrayal
 
 The artifact is defined as much by what it refuses as by what it does. These are the
 lines that would make it a different, more familiar product.
@@ -444,7 +403,7 @@ and the film already showed us what that object does.
 
 ---
 
-## 12. References (ACM style)
+## 10. References (ACM style)
 
 1. Liam J. Bannon. 2006. Forgetting as a Feature, Not a Bug: The Duality of Memory and Implications for Ubiquitous Computing. *CoDesign* 2, 1 (2006), 3–15. https://doi.org/10.1080/15710880600608230
 2. Jeffrey Bardzell and Shaowen Bardzell. 2013. What is "critical" about critical design? In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '13). ACM, New York, NY, USA, 3297–3306. https://doi.org/10.1145/2470654.2466451
