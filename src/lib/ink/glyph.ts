@@ -32,24 +32,54 @@ export const GLYPHS = [
   "lightning",
   "rainbow",
   "wind",
+  "fog",
+  "hail",
+  "sunrise",
+  "comet",
+  "eclipse",
+  "puddle",
   // growing
   "leaf",
   "sprout",
   "tree",
   "flower",
   "mountain",
+  "seed",
+  "root",
+  "mushroom",
+  "cactus",
+  "pine",
+  "bud",
   // water and air
   "wave",
   "drop",
   "boat",
   "bird",
   "feather",
+  "ripple",
+  "island",
+  "shell",
+  "fish",
+  "butterfly",
+  "bee",
+  "snail",
   // small things
   "cup",
   "candle",
   "key",
   "window",
   "bridge",
+  "book",
+  "letter",
+  "envelope",
+  "pencil",
+  "scissors",
+  "lamp",
+  "bell",
+  "umbrella",
+  "ladder",
+  "anchor",
+  "compass",
   // shapes that mean something
   "heart",
   "spiral",
@@ -101,6 +131,19 @@ function arc(cx: number, cy: number, r: number, from: number, to: number, steps 
   return sample(steps, (t) => {
     const angle = from + (to - from) * t;
     return [cx + Math.cos(angle) * r, cy + Math.sin(angle) * r];
+  });
+}
+
+function ellipse(
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  steps = 26,
+): Point[] {
+  return sample(steps, (t) => {
+    const angle = TAU * t;
+    return [cx + Math.cos(angle) * rx, cy + Math.sin(angle) * ry];
   });
 }
 
@@ -358,6 +401,126 @@ function wind(seed: number): GlyphStroke[] {
   ];
 }
 
+/** Air with no direction: three flat drifts, one under the next. */
+function fog(seed: number): GlyphStroke[] {
+  return [
+    stroke(
+      sample(8, (t) => [2.4 + 19.2 * t, 8.2 + Math.sin(TAU * t) * 0.8] as Point),
+      seed,
+      0.9,
+      0.2,
+    ),
+    stroke(
+      sample(7, (t) => [3.6 + 17 * t, 13.1 + Math.sin(TAU * t + 1) * 0.7] as Point),
+      seed + 211,
+      0.8,
+      0.2,
+    ),
+    stroke(
+      sample(8, (t) => [5.2 + 14.2 * t, 18 + Math.sin(TAU * t + 2) * 0.6] as Point),
+      seed + 431,
+      0.7,
+      0.2,
+    ),
+  ];
+}
+
+/** The rain cloud again, with the weather coming down as stones. */
+function hail(seed: number): GlyphStroke[] {
+  const base = 12.8;
+  const top = puffTop(
+    base,
+    3,
+    21,
+    [
+      [6.8, 3.7, 0],
+      [12, 4.7, 2.3],
+      [17.2, 3.9, 0],
+    ],
+    26,
+  );
+  const strokes = [
+    stroke([...top, [12, base + 0.6], [3.2, base + 0.2]], seed, 2.2, 0.36),
+  ];
+  const stones: [number, number, number][] = [
+    [7.2, 17.2, 1.3],
+    [12, 19.6, 1.45],
+    [16.8, 17.2, 1.25],
+  ];
+  stones.forEach(([x, y, r], i) =>
+    strokes.push(
+      stroke(arc(x, y, r, -1.2, -1.2 + TAU * 1.05, 12), seed + 300 + i * 97, 0.5, 0.2),
+    ),
+  );
+  return strokes;
+}
+
+/** A half sun on the line where the sky meets the ground. */
+function sunrise(seed: number): GlyphStroke[] {
+  const horizon = 15.2;
+  const strokes = [
+    stroke(arc(12, horizon, 4.8, Math.PI, TAU, 18), seed, 2.2, 0.35),
+    stroke(line([2.4, horizon], [21.6, horizon], 5), seed + 211, 0.8, 0.3),
+  ];
+  for (let i = 0; i < 5; i++) {
+    const angle = Math.PI * 1.08 + (Math.PI * 0.84 * i) / 4;
+    strokes.push(
+      stroke(
+        [
+          [12 + Math.cos(angle) * 6.2, horizon + Math.sin(angle) * 6.2],
+          [12 + Math.cos(angle) * 8.4, horizon + Math.sin(angle) * 8.4],
+        ],
+        seed + 400 + i * 71,
+        0.55,
+        0.28,
+      ),
+    );
+  }
+  return strokes;
+}
+
+/** A head and the long tail it leaves behind. */
+function comet(seed: number): GlyphStroke[] {
+  return [
+    stroke(arc(16.8, 8.2, 3.2, -1.3, -1.3 + TAU * 1.05, 14), seed, 1.6, 0.3),
+    stroke(line([14.4, 10.6], [3.2, 20.6], 5), seed + 233, 0.8, 0.24),
+    stroke(line([15.6, 11.8], [5.2, 21.4], 4), seed + 467, 0.6, 0.24),
+    stroke(line([12.2, 9.2], [2.8, 16.4], 4), seed + 701, 0.5, 0.24),
+  ];
+}
+
+/** Two discs, one behind the other, with the corona showing. */
+function eclipse(seed: number): GlyphStroke[] {
+  const strokes = [
+    stroke(arc(12, 12, 8.4, -1.2, -1.2 + TAU * 1.04, 26), seed, 2.2, 0.36),
+    stroke(arc(13.8, 11.2, 5.4, -1.5, -1.5 + TAU * 1.03, 22), seed + 211, 1.1, 0.28),
+  ];
+  for (let i = 0; i < 4; i++) {
+    const angle = -Math.PI * 0.75 + (Math.PI / 2) * i;
+    strokes.push(
+      stroke(
+        [
+          [12 + Math.cos(angle) * 9.6, 12 + Math.sin(angle) * 9.6],
+          [12 + Math.cos(angle) * 11.2, 12 + Math.sin(angle) * 11.2],
+        ],
+        seed + 400 + i * 83,
+        0.4,
+        0.24,
+      ),
+    );
+  }
+  return strokes;
+}
+
+/** An oval of water with two rings still spreading. */
+function puddle(seed: number): GlyphStroke[] {
+  return [
+    stroke(ellipse(12, 15.4, 9.2, 3.6), seed, 1.6, 0.35),
+    stroke(arc(12, 15.4, 4.6, Math.PI * 1.05, Math.PI * 1.95, 12), seed + 211, 0.5, 0.2),
+    stroke(arc(12, 15.4, 2.4, Math.PI * 1.1, Math.PI * 1.9, 10), seed + 411, 0.4, 0.2),
+  ];
+}
+
 /* ---- growing ------------------------------------------------------------ */
 
 /** Outline first, then the vein down the middle. */
@@ -467,6 +630,89 @@ function mountain(seed: number): GlyphStroke[] {
   ];
 }
 
+/** The seed underground, and the first green line out of it. */
+function seed(seed: number): GlyphStroke[] {
+  return [
+    stroke(ellipse(12, 16.2, 3.4, 4.4, 20), seed, 2.2, 0.32),
+    stroke(
+      sample(5, (t) => [12 + Math.sin(Math.PI * t) * 0.8, 11.8 - 4.8 * t] as Point),
+      seed + 211,
+      1,
+      0.2,
+    ),
+    stroke(blade([12.4, 8.2], [16.4, 5.4], 1.5, { steps: 8 }), seed + 419, 0.5, 0.2),
+  ];
+}
+
+/** A stem going down, and the branches that hold it. */
+function root(seed: number): GlyphStroke[] {
+  return [
+    stroke(
+      sample(8, (t) => [12 + Math.sin(Math.PI * t) * 0.6, 3.2 + 5.6 * t] as Point),
+      seed,
+      1.2,
+      0.2,
+    ),
+    stroke(corner([[12, 8.6], [8.2, 13.8], [6.2, 20.4]], 0.86), seed + 211, 0.8, 0.2),
+    stroke(corner([[12, 9.2], [15.4, 14.4], [17.6, 19.8]], 0.86), seed + 431, 0.8, 0.2),
+    stroke(corner([[12, 11.8], [12.6, 16.8], [11.4, 21.4]], 0.86), seed + 647, 0.7, 0.2),
+  ];
+}
+
+/** A cap and a stem. The spots are what make it a mushroom, not an umbrella. */
+function mushroom(seed: number): GlyphStroke[] {
+  const cap = arc(12, 10.2, 7.2, Math.PI, TAU, 20);
+  return [
+    stroke([...cap, [19.2, 10.4], [4.8, 10.4]], seed, 2.3, 0.34),
+    stroke(
+      corner([[10.2, 10.8], [10.4, 18.8], [13.6, 18.8], [13.8, 10.8]], 0.86),
+      seed + 211,
+      1.2,
+      0.3,
+    ),
+    stroke(arc(9.2, 8.4, 1.1, -1.2, -1.2 + TAU * 1.04, 8), seed + 431, 0.35, 0.2),
+    stroke(arc(14.6, 7.6, 0.9, -1.2, -1.2 + TAU * 1.04, 8), seed + 617, 0.3, 0.2),
+  ];
+}
+
+/** A tall body and two arms, with a few spines for texture. */
+function cactus(seed: number): GlyphStroke[] {
+  return [
+    stroke(ellipse(12, 12, 2.8, 8.2, 26), seed, 2.4, 0.3),
+    stroke(corner([[9.2, 12.4], [5.8, 12.4], [5.8, 8.8]], 0.84), seed + 211, 1.1, 0.28),
+    stroke(corner([[14.8, 15.2], [18.2, 15.2], [18.2, 11.2]], 0.84), seed + 431, 1.1, 0.28),
+    stroke(line([10.4, 7.4], [9.6, 5.6], 3), seed + 647, 0.3, 0.2),
+    stroke(line([13.6, 8.6], [14.6, 6.8], 3), seed + 823, 0.3, 0.2),
+  ];
+}
+
+/** Three tiers and a trunk. A pine is a stack, not a triangle. */
+function pine(seed: number): GlyphStroke[] {
+  const tier = (points: Point[], offset: number) =>
+    stroke(corner(points, 0.86), seed + offset, 1.6, 0.3);
+  return [
+    tier([[12, 3.2], [6.8, 10.4], [17.2, 10.4]], 0),
+    tier([[12, 7.2], [5.2, 15.2], [18.8, 15.2]], 211),
+    tier([[12, 11.2], [4.2, 19.8], [19.8, 19.8]], 431),
+    stroke(line([12, 19.6], [12, 22.4], 3), seed + 900, 0.8, 0.22),
+  ];
+}
+
+/** A closed bud on a stem, with two sepals holding it. */
+function bud(seed: number): GlyphStroke[] {
+  return [
+    stroke(
+      sample(6, (t) => [12 + Math.sin(Math.PI * t) * 0.8, 21.6 - 8.4 * t] as Point),
+      seed,
+      1.2,
+      0.2,
+    ),
+    stroke(blade([12, 13.6], [12, 6.4], 3.2, { steps: 14, skew: 0.85 }), seed + 211, 1.8, 0.3),
+    stroke(corner([[12, 13.6], [8.8, 12.2], [8.2, 9.6]], 0.84), seed + 431, 0.6, 0.2),
+    stroke(corner([[12, 13.6], [15.2, 12.2], [15.8, 9.6]], 0.84), seed + 647, 0.6, 0.2),
+  ];
+}
+
 /* ---- water and air ------------------------------------------------------ */
 
 /** Water: a crest and a half, gentle rather than jagged. */
@@ -552,6 +798,110 @@ function feather(seed: number): GlyphStroke[] {
     );
   }
   return strokes;
+}
+
+/** Three rings on the same water, each smaller than the last. */
+function ripple(seed: number): GlyphStroke[] {
+  return [
+    stroke(ellipse(12, 13.2, 8.8, 4.2), seed, 1.4, 0.3),
+    stroke(ellipse(12, 13.2, 5.8, 2.8), seed + 211, 0.8, 0.25),
+    stroke(ellipse(12, 13.2, 2.8, 1.4), seed + 431, 0.5, 0.2),
+  ];
+}
+
+/** A mound of land, the water line, and one small palm. */
+function island(seed: number): GlyphStroke[] {
+  const mound = arc(12, 16.8, 6.8, Math.PI, TAU, 18);
+  return [
+    stroke([...mound, [5.2, 17.2], [18.8, 17.2]], seed, 1.6, 0.3),
+    stroke(line([2.4, 18.4], [21.6, 18.4], 5), seed + 211, 0.6, 0.24),
+    stroke(line([12, 16.8], [12, 11.4], 4), seed + 431, 0.7, 0.22),
+    stroke(blade([12, 13.2], [8.2, 10.2], 1.5, { steps: 8 }), seed + 647, 0.4, 0.2),
+    stroke(blade([12, 12.2], [15.8, 9.4], 1.5, { steps: 8 }), seed + 823, 0.4, 0.2),
+  ];
+}
+
+/** A fan with ridges: the hinge is the only point they share. */
+function shell(seed: number): GlyphStroke[] {
+  const fan = arc(12, 17.2, 8.2, Math.PI * 1.08, Math.PI * 1.92, 18);
+  const strokes = [stroke([...fan, [18.4, 17.2], [5.6, 17.2]], seed, 2, 0.3)];
+  for (let i = 0; i < 3; i++) {
+    const angle = Math.PI * 1.2 + (Math.PI * 0.6 * i) / 2;
+    strokes.push(
+      stroke(
+        [
+          [12, 17.2],
+          [12 + Math.cos(angle) * 7.2, 17.2 + Math.sin(angle) * 7.2],
+        ],
+        seed + 300 + i * 97,
+        0.4,
+        0.2,
+      ),
+    );
+  }
+  return strokes;
+}
+
+/** A body and a tail; the fin is what tells it from a leaf. */
+function fish(seed: number): GlyphStroke[] {
+  return [
+    stroke(ellipse(11.4, 12, 6.2, 3.4), seed, 2, 0.3),
+    stroke(
+      corner([[17.2, 12], [21.4, 8.4], [21.4, 15.6], [17.2, 12]], 0.82),
+      seed + 211,
+      1.2,
+      0.28,
+    ),
+    stroke(line([8.2, 10.4], [10.2, 8.4], 3), seed + 431, 0.4, 0.2),
+  ];
+}
+
+/** Four wings from the same body, then the antennae. */
+function butterfly(seed: number): GlyphStroke[] {
+  const wing = (to: Point, offset: number) =>
+    stroke(blade([12, 11.8], to, 3.2, { steps: 12, skew: 0.9 }), seed + offset, 1, 0.26);
+  return [
+    stroke(line([12, 6.8], [12, 17.4], 4), seed, 0.8, 0.22),
+    wing([4.4, 6.2], 137),
+    wing([19.6, 6.2], 274),
+    wing([4.8, 18], 411),
+    wing([19.2, 18], 548),
+    stroke(line([12, 6.8], [9.4, 3.4], 3), seed + 900, 0.3, 0.2),
+    stroke(line([12, 6.8], [14.6, 3.4], 3), seed + 1011, 0.3, 0.2),
+  ];
+}
+
+/** A body with stripes and two wings folded over it. */
+function bee(seed: number): GlyphStroke[] {
+  return [
+    stroke(ellipse(12, 14, 5.4, 3.4, 22), seed, 2, 0.28),
+    stroke(line([8.2, 12.2], [8.8, 15.8], 3), seed + 211, 0.4, 0.2),
+    stroke(line([12, 10.8], [12, 17.2], 3), seed + 431, 0.4, 0.2),
+    stroke(line([15.8, 12.2], [15.2, 15.8], 3), seed + 647, 0.4, 0.2),
+    stroke(arc(9.2, 10.4, 2.8, Math.PI * 1.05, Math.PI * 1.95, 12), seed + 823, 0.5, 0.2),
+    stroke(arc(14.8, 10.4, 2.8, Math.PI * 1.05, Math.PI * 1.95, 12), seed + 1011, 0.5, 0.2),
+    stroke(line([6.6, 14], [4.8, 14.6], 3), seed + 1201, 0.3, 0.2),
+  ];
+}
+
+/** One spiral shell and the foot it travels on. */
+function snail(seed: number): GlyphStroke[] {
+  const shell = sample(40, (t) => {
+    const angle = TAU * 1.8 * t;
+    const r = 1.8 + 5.2 * t;
+    return [11.4 + Math.cos(angle) * r, 12.2 + Math.sin(angle) * r] as Point;
+  });
+  return [
+    stroke(shell, seed, 1.8, 0.28),
+    stroke(
+      sample(10, (t) => [3.4 + 15.4 * t, 18.4 + Math.sin(Math.PI * t) * 1.2] as Point),
+      seed + 211,
+      1,
+      0.22,
+    ),
+    stroke(line([12.4, 18.4], [15.2, 16.2], 3), seed + 431, 0.4, 0.2),
+    stroke(line([12.4, 18.4], [14.2, 14.8], 3), seed + 647, 0.4, 0.2),
+  ];
 }
 
 /* ---- small things ------------------------------------------------------- */
@@ -644,6 +994,179 @@ function bridge(seed: number): GlyphStroke[] {
   ];
 }
 
+/** A cover, a spine, and three lines of writing. */
+function book(seed: number): GlyphStroke[] {
+  return [
+    stroke(
+      corner([[5, 5.2], [19, 5.2], [19, 19.8], [5, 19.8], [5, 5.2]], 0.9),
+      seed,
+      2.2,
+      0.3,
+    ),
+    stroke(line([8.2, 5.4], [8.2, 19.6], 4), seed + 211, 0.7, 0.24),
+    stroke(line([10.4, 9], [16.8, 9], 3), seed + 431, 0.35, 0.2),
+    stroke(line([10.4, 12.2], [16.8, 12.2], 3), seed + 617, 0.35, 0.2),
+    stroke(line([10.4, 15.4], [15.2, 15.4], 3), seed + 823, 0.35, 0.2),
+  ];
+}
+
+/** A page with lines and a folded corner. */
+function letter(seed: number): GlyphStroke[] {
+  return [
+    stroke(
+      corner([[5.6, 4.2], [18.4, 4.2], [18.4, 19.8], [5.6, 19.8], [5.6, 4.2]], 0.9),
+      seed,
+      2,
+      0.3,
+    ),
+    stroke(line([8.2, 8.4], [15.8, 8.4], 3), seed + 211, 0.35, 0.2),
+    stroke(line([8.2, 11.8], [15.8, 11.8], 3), seed + 431, 0.35, 0.2),
+    stroke(line([8.2, 15.2], [13.6, 15.2], 3), seed + 617, 0.35, 0.2),
+    stroke(corner([[14.2, 19.8], [18.4, 15.6], [18.4, 19.8]], 0.8), seed + 823, 0.5, 0.2),
+  ];
+}
+
+/** The rectangle and the flap; nothing else is needed. */
+function envelope(seed: number): GlyphStroke[] {
+  return [
+    stroke(
+      corner([[3.8, 6.2], [20.2, 6.2], [20.2, 18.2], [3.8, 18.2], [3.8, 6.2]], 0.9),
+      seed,
+      2,
+      0.3,
+    ),
+    stroke(corner([[4.4, 6.6], [12, 13.2], [19.6, 6.6]], 0.86), seed + 211, 1.2, 0.28),
+    stroke(line([4.4, 17.8], [9.8, 12.8], 3), seed + 431, 0.4, 0.2),
+    stroke(line([19.6, 17.8], [14.2, 12.8], 3), seed + 617, 0.4, 0.2),
+  ];
+}
+
+/** A long body, a tip, and the line where the eraser starts. */
+function pencil(seed: number): GlyphStroke[] {
+  return [
+    stroke(
+      corner([[7.2, 18.8], [16.8, 9.2], [19.2, 11.6], [9.6, 21.2], [7.2, 18.8]], 0.9),
+      seed,
+      2,
+      0.3,
+    ),
+    stroke(corner([[7.2, 18.8], [4.2, 22.2], [9.6, 21.2]], 0.84), seed + 211, 0.8, 0.24),
+    stroke(line([15.2, 10.8], [17.6, 13.2], 3), seed + 431, 0.4, 0.2),
+  ];
+}
+
+/** Two blades crossing, two handles below. */
+function scissors(seed: number): GlyphStroke[] {
+  return [
+    stroke(line([6.2, 4.2], [17.8, 17.8], 4), seed, 1.6, 0.28),
+    stroke(line([17.8, 4.2], [6.2, 17.8], 4), seed + 211, 1.6, 0.28),
+    stroke(
+      arc(5.4, 19.4, 2.4, -Math.PI * 0.2, Math.PI * 1.8, 14),
+      seed + 431,
+      0.7,
+      0.24,
+    ),
+    stroke(
+      arc(18.6, 19.4, 2.4, -Math.PI * 0.8, Math.PI * 1.2, 14),
+      seed + 647,
+      0.7,
+      0.24,
+    ),
+  ];
+}
+
+/** A shade, a stem, and a base. */
+function lamp(seed: number): GlyphStroke[] {
+  return [
+    stroke(
+      corner([[6.2, 8.6], [17.8, 8.6], [15.4, 3.2], [8.6, 3.2], [6.2, 8.6]], 0.88),
+      seed,
+      2.2,
+      0.3,
+    ),
+    stroke(line([12, 8.8], [12, 19.2], 5), seed + 211, 0.8, 0.24),
+    stroke(line([7.2, 20.2], [16.8, 20.2], 4), seed + 431, 0.7, 0.24),
+    stroke(line([10.2, 8.4], [13.8, 8.4], 3), seed + 617, 0.35, 0.2),
+  ];
+}
+
+/** A dome, a rim, a clapper, and the loop on top. */
+function bell(seed: number): GlyphStroke[] {
+  const dome = arc(12, 12, 6.2, Math.PI, TAU, 18);
+  return [
+    stroke([...dome, [18.2, 12.2], [5.8, 12.2]], seed, 2.4, 0.32),
+    stroke(line([5.6, 12.2], [18.4, 12.2], 4), seed + 211, 0.7, 0.24),
+    stroke(arc(12, 14.4, 1.6, 0, TAU * 1.03, 10), seed + 431, 0.5, 0.2),
+    stroke(arc(12, 4.6, 1.2, 0, TAU * 1.03, 8), seed + 617, 0.35, 0.2),
+  ];
+}
+
+/** A canopy, a shaft, and the hook that makes it carry. */
+function umbrella(seed: number): GlyphStroke[] {
+  const canopy = arc(12, 12, 8.2, Math.PI, TAU, 22);
+  return [
+    stroke([...canopy, [20.2, 12.2], [3.8, 12.2]], seed, 2.4, 0.32),
+    stroke(line([3.8, 12.2], [20.2, 12.2], 5), seed + 211, 0.7, 0.24),
+    stroke(line([12, 12], [12, 19], 5), seed + 431, 0.7, 0.24),
+    stroke(arc(9.6, 19, 2.4, 0, Math.PI, 10), seed + 617, 0.6, 0.22),
+  ];
+}
+
+/** Two rails and four rungs. */
+function ladder(seed: number): GlyphStroke[] {
+  const strokes = [
+    stroke(line([7.2, 3.4], [7.2, 21], 5), seed, 1, 0.24),
+    stroke(line([16.8, 3.4], [16.8, 21], 5), seed + 211, 1, 0.24),
+  ];
+  for (let i = 0; i < 4; i++) {
+    const y = 7.2 + i * 4.4;
+    strokes.push(
+      stroke(line([7.2, y], [16.8, y], 3), seed + 400 + i * 83, 0.35, 0.2),
+    );
+  }
+  return strokes;
+}
+
+/** Ring, shaft, crossbar, and the U that holds the ground. */
+function anchor(seed: number): GlyphStroke[] {
+  const hook = arc(12, 13.2, 7.8, Math.PI * 0.05, Math.PI * 0.95, 18);
+  return [
+    stroke(arc(12, 4.6, 2.2, -1.3, -1.3 + TAU * 1.04, 12), seed, 0.9, 0.24),
+    stroke(line([12, 6.8], [12, 20.6], 5), seed + 211, 1.2, 0.24),
+    stroke(line([7.2, 10.2], [16.8, 10.2], 4), seed + 431, 0.7, 0.24),
+    stroke(hook, seed + 617, 1.2, 0.26),
+  ];
+}
+
+/** A face, a needle, and four ticks. */
+function compass(seed: number): GlyphStroke[] {
+  const strokes = [
+    stroke(arc(12, 12, 8.6, -1.2, -1.2 + TAU * 1.04, 28), seed, 2.4, 0.34),
+    stroke(
+      corner([[12, 5.8], [14.4, 12], [12, 18.2], [9.6, 12], [12, 5.8]], 0.82),
+      seed + 211,
+      1.2,
+      0.26,
+    ),
+    stroke(arc(12, 12, 1.2, 0, TAU * 1.03, 8), seed + 431, 0.3, 0.2),
+  ];
+  for (let i = 0; i < 4; i++) {
+    const angle = (Math.PI / 2) * i;
+    strokes.push(
+      stroke(
+        [
+          [12 + Math.cos(angle) * 7.2, 12 + Math.sin(angle) * 7.2],
+          [12 + Math.cos(angle) * 9.2, 12 + Math.sin(angle) * 9.2],
+        ],
+        seed + 600 + i * 71,
+        0.3,
+        0.2,
+      ),
+    );
+  }
+  return strokes;
+}
+
 /* ---- shapes that mean something ----------------------------------------- */
 
 /** The usual parametric heart, started at the notch and closed with overshoot. */
@@ -734,21 +1257,51 @@ const BUILDERS: Record<GlyphName, (seed: number) => GlyphStroke[]> = {
   lightning,
   rainbow,
   wind,
+  fog,
+  hail,
+  sunrise,
+  comet,
+  eclipse,
+  puddle,
   leaf,
   sprout,
   tree,
   flower,
   mountain,
+  seed,
+  root,
+  mushroom,
+  cactus,
+  pine,
+  bud,
   wave,
   drop,
   boat,
   bird,
   feather,
+  ripple,
+  island,
+  shell,
+  fish,
+  butterfly,
+  bee,
+  snail,
   cup,
   candle,
   key,
   window,
   bridge,
+  book,
+  letter,
+  envelope,
+  pencil,
+  scissors,
+  lamp,
+  bell,
+  umbrella,
+  ladder,
+  anchor,
+  compass,
   heart,
   spiral,
   arrow,
