@@ -1,0 +1,209 @@
+# Inkling — technical notes
+
+[← Back to the README](../README.md)
+
+The argument is in the README. This file is the craft: how the page writes, how the
+drawings are made, and what it takes to keep the illusion from becoming a loading
+screen.
+
+---
+
+## Two backends, one clock
+
+The interesting problem: **you cannot animate Hangul handwriting the way tutorials
+animate signatures.**
+
+The usual trick is `stroke-dashoffset` along a font's outline. That traces the
+*contour* of a letter, not the letter — it looks like someone shading in an outline,
+and it needs per-glyph stroke data that simply does not exist for 11,172 Hangul
+syllables.
+
+So Inkling runs **two backends on one clock**:
+
+| What | Technique | Why |
+|---|---|---|
+| **Text** | Per-grapheme animated `clip-path` over a real handwriting face | Works identically in Korean and English, at any font size, for any string |
+| **Marks and drawings** | `stroke-dashoffset` along a generated path | These *have* real paths, so the pen genuinely moves |
+
+What sells the illusion is the timing, not the technique:
+
+- **Per-character duration** from script and stroke count — a Hangul syllable is
+  three or four strokes stacked into one square, so it takes longer than an `a`.
+  Weights shape the rhythm; the total is then normalised, so `cpm` means the same
+  thing in every script.
+- **±18% jitter** from a seeded hash. Irregular, but frozen per character — a
+  re-render must never make the line twitch.
+- **Pen lifts** after spaces, longer rests at commas and full stops. The page
+  appears to think mid-sentence. These are written against one fixed reference hand
+  and scale from there, so the tempo is a single number rather than letters plus a
+  fixed tax: left absolute, the rests would have been a fifth of a quick reply.
+- **Wet ink** that dries to its resting tone over the following second.
+- **Nothing in front of the reveal.** No nib, no caret, no leading marker of any
+  kind.
+
+At `normal` a character takes 50ms and a two-sentence Korean reply lands in **2.9s**,
+down from 5.9s — exactly 2.00× at every one of the three settings, because the rests
+moved with the letters. Well past what a real hand can do, deliberately: what has to
+survive is the sense of being written to, and that lives in the per-character rhythm
+rather than in the total.
+
+Marks are drawn *after* the sentence is finished, the way a person marks. A
+hand-drawn circle's giveaway is that it passes its own starting point instead of
+meeting it, so it sweeps 1.08 turns.
+
+---
+
+## Riddle draws
+
+Not only writes. Riddle asks for a drawing by name — `[[rain]]`, `[[knot]]`,
+`[[hourglass]]` — and the same `stroke-dashoffset` engine that draws the circles
+draws it, stroke by stroke, in the order a hand would make them.
+
+A fixed vocabulary of **sixty** rather than free-form SVG, for two reasons.
+**Reliability:** paths a model invents come out broken or ugly and there is no way
+to know which until it is on the paper. **Safety:** a name is looked up in a table,
+so nothing the model writes can reach the renderer as markup.
+
+The vocabulary now covers weather, growing things, water and air, small objects, and
+a few shapes that mean something. The full set, the contact sheet, and the rules for
+adding to it live in [the drawing vocabulary](GLYPHS.md).
+
+A drawing takes **one character's room in the line** but nothing like one character's
+time. It sits outside the script normalisation — that exists to hold Korean and
+English to the same tempo, and a drawing is neither script; folded in, it would be
+squeezed into a letter's worth of time while every letter beside it stretched to make
+room. So it gets its own duration, which scales with the hand, and strokes share it
+by weight: a sun's disc takes longer than one of its rays.
+
+Because it occupies a real slot in the line, text wraps around it and a mark can be
+measured against it — **Riddle can circle its own drawing.** And a line holding
+nothing but drawings is drawn at nearly three times the size, because a drawing that
+*is* the reply should not arrive at the size of a letter. The extra time for that
+comes from the layout, not from CSS: stretched in the renderer, the node would report
+itself finished with a stroke still going.
+
+The first pass at the vocabulary had five drawings that were wrong in ways no test
+could see. That story is in the README's *What the making taught us*.
+
+---
+
+## Streaming into a hand
+
+A model streams faster than a hand writes. Characters therefore **mount when their
+turn comes** rather than carrying CSS delays — that is what lets a growing reply
+extend a node without re-timing the words already on the paper.
+
+---
+
+## Fading
+
+One CSS animation per word, staggered in writing order, with its play state driven
+by an inherited `--fade-state` custom property. Pausing the entire page is a single
+variable write. Clean-up hangs off `animationend` rather than a timer, so a paused
+fade also pauses its own removal.
+
+**Measured:** 3,504 character spans and 6,066 DOM nodes render at a **16.7ms median
+frame**, p95 16.8ms, two frames over 32ms out of 590.
+
+---
+
+## Four hands
+
+Each hand is a Latin face plus a Hangul one, so a line that mixes scripts still reads
+as one person wrote it — the Latin face comes first in the stack and Hangul falls
+through by unicode-range.
+
+| Hand | Latin | Hangul |
+|---|---|---|
+| Ballpoint | Caveat | Gaegu |
+| Nib | Shadows Into Light | Nanum Pen Script |
+| Brush | Kalam | Nanum Brush Script |
+| Print | Patrick Hand | Hi Melody |
+
+These faces disagree about x-height, so each carries a scale factor; the correction
+lives on `.ink-line` rather than the node, which keeps `1em` resolving to the size
+the caller asked for. The choice travels in a cookie next to the theme, so a chosen
+hand is there in the first paint instead of swapping in after hydration.
+
+---
+
+## The conversation, mechanically
+
+### Knowing when it leaves your hands
+
+Handwriting has no Enter key, and the old build hid the hand-over button until a
+stroke existed — so there was nothing to discover and then nothing happened. Now the
+button is always there, dimmed until there is something to give it. **Stop writing
+and a ring fills around it over four seconds, then the page takes the entry.** Every
+stroke, erase and undo puts the ring back to zero, and **Not yet** drops that entry to
+manual for as long as you like.
+
+The ring is deliberately excluded from the `prefers-reduced-motion` shortening that
+every other animation gets: a countdown that completes instantly is a lie about when
+your writing leaves.
+
+### Handwriting as an image
+
+Handwriting is sent to `gpt-5.4-mini` as an image — no OCR service, and Korean and
+English both just work. The model reads it and replies in one call, emitting a single
+leading `READ: …` line with its transcription. The server splits that off the token
+stream: it becomes conversational context, but it is **never drawn**, so what stays
+on the page is your hand, not a machine's rendering of it.
+
+### InkScript
+
+Marks and drawings travel as inline markup inside the stream, so they can be parsed
+incrementally:
+
+```
+__text__     underline
+((text))     circle it
+==text==     highlighter
+[[star]]     draw one of the sixty
+```
+
+The parser has one hard requirement — **the plain text it emits must be a stable
+prefix**. A character already written can never move or disappear. An unclosed opener
+is therefore treated as a mark that is still growing, not as literal text.
+
+A drawing cannot do that: half a name is not half a drawing. An unclosed `[[`
+truncates the text until its `]]` arrives, and once the stream is over it is nothing
+special, just characters. The lone `[` at the end of a chunk cannot be trimmed off
+the tail the way a half-marker is, either — that would eat the second bracket of a
+`[[` and leave the first looking ordinary.
+
+---
+
+## Layout
+
+```
+src/
+├─ app/
+│  ├─ api/converse/   the only server endpoint — SSE, stateless
+│  ├─ about/          the research note
+│  ├─ lab/            ink engine testbed
+│  ├─ icon.*          the mark, as favicon / PWA icon / social card
+│  ├─ ink.css         the animation layer
+│  └─ globals.css     design tokens, themes, the four hands
+├─ components/
+│  ├─ ink/            InkText, InkStrokes, MarkLayer, InkGlyph, the reveal scheduler
+│  ├─ page/           Diary, Composer, InkCanvas, IntroNote, Transcript
+│  └─ chrome/         header, toggles, hand picker, settings sheet
+├─ lib/
+│  ├─ ink/            segmentation, timing, dwell, mark and glyph geometry, strokes
+│  ├─ ai/             prompt, InkScript parser, reading splitter, transport
+│  ├─ i18n/           ko/en dictionaries
+│  └─ prefs/          cookie + localStorage preferences
+└─ store/session.ts   turns (fade away), history (does not), the turn gate
+```
+
+Every icon in the app — favicon, PWA icon, social card — is rendered from the one
+drawing in [`docs/media/mark.svg`](media/mark.svg): three written lines thinning out,
+and a nib still resting on the first.
+
+Pure logic is unit-tested — segmentation, timing, geometry, the incremental parser,
+the rate limiter. The animation itself is verified by looking at it, against `/lab`.
+
+---
+
+[← Back to the README](../README.md)
