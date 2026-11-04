@@ -33,6 +33,11 @@ hand. Then both of you fade off the paper, and nothing is kept.
 - [The artifact](#the-artifact) · [Research](#research-framing) · [Design value](#design-value) · [Expected outcomes](#expected-outcomes)
 - [What we did not build](#what-we-deliberately-did-not-build) · [Run it](#quick-start) · [Technical notes](docs/INK.md) · [Full research](docs/RESEARCH.md)
 
+> **If you have five minutes:** read [The provocation](#the-provocation),
+> [Design value](#design-value), and
+> [What we deliberately did not build](#what-we-deliberately-did-not-build). The
+> technical notes are in [docs/INK.md](docs/INK.md).
+
 ---
 
 ## 🕯️ The provocation
@@ -204,8 +209,30 @@ design** about accumulation.
 | **Expressive writing** — Pennebaker & Beall, 1986 | Background for writing a day down. Not a claim of clinical efficacy. |
 | **ELIZA** — Weizenbaum, 1966 | The long history of projecting a listener into a machine. |
 
-The full reference list, method, and limitations are in
-[docs/RESEARCH.md](docs/RESEARCH.md).
+The extended method and limitations are in [docs/RESEARCH.md](docs/RESEARCH.md).
+The full reference list is below.
+
+<details>
+<summary><strong>References</strong> — 16 sources, ACM style</summary>
+
+1. Liam J. Bannon. 2006. Forgetting as a Feature, Not a Bug: The Duality of Memory and Implications for Ubiquitous Computing. *CoDesign* 2, 1 (2006), 3–15. https://doi.org/10.1080/15710880600608230
+2. Jeffrey Bardzell and Shaowen Bardzell. 2013. What is "critical" about critical design? In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '13). ACM, New York, NY, USA, 3297–3306. https://doi.org/10.1145/2470654.2466451
+3. Timothy W. Bickmore and Rosalind W. Picard. 2005. Establishing and Maintaining Long-Term Human-Computer Relationships. *ACM Transactions on Computer-Human Interaction* 12, 2 (2005), 293–327. https://doi.org/10.1145/1067860.1067867
+4. Kirsten Boehner, Janet Vertesi, Phoebe Sengers, and Paul Dourish. 2007. How HCI Interprets the Probes. In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '07). ACM, New York, NY, USA, 1077–1086. https://doi.org/10.1145/1240624.1240789
+5. Carl DiSalvo. 2012. *Adversarial Design*. MIT Press, Cambridge, MA.
+6. Tanja Döring, Axel Sylvester, and Albrecht Schmidt. 2013. A Design Space for Ephemeral User Interfaces. In *Proceedings of the 7th International Conference on Tangible, Embedded and Embodied Interaction* (TEI '13). ACM, New York, NY, USA, 75–82. https://doi.org/10.1145/2460625.2460637
+7. Anthony Dunne and Fiona Raby. 2013. *Speculative Everything: Design, Fiction, and Social Dreaming*. MIT Press, Cambridge, MA.
+8. William Gaver. 2012. What Should We Expect from Research through Design? In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '12). ACM, New York, NY, USA, 937–946. https://doi.org/10.1145/2207676.2208538
+9. Barbara Grosse-Hering, Jon Mason, Dzmitry Aliakseyeu, Conny Bakker, and Pieter Desmet. 2013. Slow Design for Meaningful Interactions. In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '13). ACM, New York, NY, USA, 3431–3440. https://doi.org/10.1145/2470654.2466472
+10. Lars Hallnäs and Johan Redström. 2001. Slow Technology – Designing for Reflection. *Personal and Ubiquitous Computing* 5, 3 (2001), 201–212. https://doi.org/10.1007/PL00000019
+11. Clifford Nass and Youngme Moon. 2000. Machines and Mindlessness: Social Responses to Computers. *Journal of Social Issues* 56, 1 (2000), 81–103. https://doi.org/10.1111/0022-4537.00153
+12. William Odom, Abigail Sellen, Richard Banks, David Kirk, Tim Regan, Mark Selby, Jodi Forlizzi, and Jonathan Zimmerman. 2014. Designing for Slowness, Anticipation and Re-visitation: A Long Term Field Study of the Photobox. In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '14). ACM, New York, NY, USA, 1961–1970. https://doi.org/10.1145/2556288.2557178
+13. James W. Pennebaker and Sandra K. Beall. 1986. Confronting a Traumatic Event: Toward an Understanding of Inhibition and Disease. *Journal of Abnormal Psychology* 95, 3 (1986), 274–281. https://doi.org/10.1037/0021-843X.95.3.274
+14. Phoebe Sengers, Kirsten Boehner, Shay David, and Joseph 'Jofish' Kaye. 2005. Reflective Design. In *Proceedings of the 4th Decennial Conference on Critical Computing: Between Sense and Sensibility* (CC '05). ACM, New York, NY, USA, 49–58. https://doi.org/10.1145/1094562.1094569
+15. Joseph Weizenbaum. 1966. ELIZA—A Computer Program for the Study of Natural Language Communication between Man and Machine. *Communications of the ACM* 9, 1 (1966), 36–45. https://doi.org/10.1145/365153.365168
+16. John Zimmerman, Jodi Forlizzi, and Shelley Evenson. 2007. Research through Design as a Method for Interaction Design Research in HCI. In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '07). ACM, New York, NY, USA, 493–502. https://doi.org/10.1145/1240624.1240704
+
+</details>
 
 ---
 
@@ -231,41 +258,24 @@ A provocation keeps it open.
 
 ## 🧪 Expected outcomes
 
-### Design outcomes
+### What the artifact leaves behind
 
-- A small vocabulary for designing **forgetting** in conversational AI: absorb,
-  dwell, clear, hold, hand back.
-- A working demonstration that **ephemerality and accessibility can be designed
-  together**, rather than treated as opposites.
-- A counter-narrative to memory-first AI that is concrete enough to critique.
-- A reusable visual and interaction language: the hand, the mark, the drawing, the
-  page that clears.
+| Design outcomes | Research outcomes |
+|---|---|
+| A vocabulary for designing **forgetting** in conversational AI: absorb, dwell, clear, hold, hand back. | **Testable hypotheses** about disappearance, waiting, embodiment, ritual, and memory. |
+| A working demonstration that **ephemerality and accessibility can be designed together**, not treated as opposites. | A method for evaluating a provocation with **technical measurement plus autoethnography**, without pretending it is a clinical trial. |
+| A counter-narrative to memory-first AI that is concrete enough to critique. | A discussion piece for design research, HCI, and AI ethics about what a non-extractive conversational artifact could be. |
+| A reusable visual language: the hand, the mark, the drawing, the page that clears. | A public artifact that can be taught, forked, and argued with. |
 
-### Research outcomes
+### What would count as success, and what would not
 
-- A set of **testable hypotheses** about disappearance, waiting, embodiment, ritual,
-  and memory.
-- A method for evaluating a provocation with **technical measurement plus
-  autoethnography**, without pretending it is a clinical trial.
-- A discussion piece for design research, HCI, and AI ethics about what a
-  non-extractive conversational artifact could be.
-
-### What would count as success
-
-- Designers begin to treat memory as a choice rather than a default.
-- Readers describe the page as listening, not as generating.
-- The waiting is read as writing, not as loading.
-- The artifact generates interpretations the designer did not plan.
-- The vocabulary travels: someone else uses "absorb", "hold", "hand back" in a
-  different project.
-
-### What would count as failure
-
-- It is read as a gimmick, a skin over a chatbot.
-- The disappearance is read as a bug, or as something to fix with history.
-- The waiting is read as a slow loading screen.
-- It becomes a product that adds memory to keep people coming back.
-- It claims therapeutic benefit it cannot support.
+| Success | Failure |
+|---|---|
+| Designers treat memory as a choice, not a default. | It reads as a gimmick, a skin over a chatbot. |
+| Readers describe the page as listening, not generating. | Disappearance reads as a bug, or as something to fix with history. |
+| Waiting reads as writing, not loading. | Waiting reads as a slow loading screen. |
+| The artifact generates interpretations the designer did not plan. | It becomes a product that adds memory to keep people coming back. |
+| The vocabulary travels to other projects. | It claims therapeutic benefit it cannot support. |
 
 ### Hypotheses
 
