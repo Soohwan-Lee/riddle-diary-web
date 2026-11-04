@@ -78,3 +78,42 @@ describe("whenPaperClears", () => {
     expect(opened).toBe(true);
   });
 });
+
+describe("handwritten readings", () => {
+  beforeEach(reset);
+
+  it("keeps the reading after the strokes have faded off the paper", () => {
+    const id = useSession.getState().addUserTurn({
+      raw: "",
+      strokes: [[[1, 2, 0.5]]],
+    });
+    // Blank-page mode absorbs the entry long before the model's READ line
+    // arrives; the turn is already gone by the time the transcript lands.
+    useSession.getState().removeTurn(id);
+    useSession.getState().setUserTranscript(id, "오늘은 좀 지쳤어요");
+
+    expect(useSession.getState().history).toEqual([
+      { role: "user", content: "오늘은 좀 지쳤어요" },
+    ]);
+  });
+
+  it("does not remember the same reading twice", () => {
+    const id = useSession.getState().addUserTurn({
+      raw: "",
+      strokes: [[[1, 2, 0.5]]],
+    });
+    useSession.getState().setUserTranscript(id, "한 번만");
+    useSession.getState().setUserTranscript(id, "한 번만");
+
+    expect(useSession.getState().history).toHaveLength(1);
+  });
+
+  it("ignores a reading for a typed entry", () => {
+    const id = useSession.getState().addUserTurn({ raw: "typed" });
+    useSession.getState().setUserTranscript(id, "should not be added");
+
+    expect(useSession.getState().history).toEqual([
+      { role: "user", content: "typed" },
+    ]);
+  });
+});

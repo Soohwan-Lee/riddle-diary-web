@@ -83,6 +83,16 @@ type SessionState = {
 /** Keeps the request payload bounded without truncating mid-conversation. */
 const MAX_HISTORY_TURNS = 24;
 
+/**
+ * Which turns arrived as handwriting, and which readings have already been
+ * folded into history. The turn itself can be gone from the paper before the
+ * model's `READ:` line arrives — in blank-page mode the entry sinks in about
+ * a second and the reading often takes longer — so the turn's presence is not
+ * a reliable marker of whether its words still need to be remembered.
+ */
+const handwrittenTurns = new Set<string>();
+const transcribedTurns = new Set<string>();
+
 function newId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
@@ -104,6 +114,7 @@ export const useSession = create<SessionState>()((set) => ({
 
   addUserTurn: ({ raw, strokes, clearPage }) => {
     const id = newId();
+    if (strokes) handwrittenTurns.add(id);
     set((state) => ({
       turns: [
         // Whatever was on the paper is no longer waiting for anything: the
@@ -155,16 +166,18 @@ export const useSession = create<SessionState>()((set) => ({
     }),
 
   // A handwritten turn keeps showing the reader's own strokes; only the
-  // remembered history gains the words the page read in them.
+  // remembered history gains the words the page read in them. It has to work
+  // after the turn has faded, which in blank-page mode is usually before the
+  // reading arrives.
   setUserTranscript: (id, transcript) =>
     set((state) => {
-      const turn = state.turns.find((entry) => entry.id === id);
-      if (!turn || turn.raw || !transcript.trim()) return state;
+      const text = transcript.trim();
+      if (!text || !handwrittenTurns.has(id) || transcribedTurns.has(id)) {
+        return state;
+      }
+      transcribedTurns.add(id);
       return {
-        history: trimHistory([
-          ...state.history,
-          { role: "user", content: transcript },
-        ]),
+        history: trimHistory([...state.history, { role: "user", content: text }]),
       };
     }),
 
@@ -272,8 +285,11 @@ export const useSession = create<SessionState>()((set) => ({
 
   setError: (message) => set({ error: message }),
 
-  clearAll: () =>
-    set({ turns: [], history: [], status: "idle", error: null }),
+  clearAll: () => {
+    handwrittenTurns.clear();
+    transcribedTurns.clear();
+    set({ turns: [], history: [], status: "idle", error: null });
+  },
 }));
 
 /**
