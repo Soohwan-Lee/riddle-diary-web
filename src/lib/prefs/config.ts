@@ -11,7 +11,8 @@ export const THEME_COOKIE = "inkling.theme";
 
 export const INPUT_MODES = ["hand", "type"] as const;
 export type InputMode = (typeof INPUT_MODES)[number];
-export const DEFAULT_INPUT_MODE: InputMode = "type";
+/** The pen is the intended first experience; the keyboard is the fallback. */
+export const DEFAULT_INPUT_MODE: InputMode = "hand";
 export const MODE_COOKIE = "inkling.mode";
 
 /**
