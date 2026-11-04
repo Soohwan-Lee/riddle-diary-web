@@ -566,7 +566,7 @@ the README says plainly what that does and does not cover.
 caret at handwriting sizes, which is the one thing this page must never look like.
 Removing it made the writing feel more like writing.
 
-**The accessibility audit found 0 violations across thirteen states**, but the
+**The v1 accessibility audit found 0 violations across thirteen states**, but the
 interesting work was not the score. It was the live region, the drawing labels, the
 reduced-motion path, and the decision not to pretend the canvas is keyboard-operable.
 
