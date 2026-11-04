@@ -66,7 +66,7 @@ accepts writing while the page is still asking its question.
 
 ## What Riddle draws
 
-`[[name]]` in InkScript asks for one of the thirty glyphs in `lib/ink/glyph.ts`.
+`[[name]]` in InkScript asks for one of the sixty glyphs in `lib/ink/glyph.ts`.
 A fixed vocabulary, not free-form SVG: model-invented paths are unreliable, and
 a name looked up in a table cannot carry markup into the renderer.
 
@@ -87,9 +87,9 @@ a name looked up in a table cannot carry markup into the renderer.
   without the label a screen reader hears nothing, without the prompt line the
   drawing is never asked for.
 - Shapes are verified by rendering a contact sheet and looking at it. Four of
-  the thirty were wrong in ways no test can see: a cloud that was a mountain
-  range, a crescent that was a lens, a teardrop that was a gem, an arch that
-  was a hammock.
+  the first thirty were wrong in ways no test can see: a cloud that was a
+  mountain range, a crescent that was a lens, a teardrop that was a gem, an
+  arch that was a hammock. The contact sheet is `docs/media/glyphs.png`.
 
 ## Someday: memory, not transcript
 

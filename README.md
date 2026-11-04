@@ -60,6 +60,14 @@ artifact**: a small, working counter-proposal to the idea that a conversational 
 should accumulate everything. It is closer to an interaction probe for looking back
 at a day than to a product with a roadmap of retention features.
 
+### Why this is critical design
+
+Critical design does not predict a better product; it makes a familiar assumption
+visible by building its opposite. The assumption here is that a conversational AI
+should remember. Inkling builds the opposite and asks what changes: in the writing,
+in the waiting, in what someone is willing to say. The artifact is the argument; the
+code is the material.
+
 ---
 
 ## 🧭 What we kept, what we refused
@@ -188,7 +196,7 @@ A single-page web app, a single stateless server endpoint, and a lot of ink.
 | 🪶 | **Real handwriting animation.** Per-grapheme reveal in Korean and English, and no cursor in front of it |
 | 🖋️ | **Four handwriting faces**, each a Latin face paired with a Hangul one, chosen separately for you and for the page |
 | ✏️ | **Hand-drawn marks.** Underlines that flick, circles that overshoot their own start, a highlighter pass |
-| 🌤️ | **Riddle draws.** Thirty small things — weather, growing things, a cup, a key, a knot — stroke by stroke in the same hand |
+| 🌤️ | **Riddle draws.** Sixty small things — weather, growing things, water and air, small objects, a knot — stroke by stroke in the same hand |
 | ⏱️ | **Hand-over you can see coming.** Stop writing and a ring fills; any new stroke puts it back to zero |
 | ⏸️ | **Time that waits for you.** The clock stops while you write, while the tab is hidden, and while you hold the paper |
 | 🌗 | **Light · dark · system**, resolved server-side so nothing flashes |
@@ -209,6 +217,13 @@ animate signatures.**
 
 In one sentence: text is revealed one grapheme at a time over a real handwriting
 face; marks and drawings are drawn along real SVG paths. Both run on one clock.
+
+The craft is below. If you are here for the argument, the
+[research framing](#research-framing) is the section that matters; this one is for
+people who want to know how the illusion is made.
+
+<details>
+<summary><strong>Open the technical notes</strong> — timing, marks, drawings, fading, four hands</summary>
 
 The usual trick is `stroke-dashoffset` along a font's outline. That traces the
 *contour* of a letter, not the letter — it looks like someone shading in an outline,
@@ -254,21 +269,21 @@ Not only writes. Riddle asks for a drawing by name — `[[rain]]`, `[[knot]]`,
 `[[hourglass]]` — and the same `stroke-dashoffset` engine that draws the circles
 draws it, stroke by stroke, in the order a hand would make them.
 
-A fixed vocabulary of thirty rather than free-form SVG, for two reasons.
+A fixed vocabulary of sixty rather than free-form SVG, for two reasons.
 **Reliability:** paths a model invents come out broken or ugly and there is no way
 to know which until it is on the paper. **Safety:** a name is looked up in a table,
 so nothing the model writes can reach the renderer as markup.
 
 <div align="center">
-<img src="docs/media/glyphs.png" width="820" alt="Thirty hand-drawn glyphs: sun, moon, star, cloud, rain, snow, lightning, rainbow, wind, leaf, sprout, tree, flower, mountain, wave, drop, boat, bird, feather, cup, candle, key, window, bridge, heart, spiral, arrow, knot, clock, hourglass." />
+<img src="docs/media/glyphs.png" width="820" alt="A contact sheet of sixty hand-drawn glyphs: weather, growing things, water and air, small objects, and a few shapes that mean something." />
 <br/>
-<sub><i>The same wobble the marks use, so a drawing and a circle around a word look like one person's hand.</i></sub>
+<sub><i>The same wobble the marks use, so a drawing and a circle around a word look like one person's hand. · <a href="docs/media/glyphs.svg">vector source</a></i></sub>
 </div>
 
-Nine of these was a set of icons, not a vocabulary. Someone writing by hand reaches
-for a doodle when a sentence would say it worse, so the list now covers weather in
-six kinds, growing things, a few small objects to point at — and a knot, which is what
-going over the same thing again looks like.
+The first set was nine, which is a set of icons rather than a vocabulary. Someone
+writing by hand reaches for a doodle when a sentence would say it worse, so the list
+now covers weather, growing things, water and air, small objects, and a few shapes
+that mean something. A knot is still what going over the same thing again looks like.
 
 A drawing takes **one character's room in the line** but nothing like one character's
 time. It sits outside the script normalisation — that exists to hold Korean and
@@ -323,6 +338,8 @@ hand is there in the first paint instead of swapping in after hydration.
 
 ---
 
+</details>
+
 ## 🤝 The conversation
 
 <img src="docs/media/handwriting.jpg" width="820" alt="Handwriting mode: three lines of ink on a ruled surface, with pen, eraser, undo and clear on the left, and a countdown ring filling around the hand-over button on the right." />
@@ -353,7 +370,7 @@ incrementally:
 __text__     underline
 ((text))     circle it
 ==text==     highlighter
-[[star]]     draw one of the thirty
+[[star]]     draw one of the sixty
 ```
 
 The parser has one hard requirement — **the plain text it emits must be a stable
@@ -486,6 +503,8 @@ it is a deliberate friction placed on an AI interaction.
 | **Research through Design** — [Zimmerman et al., 2007](https://doi.org/10.1145/1240624.1240704); [Gaver, 2012](https://doi.org/10.1145/2207676.2208538) | The artifact is the contribution, not a demo of one. |
 | **Expressive writing** — [Pennebaker & Beall, 1986](https://doi.org/10.1037/0021-843X.95.3.274) | Background for writing a day down. Not a claim of clinical efficacy. |
 | **ELIZA** — [Weizenbaum, 1966](https://doi.org/10.1145/365153.365168) | The long history of projecting a listener into a machine. |
+| **Social responses to computers** — [Nass & Moon, 2000](https://doi.org/10.1111/0022-4537.00153) | Why a page that answers is read as someone, and why that is an ethical fact. |
+| **Relational agents** — [Bickmore & Picard, 2005](https://doi.org/10.1145/1067860.1067867) | The long history of designing for attachment; the line this artifact refuses to cross. |
 
 The artifact is not a clinical intervention and does not claim therapeutic outcomes.
 Pennebaker's work is a reason to take expressive writing seriously, not evidence that
@@ -495,11 +514,13 @@ this page works.
 
 - Bannon, L. J. (2006). Forgetting as a feature, not a bug: The duality of memory and implications for ubiquitous computing. *CoDesign, 2*(1), 3–15. https://doi.org/10.1080/15710880600608230
 - Bardzell, J., & Bardzell, S. (2013). What is "critical" about critical design? In *Proceedings of CHI '13* (pp. 3297–3306). ACM. https://doi.org/10.1145/2470654.2466451
+- Bickmore, T. W., & Picard, R. W. (2005). Establishing and maintaining long-term human-computer relationships. *ACM Transactions on Computer-Human Interaction, 12*(2), 293–327. https://doi.org/10.1145/1067860.1067867
 - Döring, T., Sylvester, A., & Schmidt, A. (2013). A design space for ephemeral user interfaces. In *Proceedings of TEI '13* (pp. 75–82). ACM. https://doi.org/10.1145/2460625.2460637
 - Dunne, A., & Raby, F. (2013). *Speculative everything: Design, fiction, and social dreaming*. MIT Press.
 - Gaver, W. (2012). What should we expect from research through design? In *Proceedings of CHI '12* (pp. 937–946). ACM. https://doi.org/10.1145/2207676.2208538
 - Grosse-Hering, B., Mason, J., Aliakseyeu, D., Bakker, C., & Desmet, P. (2013). Slow design for meaningful interactions. In *Proceedings of CHI '13* (pp. 3431–3440). ACM. https://doi.org/10.1145/2470654.2466472
 - Hallnäs, L., & Redström, J. (2001). Slow technology – Designing for reflection. *Personal and Ubiquitous Computing, 5*(3), 201–212. https://doi.org/10.1007/PL00000019
+- Nass, C., & Moon, Y. (2000). Machines and mindlessness: Social responses to computers. *Journal of Social Issues, 56*(1), 81–103. https://doi.org/10.1111/0022-4537.00153
 - Odom, W., Sellen, A., Banks, R., Kirk, D., Regan, T., Selby, M., Forlizzi, J., & Zimmerman, J. (2014). Designing for slowness, anticipation and re-visitation: A long term field study of the Photobox. In *Proceedings of CHI '14* (pp. 1961–1970). ACM. https://doi.org/10.1145/2556288.2557178
 - Pennebaker, J. W., & Beall, S. K. (1986). Confronting a traumatic event: Toward an understanding of inhibition and disease. *Journal of Abnormal Psychology, 95*(3), 274–281. https://doi.org/10.1037/0021-843X.95.3.274
 - Sengers, P., Boehner, K., David, S., & Kaye, J. (2005). Reflective design. In *Proceedings of the 4th Decennial Conference on Critical Computing* (pp. 49–58). ACM. https://doi.org/10.1145/1094562.1094569
@@ -638,7 +659,7 @@ and the film already showed us what that object does.
 
 ## 🗺️ Roadmap
 
-- [x] **Riddle draws** — thirty of them, through the same engine that draws the
+- [x] **Riddle draws** — sixty of them, through the same engine that draws the
       circles, and one on its own line is the whole reply
 - [x] **The page knows the hour** — a first line that follows the reader's local time
 - [x] **A listening beat** — a short pause and an ink drop before the first stroke

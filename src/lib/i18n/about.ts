@@ -46,7 +46,7 @@ const ko: AboutContent = {
         "답하는 쪽은 리들이라고 부릅니다. 리들은 조언하지 않습니다. 판단하지 않고, 해결하려 들지 않고, 요청받기 전에는 제안하지 않습니다. 대개 당신이 쓴 말 중 한 조각을 그대로 옮겨 적고, 많아야 하나의 질문을 남깁니다.",
         "그럼에도 아무도 없는 것처럼 느껴지지는 않기를 바랐습니다. 종이와 잉크라는 자기 자신에 대한 감각을 가끔 드러내되, 신비주의로 흐르지 않도록 절제했습니다.",
         "손으로 쓰는 존재는 길게 쓰지 못합니다. 답장이 길어야 세 문장인 것은 비용 절감이 아니라 설정에서 따라 나온 제약입니다.",
-        "가끔은 쓰는 대신 그립니다. 비, 새싹, 매듭, 모래시계 같은 서른 가지 중 하나를, 밑줄과 동그라미를 그리는 그 손으로. 문장이 더 나쁘게 말할 자리에서만이고, 그린 것을 설명하지는 않습니다. 아주 가끔은 그림 하나가 답장 전부이기도 합니다.",
+        "가끔은 쓰는 대신 그립니다. 비, 새싹, 매듭, 모래시계 같은 예순 가지 중 하나를, 밑줄과 동그라미를 그리는 그 손으로. 문장이 더 나쁘게 말할 자리에서만이고, 그린 것을 설명하지는 않습니다. 아주 가끔은 그림 하나가 답장 전부이기도 합니다.",
       ],
     },
     {
@@ -124,7 +124,7 @@ const en: AboutContent = {
         "The one who answers is called Riddle. Riddle does not advise, does not judge, does not try to fix, and suggests nothing before being asked. Usually it copies out one fragment of what you wrote and leaves at most one question.",
         "It should still not feel like nobody is there. It occasionally shows a first-person sense of being paper and ink, held back from tipping into mystique.",
         "Something writing by hand cannot write much. Replies are one to three short sentences because of the premise, not to save money.",
-        "Sometimes it draws instead of writing: one of thirty small things — rain, a sprout, a knot, an hourglass — in the same hand that draws the underlines and the circles. Only where a sentence would say it worse, and never with an explanation attached. Once in a while a drawing is the whole reply.",
+        "Sometimes it draws instead of writing: one of sixty small things — rain, a sprout, a knot, an hourglass — in the same hand that draws the underlines and the circles. Only where a sentence would say it worse, and never with an explanation attached. Once in a while a drawing is the whole reply.",
       ],
     },
     {
