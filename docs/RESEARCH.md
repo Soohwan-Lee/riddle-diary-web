@@ -9,6 +9,10 @@ Systems): a working artifact that makes a default assumption visible by building
 opposite. The assumption is that a
 conversational AI should remember. The artifact asks what happens if it doesn't.
 
+The artifact is built from three deliberate constraints: **it forgets**, **it is
+written by hand**, and **it is slow**. The research question is what those constraints
+do to what people are willing to say.
+
 A provocation is not evaluated by task success, retention, or conversion. It is
 evaluated by the quality of the questions it opens, the interpretations it affords,
 and the design directions it makes available. That is the research-through-design
