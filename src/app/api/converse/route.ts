@@ -94,6 +94,10 @@ async function streamModel(input: Input, send: Send, signal: AbortSignal) {
       reasoning: { effort: "low" },
       text: { verbosity: "low" },
       max_output_tokens: MAX_OUTPUT_TOKENS,
+      // The Responses API stores responses for 30 days by default. This app's
+      // whole promise is that nothing is kept, so opt out explicitly rather
+      // than relying on a provider default.
+      store: false,
       stream: true,
     },
     { signal },
