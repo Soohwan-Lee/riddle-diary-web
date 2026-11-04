@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { InkDropIcon } from "@/components/icons";
 import { useI18n } from "@/lib/i18n/provider";
-import { useIsMac } from "@/lib/platform";
+import { useCoarsePointer, useIsMac } from "@/lib/platform";
 
 /**
  * The composer is not a chat input. It is the same paper, in the same hand,
@@ -28,6 +28,7 @@ export function Composer({
 }) {
   const { t } = useI18n();
   const isMac = useIsMac();
+  const coarsePointer = useCoarsePointer();
   const ref = useRef<HTMLTextAreaElement>(null);
   const [value, setValue] = useState("");
   const ready = value.trim().length > 0 && !disabled;
@@ -53,13 +54,15 @@ export function Composer({
       <label htmlFor="composer" className="sr-only">
         {t.composer.placeholder}
       </label>
+      {/* A soft keyboard sliding over the paper is not the caret returning;
+          on a finger-first device, let the reader tap when they are ready. */}
       <textarea
         id="composer"
         ref={ref}
         rows={1}
         value={value}
         disabled={disabled}
-        autoFocus={returning}
+        autoFocus={returning && !coarsePointer}
         spellCheck={false}
         placeholder={t.composer.placeholder}
         onChange={(event) => {
