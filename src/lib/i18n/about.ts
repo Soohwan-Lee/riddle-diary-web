@@ -52,7 +52,8 @@ const ko: AboutContent = {
     {
       heading: "무엇이 남고, 무엇이 남지 않나",
       body: [
-        "서버에 저장되는 것은 없습니다. 데이터베이스가 없고, 대화 내용은 로그에도 남지 않습니다. 오류를 기록할 때도 내용이 아니라 오류의 종류만 남깁니다.",
+        "이 서버에 저장되는 것은 없습니다. 데이터베이스가 없고, 대화 내용은 로그에도 남지 않습니다. 오류를 기록할 때도 내용이 아니라 오류의 종류만 남깁니다.",
+        "답장을 만들기 위해 대화는 OpenAI API로 전송되며, 저장하지 않도록(`store: false`) 요청합니다. 다만 OpenAI가 남용 감지를 위해 입출력을 최대 30일 보관할 수 있고, 조직에 Zero Data Retention이 설정된 경우에는 보관하지 않습니다.",
         "대화 맥락은 브라우저 탭의 메모리에만 있습니다. 새로고침하거나 탭을 닫으면 그대로 사라지고, 복구 방법은 제공하지 않습니다.",
         "브라우저에 저장되는 것은 테마·언어·입력 방식·소멸 속도 같은 설정뿐입니다.",
       ],
@@ -122,14 +123,15 @@ const en: AboutContent = {
       body: [
         "The one who answers is called Riddle. Riddle does not advise, does not judge, does not try to fix, and suggests nothing before being asked. Usually it copies out one fragment of what you wrote and leaves at most one question.",
         "It should still not feel like nobody is there. It occasionally shows a first-person sense of being paper and ink, held back from tipping into mystique.",
-        "Something writing by hand cannot write much. Replies are one or two sentences because of the premise, not to save money.",
+        "Something writing by hand cannot write much. Replies are one to three short sentences because of the premise, not to save money.",
         "Sometimes it draws instead of writing: one of thirty small things — rain, a sprout, a knot, an hourglass — in the same hand that draws the underlines and the circles. Only where a sentence would say it worse, and never with an explanation attached. Once in a while a drawing is the whole reply.",
       ],
     },
     {
       heading: "What stays and what does not",
       body: [
-        "Nothing is stored on a server. There is no database, and conversation content never reaches a log — even error reporting records the kind of failure, not its message.",
+        "Nothing is stored on this server. There is no database, and conversation content never reaches a log — even error reporting records the kind of failure, not its message.",
+        "To compose a reply the conversation is sent to the OpenAI API, with `store: false` so it is not kept as retrievable application state. OpenAI may still retain inputs and outputs for abuse monitoring for up to 30 days, unless the organization has Zero Data Retention enabled.",
         "Context lives in the memory of your browser tab. Reload or close it and the conversation is gone, with no recovery offered.",
         "The only things kept in your browser are settings: theme, language, input mode, and how quickly ink fades.",
       ],

@@ -60,7 +60,7 @@ The one thing that shares the paper is the opening line. It is `pinned` and
 waits there until you answer, so your first entry lands beside it; both then
 sink together before the reply starts.
 
-The opening line is `pinned`: `restAll()` skips it until an entry unpins it.
+The opening line is `pinned`: resting skips it until `addUserTurn` unpins it.
 It is written by `greet()`, which never touches `status`, so the surface
 accepts writing while the page is still asking its question.
 
@@ -127,6 +127,11 @@ If it is ever built, these hold or it is not this product any more:
    stored locally. History lives in memory and dies with the tab. There is a
    direction that would change this — see "Someday: memory, not transcript" —
    but it is not built, and until it is, this rule holds without exception.
+   The OpenAI Responses request **must set `store: false`** — the API stores
+   responses for 30 days by default, which would quietly break this promise.
+   Note that this disables application-state retention, not the provider's
+   abuse-monitoring retention; say so plainly wherever the privacy claim is
+   made.
 2. **Two ink backends, one clock.** Text reveals via per-grapheme `clip-path`;
    marks *and drawings* draw via SVG `stroke-dashoffset`. Both schedule through
    `InkClock`. Do not add a third timing mechanism.

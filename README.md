@@ -135,6 +135,7 @@ fully explorable at zero cost. A missing key is never a 500.
 | `OPENAI_API_KEY` | no | Server-only. Absent ⇒ mock mode |
 | `OPENAI_MODEL` | no | Defaults to `gpt-5.4-mini`. Must support image input and the Responses API |
 | `MOCK_AI` | no | `1` forces mock mode even with a key present |
+| `NEXT_PUBLIC_SITE_URL` | no | Public origin for canonical URLs, the sitemap and the social card. Vercel supplies its production domain automatically; set this anywhere else |
 
 ### Deploy
 
@@ -373,6 +374,13 @@ the settings sheet: **0 violations**.
 | Conversation context | In the memory of your browser tab. Reload or close it and it is gone, with no recovery offered |
 | Browser storage | Settings only: theme, language, input mode, handwriting faces, page mode, fade pace, writing speed, and whether you have seen the opening note |
 | Third parties | The OpenAI API, and only when you have configured a key |
+
+Requests to OpenAI are sent with `store: false`, so the Responses API does not keep the
+exchange as retrievable application state. That is not the same as zero retention
+everywhere: unless the OpenAI organization has Zero Data Retention, API inputs and
+outputs may still be retained for abuse monitoring for up to 30 days. The app's claim is
+that **this server** keeps nothing — not that no infrastructure anywhere sees the words
+on their way to a reply.
 
 Rate limiting is an in-process token bucket, and its limits are honest: it stops one tab
 hammering the endpoint, but each serverless instance keeps its own bucket. For real
