@@ -25,7 +25,10 @@ const ko = {
   },
 
   page: {
-    firstLine: "오늘, 어땠어요?",
+    firstLineMorning: "좋은 아침이에요. 오늘은 어땠어요?",
+    firstLineAfternoon: "오후네요. 오늘 하루는 어땠어요?",
+    firstLineEvening: "저녁이네요. 오늘은 어땠어요?",
+    firstLineNight: "늦은 밤이네요. 오늘은 어땠어요?",
     notice: "여기 적은 것은 저장되지 않고, 곧 사라집니다.",
     writing: "쓰는 중",
     thinking: "리들이 읽는 중",
@@ -202,7 +205,10 @@ const en: Translation<Dictionary> = {
   },
 
   page: {
-    firstLine: "How was today?",
+    firstLineMorning: "Morning. How is your day going?",
+    firstLineAfternoon: "Afternoon. How has today been?",
+    firstLineEvening: "Evening. How was today?",
+    firstLineNight: "It's late. How was today?",
     notice: "Nothing here is saved. It will fade shortly.",
     writing: "Writing",
     thinking: "Riddle is reading",

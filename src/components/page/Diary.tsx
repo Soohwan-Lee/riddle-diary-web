@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Header } from "@/components/chrome/Header";
 import { SettingsSheet } from "@/components/chrome/SettingsSheet";
 import { SettingsIcon } from "@/components/icons";
@@ -34,6 +34,16 @@ import { Composer } from "./Composer";
 import { InkCanvas } from "./InkCanvas";
 import { IntroNote } from "./IntroNote";
 import { Transcript } from "./Transcript";
+
+function firstLineForHour(
+  hour: number,
+  lines: { morning: string; afternoon: string; evening: string; night: string },
+): string {
+  if (hour < 5) return lines.night;
+  if (hour < 12) return lines.morning;
+  if (hour < 18) return lines.afternoon;
+  return lines.evening;
+}
 
 export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   const { t, locale } = useI18n();
@@ -99,15 +109,28 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
    */
   const paperClear = paperIsClear(turns);
 
-  const greeted = useRef(false);
   useEffect(() => {
-    if (greeted.current) return;
-    greeted.current = true;
-    // The page speaks first. Its opening line is pinned — it waits on the
-    // paper until there is something to answer — and it is not a turn, so it
-    // does not lock the surface while it is being written.
-    useSession.getState().greet(t.page.firstLine);
-  }, [t.page.firstLine]);
+    // The page speaks first, and it knows roughly what time it is. The line is
+    // pinned — it waits on the paper until there is something to answer — and
+    // it is not a turn, so it does not lock the surface while it is written.
+    // `greet` replaces an unanswered opening line, which lets the greeting
+    // follow a language switch; once someone has written, it leaves the page
+    // alone.
+    const hour = new Date().getHours();
+    useSession.getState().greet(
+      firstLineForHour(hour, {
+        morning: t.page.firstLineMorning,
+        afternoon: t.page.firstLineAfternoon,
+        evening: t.page.firstLineEvening,
+        night: t.page.firstLineNight,
+      }),
+    );
+  }, [
+    t.page.firstLineMorning,
+    t.page.firstLineAfternoon,
+    t.page.firstLineEvening,
+    t.page.firstLineNight,
+  ]);
 
   const errorText = useCallback(
     (code: ConverseError["code"]) => {

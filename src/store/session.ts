@@ -148,7 +148,16 @@ export const useSession = create<SessionState>()((set) => ({
 
   greet: (text) =>
     set((state) => {
-      if (state.turns.length > 0) return state;
+      // Once anyone has written, the opening line is part of the exchange and
+      // must not be rewritten under them. Before that, it is still the page
+      // speaking, so a language switch may replace it with a fresh node —
+      // a new id, so the new line is written from its first stroke rather than
+      // inheriting a reveal cursor from the old one.
+      const hasUser =
+        state.history.some((message) => message.role === "user") ||
+        state.turns.some((turn) => turn.voice === "user");
+      if (hasUser) return state;
+
       return {
         turns: [
           {

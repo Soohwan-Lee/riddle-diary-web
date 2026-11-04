@@ -79,6 +79,35 @@ describe("whenPaperClears", () => {
   });
 });
 
+describe("greet", () => {
+  beforeEach(reset);
+
+  it("replaces the opening line while nobody has written yet", () => {
+    useSession.getState().greet("오늘, 어땠어요?");
+    useSession.getState().greet("늦은 밤이네요. 오늘은 어땠어요?");
+
+    expect(useSession.getState().turns).toHaveLength(1);
+    expect(useSession.getState().turns[0].raw).toBe(
+      "늦은 밤이네요. 오늘은 어땠어요?",
+    );
+    expect(useSession.getState().history).toEqual([
+      { role: "assistant", content: "늦은 밤이네요. 오늘은 어땠어요?" },
+    ]);
+  });
+
+  it("leaves the opening line alone once someone has written", () => {
+    useSession.getState().greet("오늘, 어땠어요?");
+    useSession.getState().addUserTurn({ raw: "조금 지쳤어요" });
+    useSession.getState().greet("다른 인사");
+
+    expect(useSession.getState().history[0]).toEqual({
+      role: "assistant",
+      content: "오늘, 어땠어요?",
+    });
+    expect(useSession.getState().turns[0].raw).toBe("오늘, 어땠어요?");
+  });
+});
+
 describe("handwritten readings", () => {
   beforeEach(reset);
 
