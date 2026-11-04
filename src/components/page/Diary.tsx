@@ -69,6 +69,7 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   const { composing, touch, release } = useComposingPause();
   const [held, setHeld] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [date, setDate] = useState<{ label: string; iso: string } | null>(null);
 
   // Time only runs when someone is looking and nobody is mid-sentence.
   const paused = hidden || composing || held;
@@ -132,6 +133,30 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
     t.page.firstLineEvening,
     t.page.firstLineNight,
   ]);
+
+  // The date is page furniture, not a turn: it is set after hydration so the
+  // server and the browser cannot disagree about which day it is, and it
+  // follows a language switch. The frame keeps the write out of the effect
+  // body, where React asks for effects to synchronize rather than set state.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const now = new Date();
+      const iso = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, "0"),
+        String(now.getDate()).padStart(2, "0"),
+      ].join("-");
+      setDate({
+        iso,
+        label: new Intl.DateTimeFormat(LOCALE_TAG[locale], {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+        }).format(now),
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [locale]);
 
   const errorText = useCallback(
     (code: ConverseError["code"]) => {
@@ -279,6 +304,10 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
         <h1 className="sr-only">
           {t.app.name} — {t.app.tagline}
         </h1>
+
+        <p className="ink-date" aria-hidden={!date}>
+          {date && <time dateTime={date.iso}>{date.label}</time>}
+        </p>
 
         {!introSeen && (
           <IntroNote onDismiss={() => setLocalPrefs({ introSeen: true })} />

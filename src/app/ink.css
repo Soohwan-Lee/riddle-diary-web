@@ -92,6 +92,22 @@
   }
 }
 
+/* The date in the margin: page furniture, written in the page's own hand. It
+   reserves its line before hydration so the paper does not jump when it
+   arrives. */
+.ink-date {
+  min-height: 1.2rem;
+  margin-bottom: 1.1rem;
+  padding-right: 0.15rem;
+  font-family: var(--font-hand-ai);
+  font-size: 0.78rem;
+  line-height: 1.2;
+  letter-spacing: 0.035em;
+  color: var(--muted);
+  text-align: right;
+  rotate: -0.5deg;
+}
+
 /* What the page writes at. The node holds the unscaled size; `.ink-line`
    applies each hand's own correction one level down. */
 .ink-body {
