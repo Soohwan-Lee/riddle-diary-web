@@ -164,8 +164,8 @@ design** about accumulation.
 | **Social responses & relational agents** — Nass & Moon, 2000; Bickmore & Picard, 2005 | Why a page that answers is read as someone, and the long history of designing for attachment. |
 | **Expressive writing & ELIZA** — Pennebaker & Beall, 1986; Weizenbaum, 1966 | Background for writing a day down, and the long history of projecting a listener into a machine. |
 
-The extended method and limitations are in [docs/RESEARCH.md](docs/RESEARCH.md). The
-full reference list is below.
+The extended design implications and expected outcomes are in
+[docs/RESEARCH.md](docs/RESEARCH.md). The full reference list is below.
 
 <details>
 <summary><strong>References</strong> — 19 sources, ACM style</summary>
