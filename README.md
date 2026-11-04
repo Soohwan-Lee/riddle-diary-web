@@ -8,6 +8,9 @@
 
 A critical design artifact about what a diary could be if it were designed to forget you.
 
+Write by hand or by keyboard. Riddle answers in its own handwriting, at the pace of a
+hand. Then both of you fade off the paper, and nothing is kept.
+
 [![critical design](https://img.shields.io/badge/design-critical-b4553f)](#the-diary-that-writes-back)
 [![slow technology](https://img.shields.io/badge/research-slow%20technology-2f5d57)](#research-framing)
 [![ephemeral interface](https://img.shields.io/badge/interface-ephemeral-6c665a)](#the-interface-is-the-argument)
@@ -24,16 +27,12 @@ A critical design artifact about what a diary could be if it were designed to fo
 > Every recording on this page runs in real time, at the app's own pace. The
 > clips are sped up slightly so a README stays a README.
 
-**Contents** · [The diary that writes back](#the-diary-that-writes-back) ·
-[What we kept](#what-we-kept-what-we-refused) ·
-[The interface is the argument](#the-interface-is-the-argument) ·
-[The artifact](#the-artifact) · [How the ink works](#how-the-ink-works) ·
-[The conversation](#the-conversation) ·
-[Accessibility](#accessibility-is-the-hard-part) · [Privacy](#privacy-honestly) ·
-[Research](#research-framing) ·
-[What we expect](#what-we-expect-and-what-would-prove-us-wrong) ·
-[What the making taught us](#what-the-making-taught-us) ·
-[What we did not build](#what-we-deliberately-did-not-build) · [Run it](#quick-start)
+**Contents**
+
+- [The diary that writes back](#the-diary-that-writes-back) · [What we kept](#what-we-kept-what-we-refused) · [The interface is the argument](#the-interface-is-the-argument)
+- [The artifact](#the-artifact) · [How the ink works](#how-the-ink-works) · [The conversation](#the-conversation)
+- [Accessibility](#accessibility-is-the-hard-part) · [Privacy](#privacy-honestly) · [Research](#research-framing) · [What we expect](#what-we-expect-and-what-would-prove-us-wrong)
+- [What the making taught us](#what-the-making-taught-us) · [What we did not build](#what-we-deliberately-did-not-build) · [Run it](#quick-start)
 
 ---
 
@@ -47,7 +46,7 @@ Inkling borrows the object and refuses the mechanism. You write — by hand or b
 keyboard — and **Riddle** writes back, character by character, pausing at commas,
 pressing harder at the start of a stroke, and once in a while drawing something
 small instead of saying it. Then the ink thins and goes, taking your words with it.
-The page does not keep a record, and neither does the server.
+The page does not keep a record, and this server does not either.
 
 That inversion is the whole project. In the film, memory is how the diary owns the
 writer. Here, forgetting is how the page declines to.
@@ -101,8 +100,10 @@ so for a second or two it was writing over an entry that was still sinking. Now 
 request goes out immediately and the *reply* is held until the paper is empty; text
 that arrives early queues up. Nothing is spent waiting that was not going to be spent
 anyway — the model and the absorb run at the same time, and whichever finishes last
-is the one being waited for. Measured: **1.4s from your last word to Riddle's first**,
-and no sample in a three-turn recording with both hands' ink on the page.
+is the one being waited for.
+
+Measured: **1.4s from your last word to Riddle's first**, with no sample in a
+three-turn recording showing both hands' ink on the page.
 
 The gate reads the store rather than a render snapshot. Taken from a snapshot it
 described the page as it was *before* the entry landed — which on the second turn
@@ -118,7 +119,8 @@ of the reveal; at text sizes it read as a cursor blinking along a line, which is
 one thing this page must never look like. Handwriting appearing on paper has nothing
 in front of it. The reveal itself is the pen.
 
-The date in the margin is the one thing that stays. It is furniture, not a record:
+The date in the margin is the one thing on the page that stays. It is furniture, not
+a record:
 the page's own handwriting, not either of yours.
 
 ### Writing is slow
@@ -204,6 +206,9 @@ locale, so the server and the browser never disagree about which day it is.
 
 The interesting problem: **you cannot animate Hangul handwriting the way tutorials
 animate signatures.**
+
+In one sentence: text is revealed one grapheme at a time over a real handwriting
+face; marks and drawings are drawn along real SVG paths. Both run on one clock.
 
 The usual trick is `stroke-dashoffset` along a font's outline. That traces the
 *contour* of a letter, not the letter — it looks like someone shading in an outline,
@@ -458,6 +463,9 @@ This began as a design-research question rather than a product idea, and
 short version: **slow technology is the right starting point, but it is not the
 whole lineage.**
 
+In one sentence: slow technology explains the waiting, forgetting explains the
+disappearance, and critical design explains why the diary should not remember.
+
 Hallnäs and Redström's slow technology is not about making interfaces slow for its
 own sake. It is about designing technology whose function is to produce time for
 reflection rather than to remove it. Inkling takes that seriously: there is no skip,
@@ -505,13 +513,35 @@ this page works.
 The current evidence is **technical measurement plus autoethnography**, not a
 formal user study. The hypothesis is still a hypothesis.
 
-| If this is true… | We would look for… | It would be false if… |
-|---|---|---|
-| Disappearance lowers the threshold for disclosure | Longer, more specific, more first-person entries; readers saying they wrote something they would not otherwise have written | Entries get shorter; readers ask for history or export; the fade makes them anxious |
-| The wait reads as writing, not loading | Readers re-read their own sentence before the reply; they describe the page as being written to | "Too slow", "loading", "why isn't it instant" |
-| Handwriting makes the exchange feel embodied | Handwriting mode is chosen; Riddle is described as someone; marks and drawings are noticed | Readers switch to typing immediately; "it's just text" |
-| One hand at a time creates a ritual | **Not yet** and hold-to-keep are used; readers wait for the page | Readers try to interrupt; the rule feels like a bug |
-| No memory changes what is said | Readers mention the absence; they compare it with assistants that keep everything | Readers ask for memory; the page feels unsafe without it |
+**1. A guarantee of disappearance lowers the threshold for disclosure.**
+
+- **Look for:** longer, more specific, more first-person entries; readers saying they
+  wrote something they would not otherwise have written.
+- **False if:** entries get shorter; readers ask for history or export; the fade makes
+  them anxious.
+
+**2. The wait reads as writing, not loading.**
+
+- **Look for:** readers re-reading their own sentence before the reply; describing
+  the page as being written to.
+- **False if:** "too slow", "loading", "why isn't it instant".
+
+**3. Handwriting makes the exchange feel embodied.**
+
+- **Look for:** handwriting mode is chosen; Riddle is described as someone; marks and
+  drawings are noticed.
+- **False if:** readers switch to typing immediately; "it's just text".
+
+**4. One hand at a time creates a ritual.**
+
+- **Look for:** **Not yet** and hold-to-keep are used; readers wait for the page.
+- **False if:** readers try to interrupt; the rule feels like a bug.
+
+**5. No memory changes what is said.**
+
+- **Look for:** readers mention the absence; they compare it with assistants that keep
+  everything.
+- **False if:** readers ask for memory; the page feels unsafe without it.
 
 ### What a study would look like
 
@@ -536,39 +566,37 @@ whether the artifact changes what people are willing to write down.
 
 A design artifact is also a record of what went wrong.
 
-**Five of the thirty drawings had to go back for a second pass**, and none of it was
-catchable by a test — every one passed "is inside its box, is real path data" while
-being the wrong picture. A crescent needs its inner edge to bite *left* into the disc,
-or it is a lens. A cloud cannot be three arcs in a row (each begins at its own left
-edge, sending the pen back across the puff before it) nor bell curves (peaks — that is
-a mountain range); it is the tallest of three overlapping circles at each x. A
-teardrop built from a leaf outline comes out a gem, because both sides converge at the
-far end. A bridge's arch has to rise towards the deck or it reads as a hammock. And
-wind was pure chatter: the wobble is per point, so a long smooth line described by
-many of them is not a hand. The fix for all of them was rendering a contact sheet and
-looking at it.
+- **Five drawings went back for a second pass.** None of it was catchable by a test —
+  every one passed "is inside its box, is real path data" while being the wrong
+  picture. A crescent needs its inner edge to bite *left* into the disc, or it is a
+  lens. A cloud cannot be three arcs in a row or bell curves (peaks make a mountain
+  range); it is the tallest of three overlapping circles at each x. A teardrop built
+  from a leaf outline comes out a gem. A bridge's arch has to rise towards the deck or
+  it reads as a hammock. Wind was pure chatter: the wobble is per point, so a long
+  smooth line described by many of them is not a hand. The fix was rendering a contact
+  sheet and looking at it.
 
-**The one-hand gate read a render snapshot**, which described the page as it was
-before the entry landed. On the second turn it said "empty" and opened at once. The
-fix was to read the store and to pin the behaviour with a test.
+- **The one-hand gate read a render snapshot.** It described the page as it was before
+  the entry landed; on the second turn it said "empty" and opened at once. The fix was
+  to read the store and pin the behaviour with a test.
 
-**The handwriting reading could arrive after the turn had faded.** In blank-page mode
-the entry sinks in about a second, and the model's `READ:` line often takes longer.
-The history lost the reader's words because the code looked for the turn that had
-already gone. The fix was to track the handwritten turn by id, and to remember each
-reading once.
+- **The handwriting reading could arrive after the turn had faded.** In blank-page mode
+  the entry sinks in about a second, and the model's `READ:` line often takes longer.
+  The history lost the reader's words because the code looked for a turn that had
+  already gone. The fix was to track the handwritten turn by id and remember each
+  reading once.
 
-**The OpenAI Responses API stores responses for 30 days by default.** A privacy
-promise can be broken by a provider default. The request now sets `store: false`, and
-the README says plainly what that does and does not cover.
+- **The OpenAI Responses API stores responses for 30 days by default.** A privacy
+  promise can be broken by a provider default. The request now sets `store: false`,
+  and the README says plainly what that does and does not cover.
 
-**The nib looked like a cursor.** A leading mark riding the reveal read as a text
-caret at handwriting sizes, which is the one thing this page must never look like.
-Removing it made the writing feel more like writing.
+- **The nib looked like a cursor.** A leading mark riding the reveal read as a text
+  caret at handwriting sizes, which is the one thing this page must never look like.
+  Removing it made the writing feel more like writing.
 
-**The v1 accessibility audit found 0 violations across thirteen states**, but the
-interesting work was not the score. It was the live region, the drawing labels, the
-reduced-motion path, and the decision not to pretend the canvas is keyboard-operable.
+- **The v1 accessibility audit found 0 violations across thirteen states.** The
+  interesting work was not the score; it was the live region, the drawing labels, the
+  reduced-motion path, and the decision not to pretend the canvas is keyboard-operable.
 
 ---
 
@@ -727,3 +755,5 @@ and the OpenAI Responses API.
 
 Inspired, at a distance, by a diary in a film that wrote back. That one was a
 manipulator; this one holds still.
+
+<div align="right"><a href="#inkling">Back to top ↑</a></div>
