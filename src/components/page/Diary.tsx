@@ -52,6 +52,7 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
   const turns = useSession((state) => state.turns);
   const history = useSession((state) => state.history);
   const status = useSession((state) => state.status);
+  const error = useSession((state) => state.error);
 
   const hidden = useDocumentHidden();
   const { composing, touch, release } = useComposingPause();
@@ -317,6 +318,14 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
           <span role="status" className="sr-only">
             {status === "thinking" ? t.page.thinking : ""}
           </span>
+          {/* The visible failure is written into the ink, which is aria-hidden.
+              Without this the transcript region never learns that a reply did
+              not arrive, and a screen reader user is left waiting. */}
+          {error && (
+            <span role="alert" className="sr-only">
+              {error}
+            </span>
+          )}
 
           {/* The wrapper always stays: the skip link needs somewhere to land
               even on a turn that is not yours. */}
