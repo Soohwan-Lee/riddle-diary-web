@@ -400,11 +400,17 @@
  * it has to read as "something is coming" rather than as a loading spinner.
  */
 .ink-thinking {
+  position: relative;
   display: inline-block;
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 9999px;
+  width: 0.5rem;
+  height: 0.5rem;
+  /* An imperfect edge, so it reads as a drop of ink rather than a status dot. */
+  border-radius: 55% 45% 60% 40% / 45% 55% 45% 55%;
+  rotate: -14deg;
   background: var(--ink-ai);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--ink-ai) 10%, transparent),
+    0 0 12px var(--ink-ai-glow);
   animation: ink-think 2000ms var(--ease-settle) infinite;
 }
 

@@ -57,6 +57,14 @@ export const BLANK_FADE_MS: Record<FadePace, number> = {
 export const ABSORB_DWELL_MS = 400;
 export const ABSORB_FADE_MS = 900;
 
+/**
+ * A breath between the paper clearing and the first stroke. The request is
+ * already in flight while this runs, so it costs nothing when the model is
+ * slower than the pause — and when the model is faster, it is the difference
+ * between a reply that appears and someone taking the pen.
+ */
+export const LISTENING_BEAT_MS = 650;
+
 export function readingWeight(char: string): number {
   if (char === GLYPH_PLACEHOLDER) return GLYPH_READ_UNITS;
   if (/\s/.test(char)) return 0.4;

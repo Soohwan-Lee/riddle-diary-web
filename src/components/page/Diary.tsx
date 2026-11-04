@@ -19,6 +19,7 @@ import {
   ABSORB_DWELL_MS,
   ABSORB_FADE_MS,
   BLANK_FADE_MS,
+  LISTENING_BEAT_MS,
   readDwellMs,
 } from "@/lib/ink/dwell";
 import { useComposingPause, useDocumentHidden } from "@/lib/ink/usePageClock";
@@ -181,6 +182,10 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
       let pending = "";
       const opened = (async () => {
         if (blankPage) await whenPaperClears();
+        // A beat before the first stroke. The model is already working, so
+        // this is only visible when it answered faster than a person could
+        // have decided to pick the pen up.
+        await wait(LISTENING_BEAT_MS);
         replyId = useSession.getState().beginReply();
         if (pending) {
           useSession.getState().appendReply(replyId, pending);
@@ -392,4 +397,8 @@ export function Diary({ transport = sseTransport }: { transport?: Transport }) {
       />
     </div>
   );
+}
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
