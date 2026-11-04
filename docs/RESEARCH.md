@@ -56,24 +56,24 @@ back at a day, not a treatment for anything.
 | **Expressive writing** — Pennebaker & Beall, 1986 | Background for writing a day down. Not a claim of clinical efficacy. |
 | **ELIZA** — Weizenbaum, 1966 | The long history of projecting a listener into a machine. |
 
-### References
+### References (ACM style)
 
-- Bannon, L. J. (2006). Forgetting as a feature, not a bug: The duality of memory and implications for ubiquitous computing. *CoDesign, 2*(1), 3–15. https://doi.org/10.1080/15710880600608230
-- Bardzell, J., & Bardzell, S. (2013). What is "critical" about critical design? In *Proceedings of CHI '13* (pp. 3297–3306). ACM. https://doi.org/10.1145/2470654.2466451
-- Bickmore, T. W., & Picard, R. W. (2005). Establishing and maintaining long-term human-computer relationships. *ACM Transactions on Computer-Human Interaction, 12*(2), 293–327. https://doi.org/10.1145/1067860.1067867
-- Boehner, K., Vertesi, J., Sengers, P., & Dourish, P. (2007). How HCI interprets the probes. In *Proceedings of CHI '07* (pp. 1077–1086). ACM. https://doi.org/10.1145/1240624.1240789
-- DiSalvo, C. (2012). *Adversarial design*. MIT Press.
-- Döring, T., Sylvester, A., & Schmidt, A. (2013). A design space for ephemeral user interfaces. In *Proceedings of TEI '13* (pp. 75–82). ACM. https://doi.org/10.1145/2460625.2460637
-- Dunne, A., & Raby, F. (2013). *Speculative everything: Design, fiction, and social dreaming*. MIT Press.
-- Gaver, W. (2012). What should we expect from research through design? In *Proceedings of CHI '12* (pp. 937–946). ACM. https://doi.org/10.1145/2207676.2208538
-- Grosse-Hering, B., Mason, J., Aliakseyeu, D., Bakker, C., & Desmet, P. (2013). Slow design for meaningful interactions. In *Proceedings of CHI '13* (pp. 3431–3440). ACM. https://doi.org/10.1145/2470654.2466472
-- Hallnäs, L., & Redström, J. (2001). Slow technology – Designing for reflection. *Personal and Ubiquitous Computing, 5*(3), 201–212. https://doi.org/10.1007/PL00000019
-- Nass, C., & Moon, Y. (2000). Machines and mindlessness: Social responses to computers. *Journal of Social Issues, 56*(1), 81–103. https://doi.org/10.1111/0022-4537.00153
-- Odom, W., Sellen, A., Banks, R., Kirk, D., Regan, T., Selby, M., Forlizzi, J., & Zimmerman, J. (2014). Designing for slowness, anticipation and re-visitation: A long term field study of the Photobox. In *Proceedings of CHI '14* (pp. 1961–1970). ACM. https://doi.org/10.1145/2556288.2557178
-- Pennebaker, J. W., & Beall, S. K. (1986). Confronting a traumatic event: Toward an understanding of inhibition and disease. *Journal of Abnormal Psychology, 95*(3), 274–281. https://doi.org/10.1037/0021-843X.95.3.274
-- Sengers, P., Boehner, K., David, S., & Kaye, J. (2005). Reflective design. In *Proceedings of the 4th Decennial Conference on Critical Computing* (pp. 49–58). ACM. https://doi.org/10.1145/1094562.1094569
-- Weizenbaum, J. (1966). ELIZA—A computer program for the study of natural language communication between man and machine. *Communications of the ACM, 9*(1), 36–45. https://doi.org/10.1145/365153.365168
-- Zimmerman, J., Forlizzi, J., & Evenson, S. (2007). Research through design as a method for interaction design research in HCI. In *Proceedings of CHI '07* (pp. 493–502). ACM. https://doi.org/10.1145/1240624.1240704
+1. Liam J. Bannon. 2006. Forgetting as a Feature, Not a Bug: The Duality of Memory and Implications for Ubiquitous Computing. *CoDesign* 2, 1 (2006), 3–15. https://doi.org/10.1080/15710880600608230
+2. Jeffrey Bardzell and Shaowen Bardzell. 2013. What is "critical" about critical design? In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '13). ACM, New York, NY, USA, 3297–3306. https://doi.org/10.1145/2470654.2466451
+3. Timothy W. Bickmore and Rosalind W. Picard. 2005. Establishing and Maintaining Long-Term Human-Computer Relationships. *ACM Transactions on Computer-Human Interaction* 12, 2 (2005), 293–327. https://doi.org/10.1145/1067860.1067867
+4. Kirsten Boehner, Janet Vertesi, Phoebe Sengers, and Paul Dourish. 2007. How HCI Interprets the Probes. In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '07). ACM, New York, NY, USA, 1077–1086. https://doi.org/10.1145/1240624.1240789
+5. Carl DiSalvo. 2012. *Adversarial Design*. MIT Press, Cambridge, MA.
+6. Tanja Döring, Axel Sylvester, and Albrecht Schmidt. 2013. A Design Space for Ephemeral User Interfaces. In *Proceedings of the 7th International Conference on Tangible, Embedded and Embodied Interaction* (TEI '13). ACM, New York, NY, USA, 75–82. https://doi.org/10.1145/2460625.2460637
+7. Anthony Dunne and Fiona Raby. 2013. *Speculative Everything: Design, Fiction, and Social Dreaming*. MIT Press, Cambridge, MA.
+8. William Gaver. 2012. What Should We Expect from Research through Design? In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '12). ACM, New York, NY, USA, 937–946. https://doi.org/10.1145/2207676.2208538
+9. Barbara Grosse-Hering, Jon Mason, Dzmitry Aliakseyeu, Conny Bakker, and Pieter Desmet. 2013. Slow Design for Meaningful Interactions. In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '13). ACM, New York, NY, USA, 3431–3440. https://doi.org/10.1145/2470654.2466472
+10. Lars Hallnäs and Johan Redström. 2001. Slow Technology – Designing for Reflection. *Personal and Ubiquitous Computing* 5, 3 (2001), 201–212. https://doi.org/10.1007/PL00000019
+11. Clifford Nass and Youngme Moon. 2000. Machines and Mindlessness: Social Responses to Computers. *Journal of Social Issues* 56, 1 (2000), 81–103. https://doi.org/10.1111/0022-4537.00153
+12. William Odom, Abigail Sellen, Richard Banks, David Kirk, Tim Regan, Mark Selby, Jodi Forlizzi, and Jonathan Zimmerman. 2014. Designing for Slowness, Anticipation and Re-visitation: A Long Term Field Study of the Photobox. In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '14). ACM, New York, NY, USA, 1961–1970. https://doi.org/10.1145/2556288.2557178
+13. James W. Pennebaker and Sandra K. Beall. 1986. Confronting a Traumatic Event: Toward an Understanding of Inhibition and Disease. *Journal of Abnormal Psychology* 95, 3 (1986), 274–281. https://doi.org/10.1037/0021-843X.95.3.274
+14. Phoebe Sengers, Kirsten Boehner, Shay David, and Joseph 'Jofish' Kaye. 2005. Reflective Design. In *Proceedings of the 4th Decennial Conference on Critical Computing: Between Sense and Sensibility* (CC '05). ACM, New York, NY, USA, 49–58. https://doi.org/10.1145/1094562.1094569
+15. Joseph Weizenbaum. 1966. ELIZA—A Computer Program for the Study of Natural Language Communication between Man and Machine. *Communications of the ACM* 9, 1 (1966), 36–45. https://doi.org/10.1145/365153.365168
+16. John Zimmerman, Jodi Forlizzi, and Shelley Evenson. 2007. Research through Design as a Method for Interaction Design Research in HCI. In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '07). ACM, New York, NY, USA, 493–502. https://doi.org/10.1145/1240624.1240704
 
 ## Design value
 
