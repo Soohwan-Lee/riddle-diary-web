@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "About",
   description:
     "Why a diary that writes back should also let go: slow technology, critical design, and what a disappearing interface owes the people using it.",
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {

@@ -4,18 +4,8 @@ import { LOCALE_TAG } from "@/lib/i18n/config";
 import { I18nProvider } from "@/lib/i18n/provider";
 import { PrefsProvider } from "@/lib/prefs/provider";
 import { readServerPrefs } from "@/lib/server-prefs";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
-
-/**
- * Vercel sets `VERCEL_PROJECT_PRODUCTION_URL` for us; without it the icons and
- * social card still resolve, just against localhost. Set `NEXT_PUBLIC_SITE_URL`
- * when deploying anywhere else.
- */
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "http://localhost:3000");
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -33,6 +23,7 @@ export const metadata: Metadata = {
     description:
       "Write today by hand. The page answers in its own handwriting, then lets it go.",
   },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
