@@ -12,6 +12,11 @@ a daily-reflection wellbeing context.
 Read `docs/PLAN.md` before making design decisions. It is the source of truth
 for concept, tokens, engine architecture, and safety rules.
 
+The published documents have separate jobs: `README.md` is the critical-design
+argument and landing page, `docs/RESEARCH.md` is the extended research note and
+reference list, `docs/INK.md` is the technical appendix (ink engine, parser,
+drawings), and `docs/GLYPHS.md` is the drawing vocabulary and contact sheet.
+
 ## Stack
 
 Next.js 16 (App Router) · React 19 · TypeScript strict · Tailwind CSS 4
