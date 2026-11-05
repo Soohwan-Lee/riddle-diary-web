@@ -1,767 +1,521 @@
-# Inkling — Research Notes & Design Provocation
+# Inkling — research notes
 
-[← Back to the README](../README.md) · [Technical Notes (INK.md)](INK.md) · [Drawing Vocabulary (GLYPHS.md)](GLYPHS.md)
+[← Back to the README](../README.md) · [Technical notes (INK.md)](INK.md) · [Drawing vocabulary (GLYPHS.md)](GLYPHS.md)
 
-> **A Research-through-Design (RtD) provocation and counterfunctional artifact.**
-> This document articulates the theoretical lineage, design value, transferable
-> implications, expected phenomenological outcomes, and empirical study protocol
-> for **Inkling** — a conversational diary that answers in handwriting at a hand's
-> pace and keeps nothing.
+> A working note about what the artifact argues, what it borrows from HCI and
+> design research, what it is likely to do to the people who use it, and what
+> would count as evidence. The build details are in [INK.md](INK.md).
 
-| Dimension | Specification |
+| | |
 |---|---|
-| **Artifact** | A single-sheet web diary that replies in handwriting, draws in the margin, and clears from both screen and DOM |
-| **Genre** | ACM DIS Provocation · Critical & Counterfunctional Design · Slow Technology Probe |
-| **Core Thesis** | *A structural guarantee of disappearance lowers the threshold for candid self-disclosure* |
-| **Design Position** | Memory in conversational AI is a moral and interaction choice with hidden costs, not a neutral default |
-| **Three Refusals** | **It forgets** (no archive) · **It is written by hand** (no uniform chat input) · **It is slow** (no instant generation) |
-| **Knowledge Contribution** | Six design implications for reflective AI + a five-part interaction vocabulary (*absorb, dwell, clear, hold, hand back*) |
-| **Empirical Status** | Deployed working system (207 unit tests, axe WCAG AA verified, autoethnographic log); 2×2 field study protocol specified (§6) |
+| **Artifact** | A one-page diary that answers in handwriting and then clears |
+| **Question** | What changes when an AI answers by hand, at a hand's pace, and keeps nothing? |
+| **Design position** | Memory is a choice with a cost, not an invisible default |
+| **Expected outcome** | More candid writing, more rereading, a page read as a listener |
+| **Evidence** | Deployed build (207 tests, axe verified, designer's log); study protocol in [§6](#6-a-study-that-could-test-it) |
 
-**Contents**
-1. [The Provocation: Against the Archive Default](#1-the-provocation-against-the-archive-default)
-2. [Theoretical Framework & Intellectual Lineage](#2-theoretical-framework--intellectual-lineage)
-3. [The Artifact as an Epistemic Instrument](#3-the-artifact-as-an-epistemic-instrument)
-4. [Design Value & Transferable Implications](#4-design-value--transferable-implications)
-5. [Expected Outcomes & Phenomenological Predictions](#5-expected-outcomes--phenomenological-predictions)
-6. [Empirical Protocol: A Within-Subject Study Design](#6-empirical-protocol-a-within-subject-study-design)
-7. [Evidence from the Build: RtD Reflections](#7-evidence-from-the-build-rtd-reflections)
-8. [Limitations & Ethical Guardrails](#8-limitations--ethical-guardrails)
-9. [References (ACM Style — 28 Sources)](#9-references-acm-style)
+**Contents:** [The provocation](#1-the-provocation) · [Lineage](#2-lineage-what-was-borrowed-where-it-departs) · [What it does to the exchange](#3-what-the-artifact-does-to-the-exchange) · [Design value & implications](#4-design-value-and-implications) · [Expected outcomes](#5-expected-outcomes) · [A study](#6-a-study-that-could-test-it) · [What the build shows](#7-what-the-build-already-shows) · [Limitations](#8-limitations) · [Guardrails](#9-what-would-make-it-a-betrayal) · [References](#10-references-acm-style)
 
 ---
 
-## 1. The Provocation: Against the Archive Default
+## 1. The provocation
 
-Contemporary conversational AI is built on an unquestioned triad: **total retention**,
-**frictionless velocity**, and **simulated intimacy**. By default, every exchange is
-stored in a database, indexed for search, distilled into a longitudinal user profile,
-and carried forward into future sessions (Park et al., 2023). In product discourse,
-this accumulation is framed as *continuity*, *personalization*, and *care*. Yet total
-capture also serves an extractive logic: once a system maintains a persistent model of
-the person speaking to it, the platform acquires both the means and the incentive to
-optimize for retention, habit formation, and parasocial attachment (Bickmore & Picard,
-2005; Mayer-Schönberger, 2009).
+Conversational AI has a default: **keep**. Every turn is stored, indexed for search,
+distilled into a profile, and carried into the next session (Park et al., 2023). Memory
+is presented as continuity and care. It is also how a system builds a model of the
+person speaking to it — and once that model exists, the product has a reason to use it:
+personalize, anticipate, re-engage.
 
-In *Harry Potter and the Chamber of Secrets*, Tom Riddle's diary makes this mechanism
-visceral. The diary is compelling because it answers in handwriting on the very same
-paper; it is dangerous because *it remembers*. Its intimacy is the instrument through
-which it extracts agency from the writer. **Inkling borrows the uncanny object and
-excises the extractive mechanism:** the page listens, writes back by hand, and lets go.
+Tom Riddle's diary is the reference because it makes that mechanism visible. It answers
+in handwriting on the same sheet of paper. It remembers. Its memory is how it takes
+something from the writer. Inkling keeps the object and removes the mechanism: **the
+page answers, and then it does not keep.**
 
-> [!IMPORTANT]
-> **Central Provocation:** What happens to human–AI reflection when a system answers in
-> handwriting, moves at a hand's pace, and structurally refuses to remember?
+> **Research question:** When a conversational AI answers in handwriting, at a hand's
+> pace, and keeps nothing, how does that change what people are willing to write — and
+> how they read the page?
 
-When every utterance is preserved in a scrollable transcript or fed into a persistent
-memory stream, the writer is never alone with the present moment. They are writing for
-two silent observers: **an algorithmic profile** that categorizes them, and **a future
-self** who may reread and judge the entry later (Sellen & Whittaker, 2010; Bannon,
-2006). A diary written to be kept becomes a performance of coherence. A diary that
-vanishes removes the future audience, shifting the act of writing from *archival
-self-curation* to *present-tense release*.
+When every sentence is kept, a writer is never only writing in the present. They are
+writing for two silent observers: a system building a profile, and a future self who
+may reread and judge the page later (Mayer-Schönberger, 2009; Sellen & Whittaker,
+2010). A diary meant to be reread becomes a performance. A diary that clears is written
+for the present moment.
 
-Five research questions structure this inquiry—three isolating the material
-constraints, one examining the turn-taking ritual they form together, and one probing
-the psychological weight of absence:
-
-- **RQ1 — Forgetting (Structural Ephemerality):** Does a credible guarantee of
-  disappearance change the length, specificity, and emotional candor of what someone is
-  willing to write?
-- **RQ2 — Embodiment (The Hand):** Does composing by hand—and receiving replies with
-  hand-drawn marks and marginalia—alter the felt presence and vulnerability of the
-  exchange compared to uniform keyboard input?
-- **RQ3 — Tempo (Earned Slowness):** When a reply arrives character by character after a
-  deliberate pause, is the wait experienced as *attentive writing* or as *system
-  latency*?
-- **RQ4 — Ritual (Single-Hand Spatiality):** Does enforcing "one hand on the sheet at a
-  time" produce a contemplative turn-taking ritual, or merely operational friction?
-- **RQ5 — Absence (Non-Accumulation):** Across repeated encounters, does returning to a
-  page with no cross-session memory feel liberating (unburdened) or hollow (unheard)?
-
-> [!NOTE]
-> **Scope of the Claim:** This is a **design research claim, not a clinical one**.
-> Inkling does not assert that forgetting is universally therapeutic, that handwriting
-> is superior to typing, or that slowness is inherently virtuous. It argues that
-> *persistence, modality, and tempo are designable ideological conditions*, and that
-> inverting the industry defaults opens an overlooked space for candid reflection.
+This is a **design claim, not a clinical one**. It does not claim that forgetting is
+therapeutic, that handwriting is better than typing, or that slowness is virtuous. It
+claims that persistence, input mode, and tempo are designable conditions, and that
+removing the archive changes the cost of being honest.
 
 ---
 
-## 2. Theoretical Framework & Intellectual Lineage
+## 2. Lineage: what was borrowed, where it departs
 
-Inkling is situated at the intersection of **Critical Design**, **Slow Technology**, and
-**Counterfunctional Interaction Design**. Rather than treating these traditions as
-decorative labels, the artifact operationalizes specific theoretical commitments from
-seven streams of HCI scholarship.
+Inkling sits at the intersection of **slow technology**, **critical design**, and
+**counterfunctional design** — the sort of work that belongs in an ACM DIS Provocation.
+Rather than treating those traditions as labels, the build borrows specific ideas from
+each and departs from them where a conversational AI demands something different.
 
-```mermaid
-flowchart TB
-    subgraph Critique["1 · Critical Stance"]
-        CD["Critical & Adversarial Design<br/>(Dunne & Raby, 2013; Bardzell & Bardzell, 2013; DiSalvo, 2012)"]
-        CF["Counterfunctional Things & Undesigning<br/>(Pierce & Paulos, 2014; Pierce, 2012)"]
-    end
+### Slow technology and microboundaries
 
-    subgraph Material["2 · Material & Temporal Craft"]
-        ST["Slow Technology & Microboundaries<br/>(Hallnäs & Redström, 2001; Odom et al., 2014; Cox et al., 2016)"]
-        EF["Ephemeral UI & Design for Forgetting<br/>(Bannon, 2006; Döring et al., 2013; Sas & Whittaker, 2013)"]
-        EM["Embodied Interaction & Ambiguity<br/>(Dourish, 2001; Gaver et al., 2003; Chalmers & Galani, 2004)"]
-    end
+Hallnäs and Redström (2001) proposed slow technology not as slow hardware, but as
+design that creates time for reflection instead of optimizing it away. Grosse-Hering et
+al. (2013) and Odom et al. (2014) showed how slowing down moments of interaction builds
+anticipation and ritual. Cox et al. (2016) added the idea of **design frictions and
+microboundaries**: small intentional pauses that interrupt automatic habits.
 
-    subgraph Knowledge["3 · Epistemic Output"]
-        RTD["Research through Design & Strong Concepts<br/>(Zimmerman et al., 2007; Gaver, 2012; Höök & Löwgren, 2012)"]
-    end
+Inkling uses three microboundaries on every turn: a four-second hand-over ring when the
+pen stops (with a **Not yet** button to keep the page), a one-hand gate that waits for
+your ink to sink before the reply begins, and a 650ms listening beat before the first
+stroke. Where slow technology usually studies domestic objects over months, Inkling
+applies slowness to real-time AI streaming as a condition on what gets written.
 
-    Critique --> Material --> Knowledge
-```
+### Counterfunctional things and undesigning
 
-### 2.1 Critical, Reflective, and Adversarial Design
-Critical design uses speculative and functional artifacts to expose hidden norms, values,
-and power asymmetries embedded in everyday technology (Dunne & Raby, 2013; Bardzell &
-Bardzell, 2013). Sengers et al. (2005) argue for *reflective design*, where interfaces
-surface their own limitations so users can critically negotiate their relationship with
-the system. DiSalvo (2012) extends this into *adversarial design*, where an artifact
-contests a hegemonic technological narrative by materializing an agonistic alternative.
-In Inkling, the contested narrative is **memory-first AI** (exemplified by generative
-agent architectures that log, synthesize, and retrieve every observation; Park et al.,
-2023). Inkling does not critique AI memory through a policy essay; it builds a working
-conversational page where memory is structurally absent.
+At DIS, Pierce and Paulos (2014) introduced **counterfunctional things**: objects that
+deliberately remove or invert a core digital function — such as a camera that prevents
+reviewing or exporting photos — to open new kinds of experience. This builds on
+Pierce's (2012) account of **undesigning**: negating familiar features by design.
 
-### 2.2 Counterfunctional Things and Undesigning
-At ACM DIS, Pierce and Paulos (2014) introduced **counterfunctional things**: artifacts
-that deliberately inhibit, invert, or strip away core canonical functions of a digital
-genre (such as a digital camera that prevents reviewing or exporting photos) to unlock
-new experiential qualities. This builds on Pierce's (2012) framework of **undesigning
-technology**—the intentional negation of design features by design. Inkling is a
-counterfunctional conversational agent. By removing the canonical affordances of both
-chatbots and journaling apps (no scrollback, no search, no export, no typing indicator,
-no skip button, no profile), it forces the interaction to rely entirely on **attention
-in the present turn**.
+Inkling is a counterfunctional conversational interface. By removing history, search,
+export, copy-paste bubbles, typing indicators, and a skip button, it takes away the
+tools people normally use to manage a chat thread. What remains is a single turn on a
+single sheet.
 
-### 2.3 Slow Technology, Slow Design, and Microboundaries
-Hallnäs and Redström (2001) formulated **slow technology** not as technology that runs
-on slow hardware, but as design that *creates time for reflection* by refusing
-efficiency as its primary metric. Grosse-Hering et al. (2013) and Odom et al. (2014)
-demonstrated how slowing down moments of interaction fosters anticipation, ritual, and
-meaningful engagement. Complementing this, Cox et al. (2016) introduced **design
-frictions and microboundaries**: small, intentional obstacles that interrupt mindless,
-automatic interaction loops and prompt mindful transition. Inkling embeds three
-microboundaries into every turn:
-1. A **4-second hand-over ring** that fills only when the pen rests (with a **Not yet**
-   escape to reclaim manual control).
-2. A **one-hand turn gate** (`whenPaperClears()`) that absorbs the user's entry into the
-   paper before Riddle takes the sheet.
-3. A **650ms listening beat** before the first stroke of the reply, followed by a
-   grapheme-by-grapheme reveal with punctuation rests.
+### Forgetting and ephemeral interfaces
 
-### 2.4 Ephemeral User Interfaces and Design for Forgetting
-In ubiquitous computing and HCI, Bannon (2006), Mayer-Schönberger (2009), and Sellen and
-Whittaker (2010) challenged the ideology of *total capture*, showing that human memory
-depends as much on forgetting as on retention, and that permanent digital records induce
-self-censorship. Döring et al. (2013) formalized **ephemeral user interfaces**—interfaces
-whose elements intentionally decay over time, using transience as an expressive design
-material. Sas and Whittaker (2013) further argued for **design for forgetting**, showing
-that letting go of emotionally charged digital traces requires deliberate material
-rituals rather than clinical deletion. Inkling translates ephemeral UI from physical
-materials (water, soap, fading thermochromic ink) into conversational typography: words
-arrive wet, dry into the paper, dwell for a script-weighted reading duration, and
-dissolve word by word from both the visual sheet and the DOM.
+Bannon (2006), Mayer-Schönberger (2009), and Sellen and Whittaker (2010) argued against
+total capture: human memory depends on forgetting as much as keeping, and permanent
+digital archives make people censor themselves. Döring et al. (2013) mapped out
+**ephemeral user interfaces** where decay is an expressive material, and Sas and
+Whittaker (2013) showed that letting go of digital traces works best when it is designed
+as a visible ritual rather than a delete button.
 
-### 2.5 Embodied Interaction, Ambiguity, and Seamfulness
-Dourish (2001) established that **embodied interaction** is not merely physical input,
-but how meaning is created through situated, bodily engagement with the world. Typing
-flattens expression into discrete, uniform keystrokes; handwriting preserves somatic
-trace—hesitation appears as stroke wobble, emphasis as pen pressure, and spatial layout
-as personal rhythm. On the output side, Inkling draws on Gaver, Beaver, and Benford's
-(2003) **ambiguity as a resource for design**. Instead of mimicking an omniscient
-therapist or life coach, Riddle is constrained to poetic economy: echoing one exact
-phrase from the user, asking at most one open question, or drawing one of sixty
-hand-sketched glyphs (`[[rain]]`, `[[knot]]`, `[[hourglass]]`) without explanation. This
-ambiguity leaves the interpretive work with the writer. Furthermore, following Chalmers
-and Galani's (2004) **seamful design**, Inkling does not disguise its nature as a
-machine: when asked what it is, it states plainly in one sentence that it is a program,
-and when handwriting is illegible, it admits it cannot read the stroke rather than
-hallucinating certainty.
+Inkling turns ephemerality into conversational ink: words arrive wet, dry into the
+sheet, stay long enough to be read, and fade out of both the screen and the DOM.
 
-### 2.6 Social Responses, the ELIZA Effect, and Anti-Persona Restraint
-Since Weizenbaum's (1966) ELIZA and Nass and Moon's (2000) CASA (*Computers Are Social
-Actors*) paradigm, HCI has known that humans readily attribute mind, empathy, and
-personhood to minimal textual cues. Relational agents (Bickmore & Picard, 2005)
-deliberately amplify these cues—via avatars, small talk, and persistent relational
-memory—to build long-term emotional bonds. Expressive writing research (Pennebaker &
-Beall, 1986) shows that putting difficult experiences into words is beneficial even
-without an advisor, yet combining expressive disclosure with an anthropomorphic AI
-creates severe ethical risks of parasocial dependency. Inkling navigates this knife-edge
-through **anti-persona restraint**: it uses handwriting and tempo to create the felt
-sense of *being listened to in the moment*, while stripping away every mechanism of
-long-term relational capture.
+### Critical, reflective, and adversarial design
 
-### 2.7 Research through Design and Strong Concepts
-In **Research through Design (RtD)** (Zimmerman et al., 2007; Gaver, 2012), the designed
-artifact is not a neutral stimulus for a usability test; it is a physical/digital
-embodiment of theory. Boehner et al. (2007) argue that probes and provocations succeed
-when they open interpretive space rather than converging on standardized metrics. To
-bridge the gap between a single bespoke artifact and general theory, Höök and Löwgren
-(2012) propose **strong concepts**: intermediate-level design knowledge that names a
-generative interactive behavior over time, abstracted just enough to travel across
-application domains. Inkling contributes the five-part forgetting lifecycle (**absorb ·
-dwell · clear · hold · hand back**) as a strong concept for ephemeral human–AI
-interaction.
+Critical design uses working or speculative objects to expose the hidden values inside
+everyday products (Dunne & Raby, 2013; Bardzell & Bardzell, 2013). Sengers et al.
+(2005) argued for reflective interfaces that make their own limits legible, and DiSalvo
+(2012) described adversarial design as contesting a dominant narrative by building a
+concrete alternative. Here the dominant narrative is memory-first AI; the counter-case
+is a page that forgets on purpose.
 
-### Synthesis: Related Work Matrix
+### Embodiment, ambiguity, and seamfulness
 
-| Lineage & Source | Core Concept Borrowed | Materialization in Inkling | Where Inkling Departs / Extends |
+Typing is uniform; handwriting carries the body's hesitation and pressure (Dourish,
+2001). On the reply side, Inkling leans on Gaver, Beaver, and Benford's (2003)
+**ambiguity as a resource for design**. Instead of acting like an all-knowing coach,
+Riddle copies back one exact fragment of what you wrote, asks at most one question, or
+draws one of sixty small shapes (`[[rain]]`, `[[knot]]`, `[[hourglass]]`) without
+explaining it. Ambiguity leaves the meaning with the writer. And following Chalmers and
+Galani's (2004) **seamful design**, the page does not hide what it is: if asked, it
+states in one sentence that it is a program, and if handwriting is illegible, it says
+so plainly.
+
+### Social responses and restraint
+
+Since Weizenbaum's (1966) ELIZA and Nass and Moon's (2000) work on social responses to
+computers, HCI has known how easily people project a listener into a machine. Relational
+agents (Bickmore & Picard, 2005) build on that projection to create long-term bonds.
+Expressive writing (Pennebaker & Beall, 1986) shows the value of putting a hard day
+into words, but pairing disclosure with a synthetic persona risks unhealthy attachment.
+Inkling uses handwriting and tempo to feel attentive in the moment while refusing every
+feature that builds long-term dependency.
+
+### Research through design and strong concepts
+
+In Research through Design, the artifact itself carries the argument (Zimmerman et al.,
+2007; Gaver, 2012), and different readers will interpret a probe in different ways
+(Boehner et al., 2007). To explain how a single design transfers to other projects,
+Höök and Löwgren (2012) proposed **strong concepts**: intermediate-level knowledge that
+names an interactive behavior over time. Inkling offers the five-part forgetting cycle
+(*absorb, dwell, clear, hold, hand back*) as a strong concept for ephemeral interfaces.
+
+| Work | Idea borrowed | Where it appears in Inkling | Where Inkling departs |
 |---|---|---|---|
-| **Slow Technology**<br/>Hallnäs & Redström (2001); Grosse-Hering et al. (2013); Odom et al. (2014) | Producing time for reflection; anticipation over instant utility | 650ms listening beat; character-by-character reveal; reading-weighted dwell; no skip button | Slowness is applied to real-time generative AI streaming, acting as a condition on *disclosure* rather than domestic contemplation alone |
-| **Counterfunctional Design & Undesigning**<br/>Pierce & Paulos (2014); Pierce (2012) | Designing digital limitations by negating canonical features | Refusal of chat history, export, search, copy-paste bubbles, and cross-session memory | Moves counterfunctionality from hardware/camera prototypes into conversational LLM interfaces |
-| **Forgetting & Total Capture Critique**<br/>Bannon (2006); Mayer-Schönberger (2009); Sellen & Whittaker (2010) | Total capture induces self-censorship; forgetting is an affirmative feature | Stateless server, tab-bound session, `store: false` upstream, no transcript archive | Operationalizes forgetting not as archival pruning/search filtering, but as immediate *in-situ* vanishing of the dialogue |
-| **Ephemeral UI & Ritual Disposal**<br/>Döring et al. (2013); Sas & Whittaker (2013) | Decay as an expressive interface material; rituals of letting go | Staggered CSS ink absorption and word-order fade; DOM node removal on `animationend` | Pairs visual ephemerality with a persistent accessibility layer (`aria-live` + `hold-to-keep`) so transience never causes exclusion |
-| **Critical, Reflective & Adversarial Design**<br/>Dunne & Raby (2013); Bardzell & Bardzell (2013); Sengers et al. (2005); DiSalvo (2012) | Contesting dominant technological ideologies through working counter-proposals | Inverting the *Remember Everything* default of companion and productivity AI | Deployed as a daily-use web instrument with falsifiable behavioral hypotheses, not a static gallery prop |
-| **Embodied Interaction, Ambiguity & Seams**<br/>Dourish (2001); Gaver et al. (2003); Chalmers & Galani (2004) | Bodily inscription; interpretive ambiguity; honest system seams | Stylus/finger pressure canvas; 60 unannotated glyphs (`[[knot]]`); one-sentence program disclosure | Combines multimodal vision transcription (`READ:` stream splitting) with typographic/SVG stroke choreography |
-| **Design Frictions & Microboundaries**<br/>Cox et al. (2016) | Small mindful obstacles that prevent impulsive, automatic action | 4s hand-over ring on pen lift; **Not yet** override; single-occupant paper gate | Uses microboundaries to pace turn-taking between human and AI rather than blocking app launch |
-| **Social Actors, ELIZA & Expressive Writing**<br/>Weizenbaum (1966); Pennebaker & Beall (1986); Nass & Moon (2000); Bickmore & Picard (2005) | Projection of a listener onto text; emotional disclosure through writing | Riddle echoes a fragment, marks a phrase (`((circle))`), and asks at most one question | Explicitly refuses relational persistence, therapeutic claims, and persona Lock-in |
-| **RtD, Probes & Strong Concepts**<br/>Zimmerman et al. (2007); Boehner et al. (2007); Gaver (2012); Höök & Löwgren (2012) | Artifact as theoretical argument; intermediate-level design knowledge | Five-stage forgetting vocabulary (*absorb, dwell, clear, hold, hand back*); built-in study toggles | Couples RtD craft reflection with deterministic engine invariants (207 tests) and a zero-logging study design |
+| Hallnäs & Redström, 2001; Grosse-Hering et al., 2013; Odom et al., 2014 | Slowness creates room for reflection and anticipation | 650ms beat, hand-paced reveal, reading dwell, no skip | Applied to live AI dialogue as a condition on candor, not only contemplation |
+| Pierce & Paulos, 2014; Pierce, 2012 | Counterfunctional design: removing features to open new use | No history, export, search, chat bubbles, or skip | Moves counterfunctionality from hardware/cameras into LLM interfaces |
+| Bannon, 2006; Mayer-Schönberger, 2009; Sellen & Whittaker, 2010 | Total capture chills candor; forgetting is a feature | Stateless server, tab-only context, `store: false` | Forgetting happens in front of the writer on every turn, not in an archive later |
+| Döring et al., 2013; Sas & Whittaker, 2013 | Decay as a material; rituals of release | Ink absorbs at hand-over and fades word by word | Pairs visual decay with an accessible layer (`aria-live`, hold-to-keep) |
+| Dunne & Raby, 2013; Bardzell & Bardzell, 2013; Sengers et al., 2005; DiSalvo, 2012 | Artifacts as arguments that contest dominant defaults | Inverting memory-first AI (Park et al., 2023) | Built as a daily-use web app with testable toggles, not a gallery prop |
+| Dourish, 2001; Gaver et al., 2003; Chalmers & Galani, 2004 | Embodied input, interpretive ambiguity, honest seams | Pressure strokes, 60 unexplained glyphs, plain disclosure | Combines vision reading (`READ:` split) with typographic and SVG ink |
+| Cox et al., 2016 | Microboundaries interrupt automatic habits | 4s hand-over ring, **Not yet**, one-hand sheet gate | Paces turn-taking inside a conversation rather than blocking app entry |
+| Weizenbaum, 1966; Pennebaker & Beall, 1986; Nass & Moon, 2000; Bickmore & Picard, 2005 | Projecting a listener into text; writing a day down | Echoing one fragment, marking a phrase, at most one question | Refuses persona, avatar, advice, and relational memory |
+| Zimmerman et al., 2007; Boehner et al., 2007; Gaver, 2012; Höök & Löwgren, 2012 | Artifact as argument; strong concepts that travel | The five-word forgetting vocabulary and built-in study modes | Pairs design reflection with 207 engine tests and a zero-logging study plan |
 
 ---
 
-## 3. The Artifact as an Epistemic Instrument
+## 3. What the artifact does to the exchange
 
-In Research through Design, an argument stands or falls by the precision of its
-materialization (Gaver, 2012). The three constraints of Inkling are not metaphors; they
-are deterministic mechanisms enforced across the client state machine, the CSS animation
-compositor, and the stateless API boundary.
+The constraints are not features. Each one removes something familiar from the exchange
+to make room for something else.
 
-### 3.1 Mechanistic Operationalization of the Three Constraints
-
-| Constraint | Architectural & Interaction Mechanism | Experiential Consequence for the Writer |
+| Constraint | What it removes | What it makes room for |
 |---|---|---|
-| **1. It Forgets**<br/>*(Non-Persistence)* | • Zero database, zero server content logging (errors log class only)<br/>• Session context lives strictly in volatile tab memory (max 24 turns)<br/>• OpenAI Responses API explicitly sets `store: false`<br/>• `ABSORB_*` transition sinks user ink in `400ms` dwell + `900ms` fade | Reloading or closing the tab is an irreversible clean slate. There is no future self or persistent profile watching over the writer's shoulder. |
-| **2. It Is Written by Hand**<br/>*(Embodied Modality)* | • Default input is freehand canvas (`perfect-freehand`, pointer pressure)<br/>• Canvas rasterizes to PNG (`≤1024px`) for vision reading; `READ:` transcript is stripped from the visual stream so only raw user strokes appear<br/>• Replies use 4 paired Latin/Hangul hands + SVG `stroke-dashoffset` marks (`__underline__`, `((circle))`, `==highlight==`) and 60 hand-drawn glyphs (`[[name]]`) | Composition slows from keystroke bursts to physical strokes. Hesitation, pressure, and margin marks remain visible on the sheet. |
-| **3. It Is Slow**<br/>*(Earned Tempo)* | • Single-occupant sheet gate (`whenPaperClears()`) holds reply until user ink vanishes<br/>• `650ms` listening beat before the first reply stroke<br/>• Script-normalized grapheme reveal (`~50ms/char` at default pace, ±18% seeded jitter, scaled punctuation rests)<br/>• Reading-weighted dwell (`4.5s–20s`, scaled by script density) before word-staggered fade | Waiting is transformed from dead network latency into visible, rhythmic inscription. The writer rereads their own words as they sink into the paper. |
+| **It forgets** | The archive, the future reader, continuity | Candor, present tense, release |
+| **It is handwritten** | Uniform input, copy-paste, speed | Hesitation, pressure, presence |
+| **It is slow** | Instant output, skimming | Rereading, anticipation, attention |
+| **One hand at a time** | Multitasking, interruption, a scrolling feed | Ritual, turn-taking, a single shared sheet |
 
-### 3.2 Choreography of a Single Turn (Blank-Page Mode)
+### The archive is removed
 
-Because the network request dispatches the instant the entry is handed over—while the
-user's ink is still sinking into the paper—**model inference latency is hidden inside
-the material ritual** rather than experienced as a loading state.
+The page clears before the reply and again after it. There is no history panel, no
+export, no search. The point is not privacy in the compliance sense; it is that the
+writer has **no future audience to perform for**. The cost is real: no continuity, no
+building on yesterday, no record to return to. The artifact does not claim this cost is
+always worth paying; it makes the cost visible.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Writer as Writer (Hand / Pen)
-    participant Sheet as Paper Surface (DOM)
-    participant Gate as Turn Gate (Session Store)
-    participant AI as Stateless API (store: false)
+### The body is put back in
 
-    Writer->>Sheet: Stops writing (4.0s countdown ring fills, or tap Hand Over)
-    par Material Absorption (0.0s – 1.3s)
-        Sheet->>Gate: Mark user ink "absorbing" (400ms dwell + 900ms fade)
-        Sheet-->>Sheet: Composer disappears; user ink sinks into paper
-    and Hidden Network Flight
-        Gate->>AI: POST /api/converse (PNG canvas + volatile tab history)
-        AI-->>Gate: Stream SSE tokens (split off "READ:" transcript, queue deltas)
-    end
-    Sheet->>Gate: onRemoved() — Sheet is completely empty (~1.3s)
-    Gate->>Sheet: Open gate → 650ms listening beat (ink drop breath)
-    Sheet->>Writer: Reveal reply grapheme-by-grapheme + stroke marks & glyphs (~1.95s+)
-    Note over Writer,Sheet: Dwell for script-weighted reading estimate (4.5s – 20.0s)<br/>Writer may press & hold paper ("hold-to-keep") to freeze time
-    Sheet->>Sheet: Staggered word-by-word fade (5.0s) → DOM nodes removed
-    Sheet->>Writer: Hand back empty sheet (640ms composer rise, focus restored)
-```
+Handwriting is slower, clumsier, and more revealing than typing. Hesitation is a
+wobble; feeling is pressure. When you write by hand, the canvas is sent to the model as
+an image and its `READ:` transcription is stripped from the display stream, so what
+remains on the paper is your own hand rather than machine text. Handwriting changes the
+unit of expression from the message to the stroke, and the tempo of thought from
+**send** to **compose**.
 
-### 3.3 Positioning Across Conversational & Reflective Archetypes
+### Time is made visible
 
-Inkling is not the first ephemeral interface, the first pen-based note app, or the first
-slow technology probe. Its contribution lies in **holding all three constraints together
-as an irreducible system** within a generative AI dialogue:
+The reply is not pasted; it is written. Because the network request leaves the moment
+you hand the entry over — while your ink is still sinking into the paper — model
+latency hides inside the ritual instead of showing up as a spinner:
 
-| System Archetype | Retention Model | Primary Modality | Temporal Regime | Relational Stance | Primary Optimization Target |
-|---|---|---|---|---|---|
-| **Memory-First AI Assistant**<br/>*(e.g., ChatGPT Memory, Gemini)* | Cross-session profile, searchable transcript archive | Keyboard, voice | Instant streaming (`>50 tok/s`) | Helpful utility / adaptive assistant | Task efficiency, user lock-in, retention |
-| **Relational Companion AI**<br/>*(e.g., Replika, Character.AI)* | Long-term emotional memory, persona backstory | Chat bubbles, avatars, voice | Instant messaging cadence | Parasocial friend / romantic / therapist | Daily active engagement, emotional attachment |
-| **Digital Journaling App**<br/>*(e.g., Day One, Apple Journal)* | Encrypted permanent archive, calendar streaks, tags | Keyboard, photo attachments | Immediate local save | Passive vault / self-archiving tool | Habit streaks, longitudinal life-logging |
-| **Slow Technology Probe**<br/>*(e.g., Photobox, Odom et al., 2014)* | Curated physical/digital domestic archive | Asynchronous system | Days to months (unpredictable) | Domestic artifact | Anticipation, re-visitation |
-| **Inkling**<br/>*(This Provocation)* | **Zero persistence (`store: false`, tab-only, DOM-cleared)** | **Handwriting first (stylus/finger + 60 glyphs)** | **Hand-paced reveal + reading dwell + single-hand turn gate** | **Attentive sheet (echoes fragment, ≤1 question, no persona)** | **Present-tense candor, self-disclosure, critical reflection** |
+| Time | What happens on the sheet |
+|---|---|
+| `0s` | Pen stops. The 4s countdown ring fills (or you tap Hand over). Request leaves at once. |
+| `0s – 1.3s` | Your ink sinks into the paper (`400ms` dwell + `900ms` fade). The composer disappears. |
+| `~1.3s` | The sheet is empty. The turn gate opens; the `650ms` listening beat begins. |
+| `~1.95s` | First character appears. Characters reveal at a hand's pace (`~50ms` weighted), with rests at commas and periods. |
+| Reply end | The reply rests for a reading estimate (`4.5s – 20s`), then fades word by word over `5s`. |
+| After fade | The empty sheet hands the composer back at the top (`640ms` rise). |
 
-Remove any one of Inkling's three constraints and the provocation collapses into a
-familiar product category:
-- *Keep the hand and slowness, but add an archive* → an aestheticized journaling app.
-- *Keep the forgetting and slowness, but default to keyboard chat bubbles* → an
-  ephemeral messaging client.
-- *Keep the forgetting and the hand, but stream replies instantly* → a handwriting OCR
-  utility where the AI breaks the illusion of the shared sheet.
+### Where it sits among familiar tools
 
-### 3.4 Decisions and Rejected Alternatives
+Read down any column below and each choice has been tried before. Read across the last
+row and the argument appears: remove any one constraint and Inkling collapses back into
+a familiar category.
 
-A design provocation is defined by the easy conveniences it refuses. Each architectural
-decision below rejected a simpler, more conventional implementation and accepted a
-deliberate experiential cost:
-
-| Design Decision | Conventional Alternative Rejected | Why Rejected (Theoretical Grounds) | Cost Deliberately Accepted |
-|---|---|---|---|
-| **Blank-page mode by default** | Keep the conversation scrolling on screen | Ephemerality must be structural, not a hidden toggle; a visible scrollback reinstates the archive | Zero rereading of prior turns; an accidental reload erases the session |
-| **Handwriting canvas on first paint** | Keyboard text box as default | The thesis concerns embodied inscription; opening with a text box frames the app as a chatbot with a cursive font | Higher initial friction on desktop devices without a stylus (typing remains one click away) |
-| **Dual-backend clock (`clip-path` + `stroke-dashoffset`)** | Standard token-by-token text append | Token chunks arrive irregularly and read as machine output; per-grapheme rhythm with punctuation lifts reads as a hand | Complex deterministic scheduling (`InkClock`) and script-weight normalization |
-| **Fixed table of 60 hand-crafted glyphs** | Let the LLM generate raw inline `<svg>` | Model-generated SVG paths are geometrically unreliable and open XSS/injection vectors; a lookup table guarantees stroke order and safety | Expressive drawing vocabulary is bounded to 60 curated concepts |
-| **Script-weighted reading dwell (`readDwellMs`)** | Fixed 10-second fade timer for all turns | A three-word acknowledgment and a three-sentence reflection require different reading times; fixed timers feel either rushed or stuck | Requires per-script weighting (`Hangul` vs. `Latin`) and user pace multipliers |
-| **Removal of leading nib/caret during reveal** | Animated pen nib or blinking cursor at the writing edge | At body text scale, a leading dot reads as a digital text cursor rather than a physical pen, breaking the paper metaphor | The reader must track the growing ink edge solely through motion and wet-ink color drying |
-| **Upstream `store: false` on Responses API** | Default OpenAI API request parameters | OpenAI retains Responses API state for 30 days by default; leaving the default intact silently betrays the non-persistence promise | Requires explicit documentation separating application-state opt-out from abuse-monitoring logs |
-| **No "Skip Animation" button** | A skip/fast-forward control during AI replies | A skip button immediately reframes the writing tempo as an annoying loading screen to be bypassed | Impatient users may bounce; accessibility relies on `prefers-reduced-motion` and `aria-live` instead |
-
----
-
-## 4. Design Value & Transferable Implications
-
-What does HCI and AI design practice gain from a diary that refuses to remember?
-Following Höök and Löwgren (2012), we articulate Inkling's design value not as universal
-laws, but as **six transferable design implications** and **one strong-concept
-vocabulary** that travel to other reflective, intimate, or conversational systems.
-
-### 4.1 Six Implications for Designing Reflective AI
-
-#### 1. Memory Is a Moral and Epistemic Choice, Not a Neutral Default
-In mainstream AI product design, persistence is treated as an infrastructure given: logs
-are kept because storage is cheap, profiles are built because personalization increases
-retention, and transcripts are saved because users might want them. Inkling demonstrates
-that **memory is never neutral**. Every stored turn introduces a panoptic observer into
-the room—changing what the user dares to articulate—and creates an institutional
-obligation to monetize or protect that archive.
-- **What this asks of designers:** Conduct an explicit **Memory Audit** before storing
-  conversational state. Ask not only *"How do we secure this data?"* but *"What does the
-  existence of this record prevent the user from saying?"* Treat structural forgetting
-  (including provider-level flags like `store: false`) as an affirmative privacy and
-  candor affordance.
-
-#### 2. Slowness Must Be Earned Through Brevity and Rhythmic Legibility
-Adding an artificial delay to a chatbot does not make it "slow technology"; it makes it
-a slow chatbot. Waiting is a claim on human time. In Inkling, the wait is legible as
-*writing* only because three conditions hold simultaneously:
-1. The user's own entry has just sunk into the paper, leaving a quiet visual interstice.
-2. The reply arrives with human micro-rhythms (per-character stroke weights, ±18%
-   jitter, and proportional pen lifts at commas and full stops).
-3. The reply is strictly brief (1–3 sentences, or a single drawing).
-- **What this asks of designers:** Never impose slowness without reducing volume. If an
-  interface asks a user to wait ten seconds, the response must carry the density and
-  restraint of something written by hand.
-
-#### 3. Spatial Turn-Taking ("One Hand at a Time") Replaces the Infinite Feed
-The scrolling chat feed—inherited from telegraphy, IRC, and SMS—frames conversation as
-an accumulating ledger of transactions. By enforcing that **the sheet belongs to one
-hand at a time** (your ink absorbs before Riddle writes; Riddle's ink clears before your
-composer returns at the exact same vertical coordinate), Inkling transforms the screen
-from a *timeline* into a *place*.
-- **What this asks of designers:** Question the scrolling feed for reflective or
-  decompressive interfaces. When prior turns do not stack vertically, users stop
-  managing a thread and start inhabiting a turn.
-
-#### 4. Handwriting Is an Epistemic Mode, Not a Typographic Skin
-Applying a cursive webfont to a standard chat input is skeuomorphic decoration. Treating
-handwriting as a genuine **interaction mode** means designing for the body's
-imperfections: variable pressure, hesitation, spatial annotations (`__underline__`,
-`((circle))`, `==highlight==`), inline sketches (`[[leaf]]`, `[[candle]]`), and the
-possibility of being misread. Notably, when a user writes by hand in Inkling, the system
-never replaces their strokes on screen with OCR text; their actual hand remains the
-artifact until it sinks into the paper.
-- **What this asks of designers:** When incorporating somatic or analog modalities
-  (handwriting, voice tone, sketch), preserve the raw expressive trace rather than
-  immediately normalizing it into clean machine text.
-
-#### 5. Productive Ambiguity Resists Parasocial and Therapeutic Overreach
-Large language models are trained to be helpful, comprehensive, and authoritative—traits
-that become hazardous when users disclose personal distress. Rather than engineering an
-elaborate empathetic persona, Inkling applies Gaver et al.'s (2003) **ambiguity of
-relationship and information**: Riddle copies back one exact fragment of the user's own
-words, asks at most one quiet question, or leaves a single unannotated drawing. By doing
-less, the interface avoids simulating clinical authority while still offering the relief
-of being heard.
-- **What this asks of designers:** In wellbeing and reflection contexts, design prompts
-  and output grammars that **mirror and open** rather than **diagnose and advise**. Use
-  non-verbal or ambiguous tokens (marks, glyphs, silence) where prose would overstep.
-
-#### 6. Ephemerality and Accessibility Must Be Designed as a Paired Pattern
-A disappearing interface is inherently hostile to accessibility if designed naively: it
-penalizes slow readers, people with cognitive or visual impairments, and anyone whose
-attention is interrupted. Inkling proves that **ephemerality and accessibility are not
-opposites** when visual transience is decoupled from perceptual access:
-- Visual ink fades on the canvas, while a visually hidden `aria-live="polite"` region
-  retains the full text for screen readers.
-- Pressing and holding anywhere on the paper (or holding `Space`) freezes `--fade-state:
-  paused`, halting all CSS animations and darkening the ink.
-- Switching tabs (`document.visibilityState === "hidden"`) or actively writing pauses
-  all dwell clocks so a user never returns to a blank page by surprise.
-- `prefers-reduced-motion: reduce` collapses the character reveal into an instant fade-in
-  and removes blur while preserving the conceptual lifecycle (except the 4-second
-  hand-over countdown ring, which must run its true duration so it never lies about when
-  an entry leaves the user's hands).
-
-### 4.2 Strong Concept: A Vocabulary for Designing Forgetting
-
-To make "designing for forgetting" operational across HCI projects, Inkling defines five
-distinct temporal phases. Each names an observable, parameterizable moment in an
-ephemeral exchange:
-
-| Term | Phase Definition | Governing Mechanism in Inkling | Experiential Function | If Removed… |
+| Archetype | What it keeps | Input | Tempo | What it optimizes for |
 |---|---|---|---|---|
-| **1. Absorb** | The deliberate sinking of the user's contribution upon hand-over, *before* the system replies. | `ABSORB_DWELL_MS` (`400ms`) + `ABSORB_FADE_MS` (`900ms`); hides model TTFB inside the visual sink. | Signals that the page has received the words and is releasing them from the surface. | Both voices crowd the sheet; the exchange reads as a persistent chat log. |
-| **2. Dwell** | The interval a reply rests on the surface after its last stroke finishes, scaled to reading effort. | `readDwellMs()`: `900` script-weighted units/min + `1.2s` tail, clamped to `4.5s–20.0s` × pace multiplier. | Gives the reader unhurried time to absorb the reply without a visible countdown clock. | Short replies linger awkwardly; long or dense replies vanish mid-sentence. |
-| **3. Clear** | The staggered dissolution of the reply from both the visual viewport and the underlying DOM tree. | Per-word staggered CSS keyframe (`5.0s`); DOM cleanup bound to `animationend`, never a blind `setTimeout`. | Completes the promise of non-persistence; leaves zero scrollback or inspectable DOM residue. | Faded nodes accumulate in the DOM, degrading frame rate and breaking the privacy guarantee. |
-| **4. Hold** | A user-invoked suspension of decay that freezes time for as long as physical contact is maintained. | Pointer long-press / `Space` hold toggles `--fade-state: paused` on the sheet; **Not yet** cancels auto-hand-over. | Grants the reader agency over ephemerality; prevents disappearance from becoming a reading race. | Slow readers or reflective pauses are punished by irreversible loss. |
-| **5. Hand back** | The quiet return of the input surface to the top of the empty sheet once the last trace of the reply is gone. | `whenPaperClears()` resolves → `640ms` eased composer rise at fixed `100px` top offset + focus restoration. | Establishes spatial rhythm: every turn begins on a fresh, unencumbered sheet of paper. | The input box jumps erratically down and up the viewport as turns grow and vanish. |
+| **Memory-first assistant** | Transcripts, user profile, cross-session recall | Keyboard, voice | Instant | Task speed, retention |
+| **Companion chatbot** | Relationship history, persona backstory | Chat bubbles, voice | Instant | Attachment, daily return |
+| **Journaling app** | Encrypted archive, tags, streaks | Keyboard | Immediate save | Habit, personal archive |
+| **Slow-tech artifact** | Curated domestic traces | Varied | Hours to months | Anticipation, re-visitation |
+| **Inkling** | **Nothing (`store: false`, tab-only, DOM-cleared)** | **Hand first** | **Hand-paced, one turn at a time** | **Present-tense candor, reflection** |
 
-### 4.3 The Unresolved Tensions Matrix
+### Decisions and rejected alternatives
 
-A commercial product attempts to smooth over design tensions; a critical provocation
-Sharpens them and leaves them visible for inspection:
+A refusal only matters if the easier option was real. Every decision below rejected a
+simpler convention and paid a price for it:
 
-| Structural Decision | What It Buys (Value Gained) | What It Costs (Value Surrendered) | The Productive Tension Left Open |
+| Decision | Easier alternative | Why rejected | Cost accepted |
 |---|---|---|---|
-| **Zero History / No Export** | Psychological safety, unguarded candor, freedom from self-curation | Longitudinal continuity, ability to revisit a meaningful reply | **Candor vs. Continuity** |
-| **Handwriting First** | Somatic presence, stroke hesitation, personal intimacy | Input speed, effortless ergonomics on non-touch hardware | **Embodiment vs. Convenience** |
-| **Hand-Paced Reveal + Beat** | Anticipation, interstitial rereading, felt listening | Immediate throughput, skimmability | **Reflection vs. Efficiency** |
-| **Single-Hand Sheet Gate** | Contemplative ritual, spatial calm, undivided turn ownership | Ability to interrupt, multitask, or send rapid follow-ups | **Ritual vs. Autonomy** |
-| **Anti-Persona Restraint** | Epistemic honesty, protection against parasocial manipulation | Comforting warmth, illusion of a caring companion | **Honesty vs. Attachment** |
+| **Blank page by default** | Keep turns scrolling on screen | Forgetting should be structural, not hidden in settings | No rereading; a reload loses the turn |
+| **Pen by default** | Open with a text box | Opening with a text box frames the app as a chatbot with a font | Higher friction on devices without a stylus |
+| **Per-grapheme reveal** | Stream tokens as plain text | Token chunks read as machine output; character timing reads as a hand | Custom scheduling (`InkClock`) and script normalization |
+| **Fixed 60-glyph table** | Let the model output raw SVG | Model SVG paths break often and can carry markup | Expression is bounded to sixty drawings |
+| **Script-weighted dwell** | One fixed timer for every reply | A one-line reply and a three-line reply need different reading time | Formula tuning across Korean and English |
+| **No leading nib/caret** | A dot or cursor at the writing edge | At reading size, a leading dot reads as a text cursor | The eye must follow the growing ink edge itself |
+| **No skip button** | Skip animation control | A skip button turns writing back into a loading screen | Impatient readers leave; accessibility uses `prefers-reduced-motion` |
 
 ---
 
-## 5. Expected Outcomes & Phenomenological Predictions
+## 4. Design value and implications
 
-Because Inkling is framed as an empirical research instrument as well as a design
-provocation, its expected outcomes are formulated as **observable behavioral,
-interpretive, and disciplinary predictions** rather than vague aspirations.
+The provocation does not argue that every AI should forget. It argues that **the cost
+of memory is usually hidden**. A memory-first product shows what it remembers and calls
+that personalization; it rarely shows what the person left unsaid to avoid being
+remembered.
 
-```mermaid
-flowchart LR
-    subgraph C["Three Constraints"]
-        C1["It Forgets<br/>(No Archive)"]
-        C2["By Hand<br/>(Embodied Ink)"]
-        C3["Hand-Paced<br/>(Slow & Gated)"]
-    end
+These six implications are the intermediate-level design knowledge (Höök & Löwgren,
+2012) we think travel beyond Inkling:
 
-    subgraph M["Mediating Mechanisms"]
-        M1["Removal of Future Audience<br/>& Profile Surveillance"]
-        M2["Somatic Inscription<br/>& Margin Drawings"]
-        M3["Interstitial Rereading<br/>& Single-Hand Turn Ritual"]
-    end
+### 1. Memory is a choice with a cost, not a default
+A system that remembers builds a model of the user and gives the user a future observer
+to perform for. Designers of reflective or wellbeing tools should run a **memory
+audit**: state plainly what is kept, why, for how long, and what keeping it discourages
+the user from saying. That audit has to include upstream provider defaults such as
+OpenAI's 30-day retention (`store: false`).
 
-    subgraph O["Expected Outcomes"]
-        O1["The Candor Shift<br/>(Higher unguarded self-disclosure)"]
-        O2["Relational Reframing<br/>('Listening' vs. 'Generating')"]
-        O3["Mindful Decompression<br/>(Release without archival burden)"]
-    end
+### 2. Slowness has to be earned
+Waiting is a claim on someone's time. If nothing meaningful happens in the gap, a slow
+interface is just latency. In Inkling, the wait works only because the reply is short
+(one to three sentences), the character rhythm has human pauses, and your own sentence
+has just cleared the sheet. If you slow an interface down, write less.
 
-    C1 --> M1 --> O1
-    C2 --> M2 --> O2
-    C3 --> M3 --> O3
-    M1 --> O3
-    M3 --> O2
-```
+### 3. One hand at a time replaces the scrolling feed
+The scrolling chat feed treats conversation as a growing ledger. Giving the sheet to
+one hand at a time — your ink leaves before Riddle writes, and Riddle's ink leaves
+before the composer returns to the same spot at the top — turns the screen from a
+thread into a place. Turn-taking becomes the unit of design.
 
-### 5.1 Behavioral and Compositional Shifts (What Writers Will Do)
+### 4. Handwriting is a mode, not a skin
+Putting a handwriting font on a chat bubble is decoration. Treating the hand as a mode
+means designing for strokes, pressure, margin marks (`__underline__`, `((circle))`,
+`==highlight==`), inline drawings (`[[leaf]]`, `[[candle]]`), and the risk of being
+misread. Preserving the user's raw strokes on screen rather than swapping them for OCR
+text keeps the body in the exchange.
 
-1. **The Candor Shift (Lowered Threshold for Self-Disclosure):**
-   When writers internalize that neither they nor the system can retrieve the entry
-   tomorrow, we expect a measurable shift from *narrative summary* ("Today I worked on X
-   and met Y") to *unguarded, fragmented admission*—higher first-person density, more
-   specific emotional naming, and willingness to write sentences they would delete from
-   a permanent journal.
-2. **Interstitial Rereading During Absorption and Reveal:**
-   In standard chat interfaces, pressing `Enter` immediately shifts attention to the
-   bot's typing indicator. In Inkling, the `1.3s` absorption window and `650ms`
-   listening beat prompt the writer to watch their own words sink into the paper—turning
-   the transition into a moment of self-witnessing before Riddle writes a single letter.
-3. **Negotiating Time via Micro-Agency (`Hold` and `Not yet`):**
-   We expect participants to actively use **Not yet** when pausing mid-thought in
-   handwriting mode, and to press-and-hold the paper when a reply lands on a resonant
-   question or drawing (`[[knot]]`, `[[candle]]`). Time becomes a tactile material the
-   reader holds with their finger.
-4. **Boundary Testing and Trust Verification:**
-   In the first 1–2 sessions, users will test the provocation's honesty: refreshing the
-   tab to verify that the text truly disappears, checking whether Riddle remembers
-   yesterday's secret after a browser restart, and probing whether the page can be
-   provoked into giving advice. Once the refusal holds firm, deeper disclosure follows.
+### 5. Ambiguity beats false authority
+Language models are trained to explain and advise. When someone is writing about a hard
+day, unsolicited advice closes the thought and mimics clinical authority the model does
+not have. Borrowing Gaver et al.'s (2003) **ambiguity as a resource**, Riddle copies one
+phrase, asks at most one question, or leaves an unexplained drawing (`[[knot]]`). Doing
+less leaves the interpretation with the writer.
 
-### 5.2 Interpretive and Phenomenological Readings (How the Page Will Be Described)
+### 6. Ephemerality and accessibility belong together
+Disappearing text is exclusionary if designed carelessly: it punishes anyone who reads
+slowly, looks away, or uses a screen reader. Inkling pairs visual decay with a
+persistent `aria-live` region, a press-and-hold gesture that freezes the clock, timers
+that pause when the tab is hidden or the user is writing, and `prefers-reduced-motion`
+support. Ephemerality does not have to mean exclusion.
 
-Following Boehner et al. (2007), how participants interpret and name an artifact is
-primary evidence of its design work. We predict four specific interpretive shifts in
-exit interviews:
+### A vocabulary for designing forgetting
 
-| Conventional AI Framing | Expected Inkling Framing | Why the Shift Occurs |
+To make these ideas usable in other projects, Inkling names five moments in a
+disappearing exchange:
+
+| Term | What it names | How it works here | What breaks without it |
+|---|---|---|---|
+| **absorb** | The entry sinks at hand-over, before the reply begins. | `400ms` dwell + `900ms` fade while the request is in flight. | Both voices crowd the sheet; the page reads like a chat log. |
+| **dwell** | The reply stays for a reading estimate, not a fixed timer. | `readDwellMs()`: weighted by script and length (`4.5s – 20s`). | Short replies linger too long; long replies vanish mid-read. |
+| **clear** | The reply leaves both the screen and the DOM word by word. | `5s` staggered CSS fade; unmounted on `animationend`. | Hidden nodes pile up in the DOM and break the privacy promise. |
+| **hold** | Pressing the paper stops the clock so reading is not a race. | Pointer hold or `Space` sets `--fade-state: paused`. | Slow readers lose sentences they were still reading. |
+| **hand back** | The composer returns only after the sheet is empty again. | `whenPaperClears()` opens the top of the sheet (`640ms` rise). | The input box jumps up and down the screen as turns fade. |
+
+### The trade-offs the artifact accepts
+
+| Decision | What it buys | What it costs | The tension left open |
+|---|---|---|---|
+| **No history** | Candor, release | Continuity, revisiting a good reply | Candor vs. continuity |
+| **Hand input** | Embodiment, presence | Effort, slower input on desktop | Embodiment vs. convenience |
+| **Slow reveal** | Attention, anticipation | Patience, friction | Reflection vs. friction |
+| **One hand at a time** | Ritual, turn-taking | Control, ability to interrupt | Ritual vs. autonomy |
+| **No persona** | Honesty, non-manipulation | Warmth, sense of a companion | Honesty vs. attachment |
+
+The right-hand column is the design. A product tries to smooth these tensions over; a
+provocation keeps them open.
+
+---
+
+## 5. Expected outcomes
+
+These are predictions written as concrete signals so a study can confirm or refute
+them.
+
+### What we expect the writer to do
+
+- **Write more candidly.** With no archive and no future audience, entries should shift
+  from tidy summaries of the day toward unguarded, first-person fragments people would
+  hesitate to leave in a permanent journal.
+- **Reread their own sentence in the gap.** While the entry sinks (`1.3s`) and the
+  listening beat rests (`650ms`), the writer's attention stays on what they just let go
+  of rather than jumping straight to an answer.
+- **Hold the paper to control time.** When a question or a drawing lands, readers will
+  use **Not yet** and press-and-hold to pause the clock rather than wishing for a skip
+  button.
+- **Test the fade first.** In early sessions, users will reload the tab, wait out the
+  fade, or check whether Riddle remembers a previous session to verify that the promise
+  is real.
+
+### What we expect the page to be called
+
+How people describe a probe is part of the evidence (Boehner et al., 2007):
+- *"It listens / it wrote back"*, rather than *"it generated a reply"*.
+- *"Taking its turn"*, rather than *"loading"*.
+- *"A sheet of paper"*, rather than *"a chat window with a font"*.
+- *"Letting go"*, rather than *"losing data"*.
+
+### What we expect design practice and research to take
+
+- **A memory audit** for conversational AI: asking what a record prevents users from
+  saying, and checking provider retention defaults (`store: false`).
+- **The five-word vocabulary** (*absorb, dwell, clear, hold, hand back*) for specifying
+  ephemeral interfaces.
+- **A paired pattern for ephemerality and accessibility** that passes strict WCAG checks.
+- **A counter-case to memory-first AI** that is concrete enough to test and argue with.
+
+### What success looks like, and what would count against it
+
+| Expected outcome | Why we expect it | If it holds | If it does not |
+|---|---|---|---|
+| **More disclosure** | No record removes the future audience | Longer, more specific first-person entries in Blank vs. Keep; *"I wouldn't have written that if it stayed"* | Shorter entries in Blank mode; screenshots; anxiety about losing text |
+| **The wait reads as writing** | Per-character rhythm, punctuation rests, and a cleared sheet | Readers reread their own sentence and call the reveal *"writing"* | *"Too slow"*, *"laggy"*, requests for a skip button |
+| **Handwriting feels embodied** | Raw strokes stay on screen; replies carry marks and drawings | Hand mode is chosen on free-choice days; marks and drawings are noticed | Immediate switch to typing; *"it's just text"* |
+| **One hand creates ritual** | The sheet has one occupant at a time | **Not yet** and hold-to-keep are used and described as calm control | Readers tap the empty sheet trying to interrupt; the gate feels like a bug |
+| **No memory feels lighter** | No profile is built across sessions | Readers contrast it favorably with assistants that keep everything | Readers disengage because *"it doesn't know me anymore"* |
+| **Drawings carry ambiguity** | A sketch (`[[knot]]`, `[[candle]]`) makes no diagnostic claim | Solo drawings and margin marks are remembered longer than prose replies | Drawings are ignored or read as random icons |
+
+### Rival explanations
+
+- **Novelty.** First sessions may produce longer entries simply because the page is new.
+  Running the study over two weeks and including a free-choice day helps separate
+  novelty from preference.
+- **Task demand.** Participants in a study may write more to be helpful. Using
+  unprompted entries and comparing Blank against Keep within the same person reduces
+  this.
+- **Visual halo.** Warm paper colors and handwriting fonts might drive the effect on
+  their own. The baseline condition (`Type + Keep`) uses the exact same paper palette
+  and fonts while removing both the hand input and the blank-page fade.
+- **Designer in the room.** Participants may call the page *"listening"* to please the
+  interviewer. Neutral prompts and two independent coders help.
+
+### If the result is negative — and what would surprise us
+
+A negative result would not make the artifact useless. If Blank mode produces *less*
+disclosure because total disappearance feels unsafe or pointless, the design question
+becomes which part of forgetting caused the friction. The answer would not be to log
+full transcripts by default, but to design a selective ritual — such as the roadmap's
+*end-of-session ritual: keep one sentence you choose, burn the rest*.
+
+What would surprise us:
+- No one asks for memory across two weeks.
+- People write *less* in `Hand + Blank` because the sheet feels too intimate.
+- A solo drawing (`[[candle]]`) is remembered days later when the words are not.
+- Handwriting is dropped as too effortful, while the slow blank-page tempo is kept.
+
+Surprise is not failure; each of those outcomes sharpens the argument.
+
+---
+
+## 6. A study that could test it
+
+The app already contains the conditions a study needs: `Hand / Type` and `Blank / Keep`
+are live toggles. A small within-subject study would test the core claim without
+pretending to be a clinical trial.
+
+### Design
+
+Twelve adult participants, balanced across Korean and English speakers. Over two weeks:
+eight condition days (four conditions, two consecutive days each, Latin-square order),
+one free-choice day where all toggles are unlocked, and one exit interview.
+
+| Condition | Input | Page | What it isolates |
+|---|---|---|---|
+| **A** | Hand | Blank | The intended experience (hand + forgetting) |
+| **B** | Type | Blank | Forgetting, without the hand |
+| **C** | Hand | Keep | The hand, without forgetting |
+| **D** | Type | Keep | The baseline (same paper theme, typed and kept) |
+
+One entry per evening, about anything, with no writing prompts. Skipping a day is data,
+not a failure.
+
+### Measures and core hypotheses
+
+| What is measured | How | Hypothesis |
 |---|---|---|
-| *"It generated a response"* | ***"It wrote back / It listened"*** | Per-grapheme rhythm, punctuation rests, and echoing a single fragment cue attentive reception rather than bulk token synthesis. |
-| *"It was loading / lagging"* | ***"It was taking its turn"*** | The one-hand sheet gate and `650ms` beat frame the pause as turn-taking etiquette on shared paper rather than server latency. |
-| *"A chatbot with a cursive font"* | ***"A sheet of paper with another hand"*** | Absence of chat bubbles, avatars, and timestamps—combined with stroke-drawn underlines, circles, and 60 glyphs—sustains the material metaphor. |
-| *"I lost my data"* | ***"It let me put the thought down"*** | When non-persistence is disclosed upfront as the premise, vanishing is experienced as *unburdening* (Sas & Whittaker, 2013) rather than data loss. |
+| **Disclosure** | Device-computed character count, first-person rate, and a 1–7 comfort item after each turn | **Blank vs. Keep:** Blank mode (`A, B`) produces longer, more candid entries than Keep (`C, D`) without lowering comfort. |
+| **Tempo & ritual** | Forced choice (*"written"* vs. *"loaded"*), perceived duration, and counts of **Not yet** / hold-to-keep | **Tempo:** Most participants read the wait as *writing* rather than *loading*, and use hold-to-keep as agency over time. |
+| **Embodiment & absence** | Mode chosen on the free-choice day; exit interview coded by two raters (Braun & Clarke, 2006) | **Modality & memory:** Hand mode stays chosen by at least half the sample on the free day, and no-memory is framed as relief more often than loss. |
 
-### 5.3 Disciplinary and Practice Outcomes (What Travels to HCI & Industry)
+Because Korean drops pronouns more often than English and packs syllables differently,
+all counts are compared **within participants** across conditions (`A–D`), never pooled
+raw across languages.
 
-Beyond individual user sessions, Inkling is designed to leave behind four durable
-artifacts for the research and design community:
-1. **A Concrete Counter-Case to Memory-First AI:** A citeable, runnable system proving
-   that conversational AI can create value through *subtraction and release* rather than
-   *accumulation and profiling*.
-2. **The Five-Part Forgetting Vocabulary:** (`absorb`, `dwell`, `clear`, `hold`, `hand
-   back`) as a shared lexicon for specifying and critiquing transient interfaces.
-3. **An Accessible Ephemerality Reference Implementation:** Open-source production code
-   demonstrating how CSS-composited decay, `aria-live` persistence, visibility-aware
-   clocks, and `prefers-reduced-motion` can coexist with zero WCAG violations.
-4. **A Privacy-Preserving Evaluation Method:** A blueprint for studying intimate writing
-   interfaces using client-side structural counts and autoethnography without ever
-   logging or transmitting user transcripts to a research server.
+### Data and ethics
 
-### 5.4 Diagnostic Matrix: Success vs. Failure Signals
-
-A rigorous provocation states upfront what would validate its argument and what would
-falsify it:
-
-| Dimension | Expected Outcome (Success Signal) | Falsification / Failure Mode | What Failure Would Mean |
-|---|---|---|---|
-| **Self-Disclosure (`RQ1`)** | Longer, more specific first-person entries in `Blank` vs. `Keep`; interview reports of *"I wouldn't have written that if it stayed."* | Shorter, guarded entries in `Blank`; frequent attempts to screenshot or copy-paste before fade; anxiety about losing text. | Structural forgetting feels unsafe or futile without at least a selective preservation ritual. |
-| **Embodiment (`RQ2`)** | Handwriting remains chosen on the free-choice day; participants explicitly mention stroke pressure, circles, or specific drawings (`[[rain]]`). | Immediate permanent switch to typing after Day 1; marks and glyphs go unnoticed or are dismissed as visual clutter. | The friction of digital handwriting outweighs its somatic value on consumer screens. |
-| **Temporal Reading (`RQ3`)** | `≥60%` categorize the reveal as *"writing"* rather than *"loading"*; perceived wait time aligns with or feels shorter than clock time. | Complaints of *"too slow"* or *"laggy"*; requests for a skip button or instant text appearance. | The per-character rhythm failed to earn its duration; slowness collapsed into mere latency. |
-| **Turn Ritual (`RQ4`)** | `Not yet` and `hold-to-keep` are used purposefully and described as calming control over the page's tempo. | Users repeatedly tap the screen trying to force the composer open while Riddle is writing; the gate reads as a broken UI lock. | Single-occupant turn-taking violates chat conventions too harshly without clearer spatial cues. |
-| **Absence of Memory (`RQ5`)** | Participants contrast the page favorably with memory-heavy assistants; returning to a blank sheet feels clean and unjudged. | Participants stop engaging because *"it doesn't know me anymore"*; strong demand for cross-session history. | Continuity is necessary for multi-week reflective engagement, requiring *memory without transcripts* (see `CLAUDE.md`). |
-| **Epistemic Stance** | Designers and readers debate the hidden costs of AI memory and retention defaults. | The artifact is received merely as a nostalgic *Harry Potter* fan skin over a standard LLM wrapper. | The aesthetic reference overpowered the critical design argument. |
-
-### 5.5 Rival Explanations, Negative Results, and Productive Surprises
-
-- **Rival Explanations to Control For:**
-  1. *Novelty Effect:* Initial entries in `Blank` or `Hand` mode may be longer simply
-     because the interface is unfamiliar. Counterbalancing across a two-week window and
-     isolating Day 9 (free-choice day) separates novelty from sustained preference.
-  2. *Demand Characteristics:* Participants who know the study concerns "disappearing
-     diaries" may perform candor. Using unprompted daily entries and within-subject
-     comparisons (`Blank` vs. `Keep`) mitigates this.
-  3. *Aesthetic Halo:* Positive descriptions ("it listens") may stem from the warm paper
-     palette and typography rather than the constraints. Condition `D` (`Type + Keep`)
-     uses the exact same paper palette and handwriting fonts while removing both the
-     hand input and the blank-page fade, isolating the constraints from the visual
-     theme.
-- **If the Empirical Result Is Negative:**
-  In Research through Design, a negative behavioral finding does not invalidate the
-  provocation; it refines the design space (Gaver, 2012). If `Blank` mode produces
-  *less* disclosure because total disappearance feels nihilistic ("why write if nothing
-  remains?"), the implication is not to revert to full transcript logging. Instead, it
-  points toward **selective ritual preservation**—such as the roadmap's *end-of-session
-  ritual: keep one sentence you choose, burn the rest*.
-- **Productive Surprises We Watch For:**
-  - *Intimacy Avoidance:* Writers write *less* in `Hand + Blank` because the sheet feels
-    *too* exposed and immediate, revealing an inverse comfort curve.
-  - *Solo-Glyph Resonance:* Turns where Riddle replies with a single drawing and zero
-    words (`[[candle]]`, `[[sprout]]`) are remembered longer by participants than verbal
-    replies—confirming Gaver's ambiguity thesis in generative AI.
+**A study of a page that forgets must not become the archive the page refuses to be.**
+No conversation content ever leaves the device. A study build computes character counts
+and timing locally and lets the participant export a number-only CSV; neither the
+server nor the researcher ever sees what was written. Participants are told upfront
+that Riddle is a program (`store: false`) and that the researcher is the designer.
+Crisis resources stay reachable in the header throughout.
 
 ---
 
-## 6. Empirical Protocol: A Within-Subject Study Design
+## 7. What the build already shows
 
-The deployed application already contains the experimental apparatus required to test
-`RQ1–RQ5`: input modality (`Hand` vs. `Type`) and persistence mode (`Blank` vs. `Keep`)
-are live state toggles governed by deterministic timing functions.
+The build works as designed: 207 unit tests across eight test files pin the timing
+math, script normalization, reading dwell, parser stability, turn gate, and glyph
+vocabulary. Five lessons from making the artifact are design knowledge in their own
+right:
 
-### 6.1 Experimental Design (2×2 Within-Subject Field Study)
+- **Resemblance is not an invariant.** All sixty drawings passed geometry tests for
+  bounding boxes and valid path syntax. Yet when rendered onto a
+  [contact sheet](media/glyphs.png), five of the first thirty were the wrong picture: a
+  cloud that read as mountains, a crescent that read as a lens, a teardrop that read as
+  a gem, a bridge that read as a hammock, and wind that was scribble. Formal tests check
+  structure; only looking checks meaning.
+- **A gate must read the state, not the picture.** The one-hand gate first read a React
+  render snapshot. On the second turn it described the page as it was before the entry
+  landed, decided the sheet was empty, and let the reply start early on top of sinking
+  ink.
+- **Disappearing interfaces need strict internal ordering.** A vision `READ:`
+  transcription of handwriting could arrive over the network after the visual turn had
+  already faded from the DOM. The fix was to track turns by immutable id in the store
+  rather than by what was still on screen.
+- **The first mark carries the metaphor.** An early build had a glowing nib dot in front
+  of each revealing letter. At body size it read as a blinking text cursor, turning the
+  sheet back into a text field. Removing it made the reveal feel like ink.
+- **A privacy promise includes provider defaults.** The OpenAI Responses API stores
+  responses for 30 days by default unless the request passes `store: false`. A promise
+  that the page keeps nothing has to include the parts of the stack the reader cannot
+  see.
 
-Twelve adult participants (balanced across Korean and English primary language, and
-across frequent vs. rare stylus/handwriting users) use Inkling once per evening for **10
-days across a two-week period**:
-- **Days 1–8 (Condition Block):** Four conditions × 2 consecutive days each, assigned in
-  a balanced **4×4 Latin Square** order to control for order and fatigue effects (~96
-  condition entries total).
-- **Day 9 (Free-Choice Behavioral Probe):** Participants open the diary with all toggles
-  unlocked and choose whichever combination of `Hand/Type` and `Blank/Keep` they prefer.
-- **Day 10 (Semi-Structured Exit Interview):** 45-minute retrospective interview
-  exploring interpretation, remembered turns, and attitude toward absence.
+### Three notes from the designer's log
 
-| Condition | Input Mode | Page Mode | What the Condition Isolates |
-|---|---|---|---|
-| **Condition A** | `Hand` (Stylus/Finger) | `Blank` (One-hand + Fade) | **The full provocation** (embodied input + structural forgetting) |
-| **Condition B** | `Type` (Keyboard) | `Blank` (One-hand + Fade) | **Structural forgetting** without somatic handwriting effort |
-| **Condition C** | `Hand` (Stylus/Finger) | `Keep` (Accumulating sheet) | **Embodied handwriting** without structural disappearance |
-| **Condition D** | `Type` (Keyboard) | `Keep` (Accumulating sheet) | **Conventional baseline** (typed chat on the same visual paper theme) |
-
-### 6.2 Constructs, Operational Measures, and Hypotheses
-
-No writing prompts are given; participants write whatever they wish at the end of the
-day, and skipping a day is recorded as natural non-use rather than protocol failure.
-
-| Construct | Operational Metrics | Data Source | Operationalized Hypothesis |
-|---|---|---|---|
-| **Self-Disclosure (`H1`)** | • Character/grapheme count per entry<br/>• First-person marker density (within-participant normalized)<br/>• Post-entry self-report: *candor* & *psychological safety* (1–7 Likert) | Local client counter + 3-item post-turn card | **`H1`:** `Blank` conditions (`A, B`) yield `+20%` median entry length and higher self-reported candor than `Keep` (`C, D`), with no drop in comfort. |
-| **Temporal Reading (`H2`)** | • Ratio of perceived duration to actual clock duration<br/>• Forced-choice item: *"felt like someone writing"* vs. *"felt like a system loading"* | Post-turn card + Exit interview | **`H2`:** In `Condition A`, `≥60%` select *"someone writing"* over *"system loading"*, and fewer than `20%` request a skip control. |
-| **Embodiment (`H3`)** | • Proportion choosing `Hand` on Day 9 (Free-Choice)<br/>• Unprompted recall of Riddle's marks (`((circle))`) and drawings (`[[glyph]]`) | Day 9 mode log + Exit interview | **`H3`:** `≥50%` choose `Hand` on the free-choice day despite higher physical effort, and explicitly connect stroke/glyphs to felt presence. |
-| **Turn Ritual (`H4`)** | • Frequency of **Not yet** taps and `hold-to-keep` pauses<br/>• Latency between composer return (`hand back`) and next stroke | Local client counter + Exit interview | **`H4`:** `Not yet` or `hold-to-keep` is used at least once per participant in `Blank` mode and described as *agency*, not *bug fixing*. |
-| **Memory Absence (`H5`)** | • Thematic coding of attitudes toward zero cross-session recall<br/>• Rate of requests for transcript export or history | Exit interview (Braun & Clarke, 2006; two independent coders) | **`H5`:** Participants frame the absence of an archive as *relief* or *permission to be messy* more frequently than *frustration*. |
-
-> [!TIP]
-> **Cross-Linguistic Normalization:** Because Korean drops first-person pronouns
-> (*pro-drop*) more frequently than English and packs multiple jamo into a single
-> syllabic block, all quantitative comparisons (`H1`, `H4`) are analyzed **within
-> participants** across conditions (`A–D`) using paired non-parametric effect sizes
-> rather than pooling raw character counts across languages.
-
-### 6.3 Zero-Archive Research Ethics
-
-**A study of a diary that forgets must not become the surveillance archive the diary
-refuses to be.**
-- In the study build, all quantitative counters (character length, turn duration,
-  `hold-to-keep` count, condition tag) are computed strictly on-device and exported by
-  the participant as a numeric CSV containing **zero text or image content**.
-- Neither the researcher nor the server ever receives what the participant wrote.
-- Informed consent explicitly discloses that Riddle is an LLM-driven program (`store:
-  false`), that the researcher is the artifact's designer, and that crisis resources
-  (`109` / `1577-0199` in Korea; `988` in US/CA; `116 123` in UK) remain one click away
-  in the header at all times.
+- Without the `650ms` listening beat, the reply started the instant the sheet cleared
+  and felt like a UI state swap. Adding the pause made it feel as if someone had
+  finished reading and picked up a pen.
+- In `Keep` mode, the eye scans upward to check earlier turns, which invites editing
+  yourself for consistency. In `Blank` mode, there is nothing above the line you are
+  writing, and watching the sentence sink produces a physical sense of letting it go.
+- The quietest turns were the ones where Riddle answered with a single drawing on its
+  own line (`[[candle]]`, `[[knot]]`) and no words at all. A drawing makes no claim you
+  have to agree or disagree with.
 
 ---
 
-## 7. Evidence from the Build: RtD Reflections
+## 8. Limitations
 
-While the formal 12-participant study (§6) remains future work, the **Research through
-Design process itself** generated concrete technical and phenomenological findings. Some
-claims are verified *by construction* (pinned by 207 automated tests across 8 test
-suites); others emerged only through building and inhabiting the artifact.
-
-### 7.1 Epistemic Status of Current Claims
-
-| Claim | Epistemic Status | Verification Basis in the Repository |
-|---|---|---|
-| **The server retains zero conversation state** | **True by construction** | Stateless `/api/converse` route; error handler logs error class only; `store: false` verified in payload. |
-| **Korean and English replies write at equal perceptual tempo** | **True by construction** | `src/lib/ink/segment.test.ts` (19 tests) pins script-weighted normalization and proportional punctuation rests. |
-| **Reading dwell scales with script density and clamps safely** | **True by construction** | `src/lib/ink/dwell.test.ts` (10 tests) pins the `4.5s` floor, `20.0s` ceiling, `1.2s` tail, and pace multipliers. |
-| **The sheet never opens early on multi-turn exchanges** | **True by construction** | `src/store/session.test.ts` (12 tests) pins `whenPaperClears()` to the live store rather than stale render snapshots. |
-| **All 60 drawings are screen-reader accessible and prompt-aligned** | **True by construction** | `src/lib/ink/glyph.test.ts` (126 tests) enforces geometry bounds, `ko`/`en` labels, and prompt token parity. |
-| **Visual decay maintains 60fps and zero WCAG AA violations** | **Measured on build** | `16.7ms` median frame time (`p95 = 16.8ms`) under 3,504 spans / 6,066 DOM nodes; `0` axe-core violations across 11 states. |
-| **The 650ms beat shifts perception from "text field" to "listener"** | **Autoethnographic** | Documented in the designer's iterative build log (§7.3); awaits formal participant triangulation (§6). |
-| **Guarantee of disappearance increases self-disclosure (`RQ1`)** | **Untested hypothesis** | Falsifiable via the 2×2 within-subject protocol in §6. |
-
-### 7.2 Five Design Lessons from Making the Provocation
-
-In RtD, the resistance of materials during implementation often exposes theoretical
-blind spots (Gaver, 2012; Zimmerman et al., 2007). Five specific failures during
-development reshaped Inkling's design theory:
-
-1. **Formal Invariants Are Not Visual Resemblance (The Contact Sheet Lesson):**
-   All sixty hand-drawn glyphs in [`src/lib/ink/glyph.ts`](../src/lib/ink/glyph.ts)
-   passed automated unit tests verifying bounding boxes (`24×24`), valid SVG path syntax,
-   and stroke counts. Yet when rendered onto a single contact sheet
-   ([`docs/media/glyphs.png`](media/glyphs.png)), five of the first thirty drawings were
-   semantically wrong: `cloud` read as a jagged mountain range, `moon` read as an optical
-   lens, `drop` read as a cut gemstone, `bridge` read as a sagging hammock, and `wind`
-   looked like random scribble. **Implication:** *Generative or procedural expressiveness
-   cannot be verified by structural invariants alone; somatic artifacts require visual
-   critique.*
-2. **Disappearing Interfaces Require Strict Internal Memory of Order:**
-   In an early build, the multimodal `READ:` transcription of a user's handwritten
-   canvas could arrive over the network *after* the user's ink had already absorbed and
-   unmounted from the DOM. Because the visual turn was gone, the transcription had
-   nowhere to attach and dropped out of the session context. Fixing this required
-   tracking turns by immutable ID in the store (`src/lib/ai/reading.test.ts`) decoupled
-   from visual presence. **Implication:** *Ephemerality at the interface layer demands
-   stricter, not looser, state accounting underneath.*
-3. **A Gate Must Read the State, Never the Picture:**
-   The "one hand at a time" rule requires holding Riddle's reply until the sheet is
-   empty. Initially, the gate checked a React render snapshot. On the second turn of a
-   session, the snapshot reported the sheet as it existed *before* the user's new entry
-   landed ("empty"), causing Riddle to start writing immediately on top of the user's
-   sinking ink. **Implication:** *When choreography carries the ethical metaphor of
-   turn-taking, a 100ms race condition breaks not just layout, but the relational
-   premise.*
-4. **The Smallest Leading Mark Decides the Metaphor:**
-   Following `docs/PLAN.md`, the reveal originally featured a 4px glowing nib dot
-   traveling ahead of each revealing character. In practice, at reading scale, that
-   leading dot looked unmistakably like a blinking text-editor caret—instantly
-   collapsing the illusion of a hand back into a terminal window. Deleting the nib so
-   that *nothing precedes the ink* made the writing feel handwritten. **Implication:**
-   *In counterfunctional design, a single familiar UI cue (a cursor) can override an
-   entire page of material craft.*
-5. **A Privacy Promise Can Be Broken by a Provider Default:**
-   Designing a stateless server with zero database and zero logs was not enough. During
-   review of the OpenAI Responses API specification, we found that the provider retains
-   application state for 30 days by default unless `store: false` is explicitly passed
-   in the request payload. **Implication:** *In LLM-based systems, interaction designers
-   cannot stop at the application boundary; third-party API defaults are active ideological
-   components of the user experience.*
-
-### 7.3 Autoethnographic Observations from the Designer's Log
-
-Across weeks of daily dogfooding during v1.0–v1.3 development, three phenomenological
-observations recurred:
-- **The Necessity of the 650ms Listening Beat:** When Riddle's first stroke began at
-  `0ms` after the user's ink cleared, the reply felt mechanical—like a transactional UI
-  state swap. Inserting a `650ms` stillness with a subtle breathing ink drop created the
-  unmistakable sensation of *someone finishing reading and lowering their pen to the
-  paper*.
-- **Blank vs. Keep Changes the Eye's Resting Place:** In `Keep` mode, the eye naturally
-  scans upward to compare the current sentence with three turns ago, inducing editorial
-  self-monitoring. In `Blank` mode, because there is nothing above the current line,
-  attention stays locked on the immediate sentence—and once handed over, watching the
-  sentence sink produces a distinct physical exhale.
-- **When a Drawing Alone Answers:** The most arresting moments in daily use occurred
-  when Riddle exercised the prompt permission to reply with a solo glyph on its own line
-  (rendered at `2.9em` scale) or a single sentence ending in `[[knot]]` or `[[rain]]`.
-  Because a drawing makes no propositional claim, it cannot be argued with or felt
-  judged by.
+1. **No formal user study yet.** The disclosure and ritual hypotheses are grounded in
+   prior literature and single-designer autoethnography; the §6 study has not been run.
+2. **The reply is typographic, not synthesized strokes.** Marks and the sixty drawings
+   are true SVG paths, but the letters are handwriting fonts revealed per grapheme via
+   `clip-path` (stroke data does not exist for 11,172 Hangul syllables; see
+   [INK.md](INK.md)).
+3. **Handwriting readings are model-generated.** `gpt-5.4-mini` reads the canvas image
+   without human verification; subtle misreadings in the hidden `READ:` line can go
+   unnoticed.
+4. **Script and language coverage.** Korean and English only; four hands; sixty
+   drawings. The private diary form itself is culturally specific.
+5. **Pressure depends on hardware.** Pen input reports real pressure; finger and mouse
+   infer it from velocity.
+6. **Disappearance is not a security guarantee.** The app keeps no record, but it
+   cannot stop a screenshot, a camera, or a browser extension.
+7. **Provider abuse-monitoring retention is separate.** `store: false` disables
+   application-state retention, not OpenAI's up-to-30-day abuse-monitoring logs (unless
+   covered by enterprise Zero Data Retention).
+8. **Prompt restraint is not a hard grammar.** Riddle's rules (no advice, brief replies,
+   at most one question) live in the system prompt and can be pushed out of character by
+   an insistent user.
+9. **Accessibility is verified by tooling, not user testing.** The app passes `axe-core`
+   WCAG AA checks across 11 states and provides `aria-live`, hold-to-keep, and reduced
+   motion, but has not been tested with disabled participants.
 
 ---
 
-## 8. Limitations & Ethical Guardrails
+## 9. What would make it a betrayal
 
-### 8.1 Methodological and Technical Limitations
+The artifact is defined as much by what it refuses as by what it does. These are the
+lines that would turn it into a different, more familiar product:
 
-1. **No Formal Participant Data Yet:** All empirical claims regarding disclosure (`RQ1`)
-   and ritual (`RQ4`) are currently hypotheses grounded in literature and single-designer
-   autoethnography; the §6 protocol has not yet been executed.
-2. **Typographic Reveal vs. True Stroke Synthesis:** While user input, inline marks
-   (`underline`, `circle`, `highlight`), and the 60 glyphs are true vector paths,
-   Riddle's letterforms are handwriting fonts revealed via per-grapheme `clip-path`
-   (necessary because stroke-order topology does not exist for 11,172 Hangul syllables;
-   see [INK.md](INK.md)). The embodiment of the reply lies in its timing and marks, not
-   in per-letter stroke synthesis.
-3. **Unverified Vision Transcription:** Handwritten entries are read by `gpt-5.4-mini`
-   vision without human-in-the-loop OCR confirmation. While the prompt instructs Riddle
-   to admit when handwriting is illegible, subtle misreadings can still occur silently in
-   the `READ:` stream.
-4. **Hardware Pressure Asymmetry:** Stylus hardware (`pointerType === "pen"`) reports
-   true physical pressure; finger and mouse input must infer stroke tapering from
-   pointer velocity.
-5. **Client-Side Capture Cannot Be Prevented:** Inkling guarantees that *the system*
-   keeps no record; it cannot prevent a user from taking a screenshot, photographing the
-   screen, or running a malicious browser extension. Disappearance is an interaction
-   contract, not DRM.
-6. **Provider Abuse-Monitoring Window:** Passing `store: false` disables OpenAI's
-   application-state retention and model training, but without an enterprise Zero Data
-   Retention (ZDR) agreement, OpenAI may retain raw API inputs/outputs for up to 30 days
-   solely for automated abuse monitoring. This distinction is disclosed transparently in
-   `/about`, `README.md`, and here.
-7. **Prompt Fragility:** Riddle's restraint (no advice, ≤3 sentences, ≤1 question) is
-   enforced via system instructions (`src/lib/ai/prompt.ts`), not deterministic grammar
-   constraints. An adversarial user can still coax the model out of character.
-8. **Unvalidated Accessibility with Disabled Participants:** While the build passes
-   automated WCAG AA (`axe-core`) checks across 11 states and implements `aria-live`,
-   `hold-to-keep`, and `prefers-reduced-motion`, it has not yet been evaluated in lab
-   sessions with screen-reader users or users with motor impairments.
-9. **Cultural Specificity of the Diary Form:** The artifact supports Korean and English
-   only, and its central metaphor—a private daily notebook—carries culturally specific
-   norms around privacy and solitary reflection.
+- Cross-session memory that stores transcripts and calls it care.
+- Streaks, reminders, or notifications that turn reflection into a habit loop.
+- Advice, diagnosis, or a coaching persona.
+- An avatar or a voice that invites attachment while hiding the program.
+- A history panel, export, or search.
+- A skip button that turns the writing back into a loading state.
+- Analytics on what people write.
 
-### 8.2 Guardrails: What Would Make This Artifact a Betrayal
-
-Because a provocation is defined by its refusals, adding certain "useful" features would
-instantly destroy its research contribution and turn it back into the extractive object
-from the film. The following are non-negotiable anti-features:
-- **Never store transcripts and call it care.** (If cross-session continuity is ever
-  explored in a separate branch, it must store only a user-editable, one-line summary
-  written *about* an exchange, never the words of the exchange itself; see `CLAUDE.md`).
-- **Never add streaks, daily push notifications, or retention loops.** Reflection that
-  is gamified ceases to be reflection.
-- **Never add a therapeutic, coaching, or diagnostic persona.**
-- **Never add an avatar, typing bubble, or voice synthesis.**
-- **Never add a "Skip" button that reduces handwriting to a loading bar.**
-- **Never log, analyze, or telemeter what people write.**
+The absence is the feature. A diary that remembers everything is a different object,
+and the film already showed us what that object does.
 
 ---
 
-## 9. References (ACM Style)
+## 10. References (ACM style)
 
 1. Liam J. Bannon. 2006. Forgetting as a Feature, Not a Bug: The Duality of Memory and Implications for Ubiquitous Computing. *CoDesign* 2, 1 (2006), 3–15. https://doi.org/10.1080/15710880600608230
 2. Jeffrey Bardzell and Shaowen Bardzell. 2013. What is "critical" about critical design? In *Proceedings of the SIGCHI Conference on Human Factors in Computing Systems* (CHI '13). ACM, New York, NY, USA, 3297–3306. https://doi.org/10.1145/2470654.2466451
@@ -794,4 +548,4 @@ from the film. The following are non-negotiable anti-features:
 
 ---
 
-[← Back to the README](../README.md) · [Technical Notes (INK.md)](INK.md) · [Drawing Vocabulary (GLYPHS.md)](GLYPHS.md)
+[← Back to the README](../README.md) · [Technical notes (INK.md)](INK.md) · [Drawing vocabulary (GLYPHS.md)](GLYPHS.md)
