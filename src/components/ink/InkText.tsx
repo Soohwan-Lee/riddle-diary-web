@@ -7,7 +7,7 @@ import {
   toGraphemeRange,
   type InkGlyphRef,
 } from "@/lib/ink/inkscript";
-import { hashSeed, noiseAt } from "@/lib/ink/random";
+import { driftAt, hashSeed, noiseAt } from "@/lib/ink/random";
 import { layoutText, wordEnd } from "@/lib/ink/segment";
 import { strokeShape } from "@/lib/ink/stroke-order";
 import { InkGlyph } from "./InkGlyph";
@@ -166,10 +166,15 @@ export function InkText({
                 >
                   {visibleChars.map((index) => {
                     const grapheme = layout.graphemes[index];
-                    // A little baseline noise, frozen per character so the
-                    // line never twitches on a re-render.
-                    const lift = noiseAt(seed, index * 3) * 0.45;
-                    const tilt = noiseAt(seed, index * 3 + 1) * 0.4;
+                    // The line wanders a little over a few words and each
+                    // letter sits slightly off it. Frozen per character, so
+                    // the line never twitches on a re-render.
+                    const lift =
+                      driftAt(seed, index) * 0.035 +
+                      noiseAt(seed, index * 3) * 0.012;
+                    const tilt =
+                      driftAt(seed + 1, index, 11) * 0.8 +
+                      noiseAt(seed, index * 3 + 1) * 0.9;
 
                     const drawing = drawings.get(index);
                     if (drawing) {
@@ -180,7 +185,7 @@ export function InkText({
                           // Marks measure by this, so a drawing can be
                           // circled like anything else on the line.
                           data-i={index}
-                          style={{ transform: `translateY(${lift.toFixed(2)}px)` }}
+                          style={{ transform: `translateY(${lift.toFixed(3)}em)` }}
                         >
                           <InkGlyph
                             id={`${id}:${drawing.id}`}
@@ -202,7 +207,7 @@ export function InkText({
                         style={
                           {
                             "--ink-d": `${Math.round(grapheme.strokeMs)}ms`,
-                            transform: `translateY(${lift.toFixed(2)}px) rotate(${tilt.toFixed(2)}deg)`,
+                            transform: `translateY(${lift.toFixed(3)}em) rotate(${tilt.toFixed(2)}deg)`,
                           } as React.CSSProperties
                         }
                       >

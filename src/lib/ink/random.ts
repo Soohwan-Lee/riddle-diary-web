@@ -33,3 +33,18 @@ export function noiseAt(seed: number, index: number): number {
   t ^= t >>> 15;
   return ((t >>> 0) / 4294967296) * 2 - 1;
 }
+
+/**
+ * Smooth noise in [-1, 1]: a fresh value every `span` positions, eased
+ * between. A hand does not jump off the line letter by letter — it wanders
+ * away over a few words and comes back. Per-letter noise alone reads as type
+ * that has been shaken.
+ */
+export function driftAt(seed: number, index: number, span = 7): number {
+  const knot = Math.floor(index / span);
+  const t = (index - knot * span) / span;
+  const eased = t * t * (3 - 2 * t);
+  const a = noiseAt(seed ^ 0x5bd1e995, knot);
+  const b = noiseAt(seed ^ 0x5bd1e995, knot + 1);
+  return a + (b - a) * eased;
+}
