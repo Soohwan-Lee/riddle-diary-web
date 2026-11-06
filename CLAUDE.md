@@ -40,6 +40,7 @@ src/lib/ink/      the ink engine (timing, segmentation, mark and glyph geometry)
 src/lib/ai/       prompt, InkScript parser, OpenAI client
 src/lib/i18n/     ko/en dictionaries + provider
 src/store/        zustand stores (ink nodes, session, settings)
+scripts/          ink-keyframes.mjs prints the Hangul clip-path keyframes in ink.css
 ```
 
 ## How the page turns
