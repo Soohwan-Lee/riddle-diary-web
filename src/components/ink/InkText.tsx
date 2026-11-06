@@ -9,6 +9,7 @@ import {
 } from "@/lib/ink/inkscript";
 import { hashSeed, noiseAt } from "@/lib/ink/random";
 import { layoutText, wordEnd } from "@/lib/ink/segment";
+import { strokeShape } from "@/lib/ink/stroke-order";
 import { InkGlyph } from "./InkGlyph";
 import { MarkLayer, type ResolvedMark } from "./MarkLayer";
 import { useInkReveal } from "./useInkReveal";
@@ -195,6 +196,9 @@ export function InkText({
                         key={index}
                         className="ink-char"
                         data-i={index}
+                        // Where the pen goes first: a Hangul syllable is
+                        // uncovered in the order its parts are written.
+                        data-shape={strokeShape(grapheme.char)}
                         style={
                           {
                             "--ink-d": `${Math.round(grapheme.strokeMs)}ms`,
