@@ -197,7 +197,7 @@ export function InkText({
                         data-i={index}
                         style={
                           {
-                            "--ink-d": `${Math.round(grapheme.durationMs)}ms`,
+                            "--ink-d": `${Math.round(grapheme.strokeMs)}ms`,
                             transform: `translateY(${lift.toFixed(2)}px) rotate(${tilt.toFixed(2)}deg)`,
                           } as React.CSSProperties
                         }

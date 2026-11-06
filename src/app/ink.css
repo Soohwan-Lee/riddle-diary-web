@@ -176,17 +176,23 @@
   /* Percentages, not em: mixing units inside an interpolated clip-path is
      asking for trouble, and each box is about one character wide anyway. */
   clip-path: inset(-45% -15% -35% -15%);
+  /* `--ink-d` runs past the character's slot in the clock, so the next one
+     starts before this one is done and a word is written in one movement. */
   animation:
-    ink-write var(--ink-d, 90ms) var(--ease-ink) both,
+    ink-write var(--ink-d, 90ms) var(--ease-pen) both,
     ink-dry 1200ms linear both;
 }
 
+/*
+ * Latin, digits, punctuation: the pen travels left to right, and the edge it
+ * leaves leans with the hand rather than standing up like a curtain.
+ */
 @keyframes ink-write {
   from {
-    clip-path: inset(-45% 100% -35% -15%);
+    clip-path: polygon(-15% -45%, -6% -45%, -28% 135%, -15% 135%);
   }
   to {
-    clip-path: inset(-45% -15% -35% -15%);
+    clip-path: polygon(-15% -45%, 137% -45%, 115% 135%, -15% 135%);
   }
 }
 

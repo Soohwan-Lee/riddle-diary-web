@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { PAUSE_REFERENCE_CPM } from "@/lib/prefs/config";
 import { GLYPH_PLACEHOLDER } from "./inkscript";
-import { layoutText, pauseAfter, strokeWeight } from "./segment";
+import {
+  layoutText,
+  pauseAfter,
+  STROKE_OVERLAP,
+  strokeWeight,
+  wordPositionWeight,
+} from "./segment";
 
 const options = { cpm: 72, locale: "ko-KR", seed: 12345 };
 
@@ -159,5 +165,63 @@ describe("layoutText", () => {
   it("keeps combining emoji as one grapheme", () => {
     const layout = layoutText("👩‍👩‍👧", { ...options, locale: "en-US" });
     expect(layout.graphemes).toHaveLength(1);
+  });
+});
+
+describe("wordPositionWeight", () => {
+  it("slows the pen coming down and lets it flick off the end", () => {
+    expect(wordPositionWeight(0, 5)).toBeGreaterThan(wordPositionWeight(2, 5));
+    expect(wordPositionWeight(4, 5)).toBeLessThan(wordPositionWeight(2, 5));
+  });
+
+  it("leaves a one-letter word alone", () => {
+    expect(wordPositionWeight(0, 1)).toBe(1);
+  });
+});
+
+describe("the movement of a word", () => {
+  const options = { cpm: 600, locale: "en-US", seed: 7 };
+
+  it("spends longer on a word's first letter than on its middle", () => {
+    // Same letter throughout, so only the position can tell them apart; the
+    // jitter is ±18%, the position weight more than that.
+    const firsts: number[] = [];
+    const middles: number[] = [];
+    const layout = layoutText("ooooo ooooo ooooo ooooo ooooo ooooo", options);
+    for (const word of layout.lines[0].words) {
+      firsts.push(layout.graphemes[word.indices[0]].durationMs);
+      middles.push(layout.graphemes[word.indices[2]].durationMs);
+    }
+    const mean = (values: number[]) =>
+      values.reduce((sum, v) => sum + v, 0) / values.length;
+    expect(mean(firsts)).toBeGreaterThan(mean(middles));
+  });
+
+  it("lets a letter's stroke run on into the next one", () => {
+    const layout = layoutText("one two", options);
+    for (const grapheme of layout.graphemes) {
+      if (grapheme.whitespace) continue;
+      expect(grapheme.strokeMs).toBeCloseTo(
+        grapheme.durationMs * STROKE_OVERLAP,
+        5,
+      );
+    }
+    expect(STROKE_OVERLAP).toBeGreaterThan(1);
+  });
+
+  it("does not stretch whitespace or a drawing past its slot", () => {
+    const layout = layoutText(`one ${GLYPH_PLACEHOLDER}\ntwo`, options);
+    for (const grapheme of layout.graphemes) {
+      if (grapheme.whitespace || grapheme.char === GLYPH_PLACEHOLDER) {
+        expect(grapheme.strokeMs).toBe(grapheme.durationMs);
+      }
+    }
+  });
+
+  it("only moves time around inside the reply, never adds to it", () => {
+    const text = "the pen lifts between words";
+    const layout = layoutText(text, options);
+    const written = layout.graphemes.reduce((sum, g) => sum + g.durationMs, 0);
+    expect(written).toBeCloseTo((text.length * 60_000) / options.cpm, 5);
   });
 });

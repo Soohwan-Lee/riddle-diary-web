@@ -14,6 +14,12 @@ export type InkGrapheme = {
   /** Absolute index across the whole text, marks stripped. */
   index: number;
   durationMs: number;
+  /**
+   * How long the character's own reveal runs. Longer than its slot in the
+   * clock: the next letter starts while this one is still being finished, so
+   * a word is one continuous movement and only the pen lifts are still.
+   */
+  strokeMs: number;
   pauseAfterMs: number;
   /** Whitespace is scheduled but drawn as a plain text node. */
   whitespace: boolean;
@@ -53,7 +59,9 @@ const LETTER = /\p{L}/u;
 
 /** Multiplier on the base per-character duration. */
 export function strokeWeight(char: string): number {
-  if (/\s/.test(char)) return 0.34;
+  // A pen lift between words: long enough to see the hand stop, still short
+  // of a punctuation mark, which is a stroke.
+  if (/\s/.test(char)) return 0.6;
   if (HANGUL_SYLLABLE.test(char)) return 1.5;
   if (HANGUL_JAMO.test(char)) return 1.1;
   if (CJK.test(char)) return 1.7;
@@ -78,6 +86,26 @@ export function pauseAfter(char: string): number {
   if (/\s/.test(char)) return 60;
   return 0;
 }
+
+/**
+ * Where a letter sits in its word changes how long it takes. The pen comes
+ * down and finds the line on the first letter, runs through the middle and
+ * flicks off the last. Normalised away in the total like every other weight,
+ * so this only moves time around inside the word.
+ */
+export function wordPositionWeight(position: number, length: number): number {
+  if (length < 2) return 1;
+  if (position === 0) return 1.22;
+  if (position === length - 1) return 0.9;
+  return 1;
+}
+
+/**
+ * How far a letter's reveal runs past its slot in the clock. At 1 every
+ * letter stops dead before the next begins, which reads as letters popping
+ * in one at a time — a typewriter, not a hand.
+ */
+export const STROKE_OVERLAP = 1.45;
 
 function splitGraphemes(text: string, locale: string): string[] {
   if (typeof Intl !== "undefined" && "Segmenter" in Intl) {
@@ -163,6 +191,7 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
             char,
             index,
             durationMs: duration,
+            strokeMs: duration,
             pauseAfterMs: restAfter(char),
             whitespace: true,
           });
@@ -175,12 +204,16 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
 
       const word: InkWord = { key: `w${index}`, order, indices: [], trailing: "" };
       order += 1;
-      for (const char of splitGraphemes(token, locale)) {
+      const chars = splitGraphemes(token, locale);
+      chars.forEach((char, position) => {
         // ±18% so no two neighbouring characters take exactly as long.
         const jitter = 1 + noiseAt(seed, index) * 0.18;
         const duration = isDrawing(char)
           ? glyphMs
-          : baseMs * strokeWeight(char) * jitter;
+          : baseMs *
+            strokeWeight(char) *
+            wordPositionWeight(position, chars.length) *
+            jitter;
         const rest = isDrawing(char)
           ? Math.round(GLYPH_REST_MS * pauseScale)
           : restAfter(char);
@@ -188,13 +221,14 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
           char,
           index,
           durationMs: duration,
+          strokeMs: duration,
           pauseAfterMs: rest,
           whitespace: false,
         });
         word.indices.push(index);
         totalMs += duration + rest;
         index += 1;
-      }
+      });
       words.push(word);
       pendingWord = word;
     }
@@ -205,6 +239,7 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
         char: "\n",
         index,
         durationMs: duration,
+        strokeMs: duration,
         pauseAfterMs: restAfter("\n"),
         whitespace: true,
       });
@@ -236,6 +271,12 @@ export function layoutText(text: string, options: LayoutOptions): InkLayout {
         totalMs += grapheme.durationMs + grapheme.pauseAfterMs;
       }
     }
+  }
+
+  // Drawings pace their own strokes, and whitespace draws nothing.
+  for (const grapheme of graphemes) {
+    const draws = !grapheme.whitespace && !isDrawing(grapheme.char);
+    grapheme.strokeMs = grapheme.durationMs * (draws ? STROKE_OVERLAP : 1);
   }
 
   return { graphemes, lines, totalMs };
