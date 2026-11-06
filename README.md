@@ -4,7 +4,7 @@
 
 # Inkling
 
-**A page that writes back — and lets go.**
+**A Tom Riddle's diary that writes back, then forgets.**
 
 A critical design provocation built from three deliberate constraints:
 **the record disappears**, **the writing is by hand**, and **the reply arrives at a hand's pace**.
